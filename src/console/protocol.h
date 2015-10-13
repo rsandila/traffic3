@@ -5,14 +5,14 @@
 
 class Protocol {
 public:
-    enum ProtocolState {
-        READ_READY = 1,
-        WRITE_READY = 2,
-        OPEN = 3,
-        CLOSED = 4
+    enum class ProtocolState {
+        READ_READY,
+        WRITE_READY,
+        OPEN,
+        CLOSED
     };
     enum class ProtocolType {
-        SERVER = 1,
+        SERVER,
         CLIENT,
         NONE
     };

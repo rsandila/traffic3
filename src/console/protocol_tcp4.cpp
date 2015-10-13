@@ -1,7 +1,7 @@
 #include <sys/socket.h>
 #include <poll.h>
 #include <netinet/in.h>
-#include "protocol_tcp.h"
+#include "protocol_tcp4.h"
 
 ProtocolTCP4::ProtocolTCP4() : host(Host::ALL_INTERFACES), active(false), port(0), type(ProtocolType::NONE),
         socket(-1), state(ProtocolState::CLOSED) {
@@ -21,7 +21,7 @@ ProtocolTCP4::ProtocolTCP4(ProtocolTCP4 && other) : host(other.host), active(oth
     other.state = ProtocolState::CLOSED;
 }
 
-ProtocolTCP4::~ProtocolTCP() {
+ProtocolTCP4::~ProtocolTCP4() {
     std::unique_lock<std::mutex> lck(lock);
     if (state != ProtocolState::CLOSED) {
         shutdown(socket, SHUT_RDWR);
