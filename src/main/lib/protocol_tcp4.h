@@ -23,7 +23,7 @@ protected:
     int socket;
     ProtocolState state;
 private:
-    ProtocolTCP4(int socket, socklen_t len, struct sockaddr_in addr);
+    ProtocolTCP4(int socket, socklen_t len, const struct sockaddr * addr);
     ProtocolTCP4(const ProtocolTCP4 &) = delete;
     ProtocolTCP4 & operator=(const ProtocolTCP4 &) = delete;
     ProtocolTCP4(ProtocolTCP4 && other);

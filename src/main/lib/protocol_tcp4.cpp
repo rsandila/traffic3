@@ -7,7 +7,7 @@ ProtocolTCP4::ProtocolTCP4() : host(Host::ALL_INTERFACES), type(ProtocolType::NO
         socket(-1), state(ProtocolState::CLOSED) {
 }
 
-ProtocolTCP4::ProtocolTCP4(int newSocket, socklen_t len, struct sockaddr_in addr) : host(len, addr),
+ProtocolTCP4::ProtocolTCP4(int newSocket, socklen_t len, const struct sockaddr * addr) : host(len, addr),
         type(ProtocolType::CLIENT), socket(newSocket), state(ProtocolState::OPEN) {
 }
 
@@ -119,7 +119,7 @@ Protocol ProtocolTCP4::waitForNewConnection() {
     struct sockaddr_in addr;
     socklen_t addrlen=sizeof(addr);
     int newSocket=::accept(socket, (sockaddr *)&addr, &addrlen );
-    return std::move(ProtocolTCP4(newSocket, addrlen, addr));
+    return std::move(ProtocolTCP4(newSocket, addrlen, (const sockaddr *)&addr));
 }
 
 void ProtocolTCP4::close() {

@@ -4,6 +4,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <iostream>
+#include <stdexcept>
 #include "host.h"
 
 const unsigned Host::DEFAULT_PORT = 0;
@@ -11,14 +12,27 @@ Host Host::ALL_INTERFACES(std::string("0.0.0.0"), Host::DEFAULT_PORT);
 
 Host::Host(const std::string & name, unsigned _port) : hostName(name), hasAddr(false), port(_port) {
     populateToAddr(hostName, _port);
+    populateToAddr6(name, _port);
 }
 
 Host::Host(const Host & other) : hostName(other.hostName), hasAddr(other.hasAddr), port(other.port) {
     populateToAddr(hostName, port);
+    populateToAddr6(hostName, port);
 }
 
-Host::Host(socklen_t len, struct sockaddr_in otherAddr) : hostName(""), hasAddr(true) {
-    memcpy(&addr, &otherAddr, sizeof(otherAddr));
+Host::Host(socklen_t len, const struct sockaddr * otherAddr, bool isIPV4) : hostName(""),
+        hasAddr(isIPV4), hasAddr6(!isIPV4) {
+    if (isIPV4) {
+        if (len < sizeof(addr)) {
+            throw new std::length_error("addr not big enough");
+        }
+        memcpy(&addr, otherAddr, sizeof(addr));
+    } else {
+        if (len < sizeof(addr6)) {
+            throw new std::length_error("addr not big enough");
+        }
+        memcpy(&addr6, otherAddr, sizeof(addr6));
+    }
 }
 
 const struct sockaddr * Host::getSockAddress() const {
@@ -28,23 +42,52 @@ const struct sockaddr * Host::getSockAddress() const {
     return (const struct sockaddr *)&addr;
 }
 
-int Host::getSockAddressLen() const noexcept {
+const struct sockaddr * Host::getSockAddress6() const {
+    if (!hasAddr6) {
+        return nullptr;
+    }
+    return (const struct sockaddr *)&addr6;
+}
+
+socklen_t Host::getSockAddressLen() const noexcept {
     return sizeof(addr);
 }
 
+socklen_t Host::getSockAddressLen6() const noexcept {
+    return sizeof(addr6);
+}
+
 bool Host::populateToAddr(const std::string & name, unsigned _port) {
+    memset(&addr, 0, sizeof(addr));
     addr.sin_family=AF_INET;
     addr.sin_port=0;
-    if (inet_pton(AF_INET, name.c_str(), &addr.sin_addr) <= 0) {
-        struct hostent * h = gethostbyname2(name.c_str(), AF_INET);
+    if (inet_pton(addr.sin_family, name.c_str(), &addr.sin_addr) <= 0) {
+        struct hostent * h = gethostbyname2(name.c_str(), addr.sin_family);
         if (h) {
             memcpy(&addr.sin_addr, h->h_addr_list[0], sizeof(addr.sin_addr));
         } else {
             return false;
         }
     }
-    addr.sin_port = htonl(_port);
+    addr.sin_port = htons(_port);
     hasAddr = true;
+    return true;
+}
+
+bool Host::populateToAddr6(const std::string & name, unsigned _port) {
+    memset(&addr6, 0, sizeof(addr6));
+    addr6.sin6_family=AF_INET6;
+    addr6.sin6_port=0;
+    if (inet_pton(addr6.sin6_family, name.c_str(), &addr6.sin6_addr) <= 0) {
+        struct hostent * h = gethostbyname2(name.c_str(), addr6.sin6_family);
+        if (h) {
+            memcpy(&addr6.sin6_addr, h->h_addr_list[0], sizeof(addr6.sin6_addr));
+        } else {
+            return false;
+        }
+    }
+    addr6.sin6_port = htons(_port);
+    hasAddr6 = true;
     return true;
 }
 
