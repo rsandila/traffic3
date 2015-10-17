@@ -7,4 +7,8 @@ public:
     virtual bool Stop() {
         return false;
     };
+    virtual void setMinimumSize(unsigned size) noexcept {
+    };
+    virtual void setMaximumSize(unsigned size) noexcept {
+    };
 };

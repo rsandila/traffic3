@@ -3,7 +3,7 @@ obj/
 traffic3.xcodeproj/
 traffic3.xcworkspace/
 bin/
-test/
+/test/
 Makefile
 *.make
 *.xcodeproj
