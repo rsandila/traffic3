@@ -6,7 +6,7 @@ project "traffic3"
 	language "C++"
         targetdir "bin/%{cfg.buildcfg}"
 	buildoptions "-std=c++11 -stdlib=libc++"
-	files { "src/console/**.h", "src/console/**.cpp" }
+	files { "src/main/**.h", "src/main/**.cpp" }
 
 	filter "configurations:Debug"
 		defines { "DEBUG" }
@@ -15,5 +15,6 @@ project "traffic3"
 	filter "configurations:Release"
 		defines { "NDEBUG" }
 		optimize "On"
+
 
 
