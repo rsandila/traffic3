@@ -53,4 +53,22 @@ TEST_CASE("Validate IPV6 host constructors", "[host][ipv6]") {
         uint8_t expectedAddress[] = { 0x20, 0x01, 0x48, 0x60, 0x48, 0x60, 0, 0, 0, 0, 0, 0, 0, 0, 0x88, 0x88 };
         REQUIRE(memcmp(&addr->sin6_addr, expectedAddress, 16) == 0);
     }
+    SECTION("IPV6: Test copy constructor") {
+        Host googleDNS("google-public-dns-a.google.com", 80);
+        Host copy(googleDNS);
+        const struct sockaddr_in6 * addr = (const struct sockaddr_in6 *)copy.getSockAddress6();
+        REQUIRE(addr != nullptr);
+        REQUIRE(copy.getSockAddressLen6() == sizeof(*addr));
+        uint8_t expectedAddress[] = { 0x20, 0x01, 0x48, 0x60, 0x48, 0x60, 0, 0, 0, 0, 0, 0, 0, 0, 0x88, 0x88 };
+        REQUIRE(memcmp(&addr->sin6_addr, expectedAddress, 16) == 0);
+    }
+    SECTION("IPV4: Test sock_addr constructor") {
+        Host googleDNS("google-public-dns-a.google.com", 80);
+        Host copy(googleDNS.getSockAddressLen6(), googleDNS.getSockAddress6(), false);
+        const struct sockaddr_in6 * addr = (const struct sockaddr_in6 *)copy.getSockAddress6();
+        REQUIRE(addr != nullptr);
+        REQUIRE(copy.getSockAddressLen6() == sizeof(*addr));
+        uint8_t expectedAddress[] = { 0x20, 0x01, 0x48, 0x60, 0x48, 0x60, 0, 0, 0, 0, 0, 0, 0, 0, 0x88, 0x88 };
+        REQUIRE(memcmp(&addr->sin6_addr, expectedAddress, 16) == 0);
+    }
 }

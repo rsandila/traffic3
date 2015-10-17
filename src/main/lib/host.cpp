@@ -15,7 +15,7 @@ Host::Host(const std::string & name, unsigned _port) : hostName(name), hasAddr(f
     populateToAddr6(name, _port);
 }
 
-Host::Host(const Host & other) : hostName(other.hostName), hasAddr(other.hasAddr), port(other.port) {
+Host::Host(const Host & other) : hostName(other.hostName), hasAddr(other.hasAddr), hasAddr6(other.hasAddr6), port(other.port) {
     populateToAddr(hostName, port);
     populateToAddr6(hostName, port);
 }
@@ -101,7 +101,14 @@ bool Host::operator==(const Host & other) const {
             return false;
         }
     }
-    return (memcmp(&addr, &other.addr, sizeof(addr)) == 0) && (port == other.port);
+    bool retval = true;
+    if (hasAddr) {
+        retval &= (memcmp(&addr, &other.addr, sizeof(addr)) == 0) && (port == other.port);
+    }
+    if (hasAddr6) {
+        retval &= (memcmp(&addr6, &other.addr6, sizeof(addr6)) == 0) && (port == other.port);
+    }
+    return retval;
 }
 
 std::ostream & operator<<(std::ostream & outp, const Host & host) {
