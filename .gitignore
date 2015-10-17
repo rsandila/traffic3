@@ -5,3 +5,4 @@ traffic3.xcworkspace/
 bin/
 Makefile
 *.make
+*.xcodeproj
