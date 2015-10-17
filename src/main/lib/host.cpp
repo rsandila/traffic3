@@ -2,6 +2,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <netdb.h>
 #include <iostream>
 #include "host.h"
 
@@ -28,16 +29,21 @@ const struct sockaddr * Host::getSockAddress() const {
 }
 
 int Host::getSockAddressLen() const noexcept {
-    return sizeof(addr.sin_addr);
+    return sizeof(addr);
 }
 
 bool Host::populateToAddr(const std::string & name, unsigned _port) {
     addr.sin_family=AF_INET;
     addr.sin_port=0;
-    if (inet_pton(AF_INET, name.c_str(), &addr.sin_addr)<0) {
-        return false;
+    if (inet_pton(AF_INET, name.c_str(), &addr.sin_addr) <= 0) {
+        struct hostent * h = gethostbyname2(name.c_str(), AF_INET);
+        if (h) {
+            memcpy(&addr.sin_addr, h->h_addr_list[0], sizeof(addr.sin_addr));
+        } else {
+            return false;
+        }
     }
-    addr.sin_port = HTONL(_port);
+    addr.sin_port = htonl(_port);
     hasAddr = true;
     return true;
 }
