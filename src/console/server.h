@@ -2,19 +2,22 @@
 
 #include <vector>
 #include <thread>
+#include <mutex>
+#include "listener.h"
 #include "protocol.h"
-#include "contentmanager.h"
+#include "contentmanagerfactory.h"
 
 class Server {
 public:
-    Server(Protocol & protocol, ContentManager & contentManager);
-    bool addPort(const Host & host, int port);
-    bool stopPort(const Host & host, int port);
-    const std::vector<int> & getPorts() const noexcept;
+    Server(Protocol & protocol, ContentManagerFactory & contentManagerFactory);
+    virtual ~Server();
+    bool addPort(Host & host);
+    bool stopPort(Host & host);
+    const std::vector<Host> getPorts() const noexcept;
 protected:
 private:
-    std::vector<int> ports;
-    std::vector<std::thread> listeners;
+    std::vector<Listener> listeners;
     Protocol & protocolFactory;
-    ContentManager & contentFactory;
+    ContentManagerFactory & contentFactory;
+    mutable std::mutex lock;
 };

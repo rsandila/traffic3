@@ -3,31 +3,24 @@
 #include <netinet/in.h>
 #include "protocol_tcp4.h"
 
-ProtocolTCP4::ProtocolTCP4() : host(Host::ALL_INTERFACES), active(false), port(0), type(ProtocolType::NONE),
+ProtocolTCP4::ProtocolTCP4() : host(Host::ALL_INTERFACES), type(ProtocolType::NONE),
         socket(-1), state(ProtocolState::CLOSED) {
 }
 
-ProtocolTCP4::ProtocolTCP4(int newSocket, socklen_t len, struct sockaddr_in addr) : host(len, addr), active(true), port(0),
+ProtocolTCP4::ProtocolTCP4(int newSocket, socklen_t len, struct sockaddr_in addr) : host(len, addr),
         type(ProtocolType::CLIENT), socket(newSocket), state(ProtocolState::OPEN) {
 }
 
-ProtocolTCP4::ProtocolTCP4(ProtocolTCP4 && other) : host(other.host), active(other.active), port(other.port),
+ProtocolTCP4::ProtocolTCP4(ProtocolTCP4 && other) : host(other.host),
         type(other.type), socket(other.socket), state(other.state) {
     other.socket = -1;
     other.host = Host::ALL_INTERFACES;
-    other.active = false;
-    other.port = 0;
     other.type = ProtocolType::NONE;
     other.state = ProtocolState::CLOSED;
 }
 
 ProtocolTCP4::~ProtocolTCP4() {
-    std::unique_lock<std::mutex> lck(lock);
-    if (state != ProtocolState::CLOSED) {
-        shutdown(socket, SHUT_RDWR);
-        close(socket);
-        socket = 0;
-    }
+    close();
 }
 
 bool ProtocolTCP4::read(std::vector<char> & data) {
@@ -87,7 +80,7 @@ bool ProtocolTCP4::isReady(const ProtocolState & expected, int timeoutInMillisec
     }
 }
 
-bool ProtocolTCP4::listen(const Host & host, int port) {
+bool ProtocolTCP4::listen(const Host & host) {
     std::unique_lock<std::mutex> lck(lock);
     if (state != ProtocolState::CLOSED || type != ProtocolType::NONE) {
         return false;
@@ -102,7 +95,7 @@ bool ProtocolTCP4::listen(const Host & host, int port) {
     return false;
 }
 
-bool ProtocolTCP4::connect(const Host & host, int port) {
+bool ProtocolTCP4::connect(const Host & host) {
     std::unique_lock<std::mutex> lck(lock);
     if (state != ProtocolState::CLOSED || type != ProtocolType::NONE) {
         return false;
@@ -127,4 +120,16 @@ Protocol ProtocolTCP4::waitForNewConnection() {
     socklen_t addrlen=sizeof(addr);
     int newSocket=::accept(socket, (sockaddr *)&addr, &addrlen );
     return std::move(ProtocolTCP4(newSocket, addrlen, addr));
+}
+
+void ProtocolTCP4::close() {
+    std::unique_lock<std::mutex> lck(lock);
+    if (state != ProtocolState::CLOSED) {
+        shutdown(socket, SHUT_RDWR);
+        ::close(socket);
+        socket = 0;
+        host = Host::ALL_INTERFACES;
+        type = ProtocolType::NONE;
+        state = ProtocolState::CLOSED;
+    }
 }

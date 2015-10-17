@@ -3,3 +3,5 @@ obj/
 traffic3.xcodeproj/
 traffic3.xcworkspace/
 bin/
+Makefile
+*.make

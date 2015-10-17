@@ -3,7 +3,7 @@
 #include <mutex>
 #include "protocol.h"
 
-class ProtocolTCP4: Protocol {
+class ProtocolTCP4: public Protocol {
 public:
     ProtocolTCP4();
     virtual ~ProtocolTCP4();
@@ -11,15 +11,14 @@ public:
     virtual bool write(std::vector<char> & data) override;
     virtual ProtocolState getState() override;
     virtual bool isReady(const ProtocolState & expected, int timeoutInMilliseconds) override;
-    virtual bool listen(const Host & host, int port) override;
-    virtual bool connect(const Host & host, int port) override;
+    virtual bool listen(const Host & host) override;
+    virtual bool connect(const Host & host) override;
+    virtual void close() override;
     virtual ProtocolType getType() override;
     virtual Protocol waitForNewConnection() override;
 protected:
-    int port;
     Host host;
     ProtocolType type;
-    bool active;
     std::mutex lock;
     int socket;
     ProtocolState state;
