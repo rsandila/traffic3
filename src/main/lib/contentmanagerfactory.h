@@ -6,17 +6,16 @@
 #include "contentmanager_random_text.h"
 #include "contentmanagertype.h"
 
-// place holder class
 class ContentManagerFactory {
 public:
     ContentManagerFactory(const ContentManagerType & _type) : type(_type) {
     };
-    virtual ContentManager * createContentManager(Protocol & protocol) {
+    virtual std::unique_ptr<ContentManager> createContentManager(std::unique_ptr<Protocol> protocol) {
         switch (type) {
             case ContentManagerType::RandomText:
-                return new ContentManager_Random_Text(protocol);
+                return std::unique_ptr<ContentManager>(new ContentManager_Random_Text(std::move(protocol)));
              default:
-                return new ContentManager();
+                return std::unique_ptr<ContentManager>(new ContentManager());
         }
     };
 private:

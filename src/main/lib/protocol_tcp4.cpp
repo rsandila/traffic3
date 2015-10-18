@@ -35,7 +35,7 @@ bool ProtocolTCP4::read(std::vector<char> & data) {
     return numRead > 0;
 }
 
-bool ProtocolTCP4::write(std::vector<char> & data) {
+bool ProtocolTCP4::write(const std::vector<char> & data) {
     std::unique_lock<std::mutex> lck(lock);
     if (state == ProtocolState::CLOSED) {
         return false;
@@ -115,11 +115,11 @@ ProtocolTCP4::ProtocolType ProtocolTCP4::getType() {
     return type;
 }
 
-Protocol ProtocolTCP4::waitForNewConnection() {
+std::unique_ptr<Protocol> ProtocolTCP4::waitForNewConnection() {
     struct sockaddr_in addr;
     socklen_t addrlen=sizeof(addr);
     int newSocket=::accept(socket, (sockaddr *)&addr, &addrlen );
-    return std::move(ProtocolTCP4(newSocket, addrlen, (const sockaddr *)&addr));
+    return std::unique_ptr<Protocol>(new ProtocolTCP4(newSocket, addrlen, (const sockaddr *)&addr));
 }
 
 void ProtocolTCP4::close() {

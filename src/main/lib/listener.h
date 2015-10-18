@@ -7,21 +7,21 @@
 #include <thread>
 #include <vector>
 #include "contentmanagerfactory.h"
-#include "protocol.h"
+#include "protocolfactory.h"
 
 class Listener {
 public:
-    Listener(const Host & _host, Protocol & protocol, ContentManagerFactory & contentManagerFactory) : host(_host),
-            _protocol(protocol), _contentManagerFactory(contentManagerFactory),
+    Listener(const Host & _host, ProtocolFactory & protocolFactory, ContentManagerFactory & contentManagerFactory) :
+            host(_host), protocol(protocolFactory.createProtocol()), _contentManagerFactory(contentManagerFactory),
             thread(std::thread(std::bind(&Listener::listen, this))) {
     }
-    Listener(Listener && other) : host(other.host), _protocol(other._protocol),
+    Listener(Listener && other) : host(other.host), protocol(std::move(other.protocol)),
             _contentManagerFactory(other._contentManagerFactory), contentManagers(std::move(other.contentManagers)) {
         thread = std::move(other.thread);
     }
     Listener & operator=(Listener&& other) {
         host = std::move(other.host);
-        _protocol = std::move(other._protocol);
+        protocol = std::move(other.protocol);
         _contentManagerFactory = std::move(other._contentManagerFactory);
         contentManagers = std::move(other.contentManagers);
         thread = std::move(other.thread);
@@ -37,10 +37,10 @@ public:
         Stop();
     }
     bool Stop() {
-        if (_protocol.getState() == Protocol::ProtocolState::CLOSED) {
+        if (protocol->getState() == Protocol::ProtocolState::CLOSED) {
             return false;
         }
-        _protocol.close();
+        protocol->close();
         for (auto manager = contentManagers.begin(); manager != contentManagers.end(); manager++) {
             (*manager)->Stop();
         }
@@ -49,10 +49,12 @@ public:
     }
 protected:
     void listen() {
-        if (_protocol.listen(host)) {
-            Protocol newProtocol = _protocol.waitForNewConnection();
-            if (newProtocol.getState() == Protocol::ProtocolState::OPEN) {
-                contentManagers.push_back(std::unique_ptr<ContentManager>(_contentManagerFactory.createContentManager(newProtocol)));
+        if (protocol->listen(host)) {
+            std::unique_ptr<Protocol> newProtocol = protocol->waitForNewConnection();
+            if (newProtocol->getState() == Protocol::ProtocolState::OPEN) {
+                std::unique_ptr<ContentManager> tempContentManager =_contentManagerFactory.createContentManager(std::move(newProtocol));
+                // TODO - configure contentManager
+                contentManagers.push_back(std::move(tempContentManager));
             }
         } else {
             std::ostringstream ostr;
@@ -62,7 +64,7 @@ protected:
     }
 private:
     Host host;
-    Protocol & _protocol;
+    std::unique_ptr<Protocol> protocol;
     ContentManagerFactory & _contentManagerFactory;
     std::vector<std::unique_ptr<ContentManager>> contentManagers;
     std::thread thread;

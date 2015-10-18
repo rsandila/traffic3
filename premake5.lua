@@ -6,6 +6,7 @@ project "common"
 	language "C++"
 	targetdir "bin/%{cfg.buildcfg}"
         buildoptions "-std=c++11 -stdlib=libc++"
+	linkoptions "-g"
         files { "src/main/lib/**.h", "src/main/lib/**.cpp" }
 
         filter "configurations:Debug"

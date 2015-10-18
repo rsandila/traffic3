@@ -4,20 +4,20 @@
 #include <thread>
 #include <mutex>
 #include "listener.h"
-#include "protocol.h"
+#include "protocolfactory.h"
 #include "contentmanagerfactory.h"
 
 class Server {
 public:
-    Server(Protocol & protocol, ContentManagerFactory & contentManagerFactory);
+    Server(ProtocolFactory & protocolFactory, ContentManagerFactory & contentManagerFactory);
     virtual ~Server();
     bool addPort(Host & host);
     bool stopPort(Host & host);
     const std::vector<Host> getPorts() const noexcept;
 protected:
 private:
-    std::vector<Listener> listeners;
-    Protocol & protocolFactory;
+    std::vector<std::unique_ptr<Listener>> listeners;
+    ProtocolFactory & protocolFactory;
     ContentManagerFactory & contentFactory;
     mutable std::mutex lock;
 };
