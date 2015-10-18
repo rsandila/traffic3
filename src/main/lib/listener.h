@@ -16,7 +16,7 @@ public:
             thread(std::thread(std::bind(&Listener::listen, this))) {
     }
     Listener(Listener && other) : host(other.host), _protocol(other._protocol),
-            _contentManagerFactory(other._contentManagerFactory), contentManagers(other.contentManagers) {
+            _contentManagerFactory(other._contentManagerFactory), contentManagers(std::move(other.contentManagers)) {
         thread = std::move(other.thread);
     }
     Listener & operator=(Listener&& other) {
@@ -41,9 +41,8 @@ public:
             return false;
         }
         _protocol.close();
-        for (auto manager : contentManagers) {
-            manager->Stop();
-            delete manager;
+        for (auto manager = contentManagers.begin(); manager != contentManagers.end(); manager++) {
+            (*manager)->Stop();
         }
         thread.join();
         return true;
@@ -53,7 +52,7 @@ protected:
         if (_protocol.listen(host)) {
             Protocol newProtocol = _protocol.waitForNewConnection();
             if (newProtocol.getState() == Protocol::ProtocolState::OPEN) {
-                contentManagers.push_back(_contentManagerFactory.createContentManager(newProtocol));
+                contentManagers.push_back(std::unique_ptr<ContentManager>(_contentManagerFactory.createContentManager(newProtocol)));
             }
         } else {
             std::ostringstream ostr;
@@ -65,7 +64,7 @@ private:
     Host host;
     Protocol & _protocol;
     ContentManagerFactory & _contentManagerFactory;
-    std::vector<ContentManager *> contentManagers;
+    std::vector<std::unique_ptr<ContentManager>> contentManagers;
     std::thread thread;
 
     Listener(const Listener &) = delete;
