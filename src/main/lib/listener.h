@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <thread>
+#include <vector>
 #include "contentmanagerfactory.h"
 #include "protocol.h"
 
@@ -40,8 +41,9 @@ public:
             return false;
         }
         _protocol.close();
-        for (auto manager: contentManagers) {
-            manager.Stop();
+        for (auto manager : contentManagers) {
+            manager->Stop();
+            delete manager;
         }
         thread.join();
         return true;
@@ -63,9 +65,11 @@ private:
     Host host;
     Protocol & _protocol;
     ContentManagerFactory & _contentManagerFactory;
-    std::vector<ContentManager> contentManagers;
+    std::vector<ContentManager *> contentManagers;
     std::thread thread;
 
+    Listener(const Listener &) = delete;
+    Listener & operator=(const Listener &) = delete;
  };
 
 

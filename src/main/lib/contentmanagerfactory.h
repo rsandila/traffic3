@@ -4,23 +4,21 @@
 #include "protocol.h"
 #include "contentmanager.h"
 #include "contentmanager_random_text.h"
+#include "contentmanagertype.h"
 
 // place holder class
 class ContentManagerFactory {
 public:
-    enum class Type {
-        RandomText
+    ContentManagerFactory(const ContentManagerType & _type) : type(_type) {
     };
-    ContentManagerFactory(const Type & _type) : type(_type) {
-    };
-    virtual ContentManager createContentManager(Protocol & protocol) {
+    virtual ContentManager * createContentManager(Protocol & protocol) {
         switch (type) {
-            case Type::RandomText:
-                return std::move(ContentManager_Random_Text(protocol));
-            default:
-                return std::move(ContentManager());
+            case ContentManagerType::RandomText:
+                return new ContentManager_Random_Text(protocol);
+             default:
+                return new ContentManager();
         }
     };
 private:
-    Type type;
+    ContentManagerType type;
 };

@@ -47,6 +47,6 @@ TEST_CASE("Test random generating random text", "[content]") {
         }
         proto.doExit = true;
         REQUIRE(proto.lastWrite.size() >= 10);
-        REQUIRE(proto.lastWrite.size() < 20);
+        REQUIRE(proto.lastWrite.size() <= 20);
     }
 }

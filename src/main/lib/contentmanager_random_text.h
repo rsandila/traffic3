@@ -1,5 +1,6 @@
 #pragma once
 
+#include <thread>
 #include <random>
 #include "contentmanager.h"
 #include "protocol.h"
@@ -10,6 +11,18 @@ public:
     ContentManager_Random_Text(Protocol & _protocol) : protocol(_protocol), min(0), max(1024000),
             worker(std::thread(std::bind(&ContentManager_Random_Text::Worker, this)))  {
     };
+    ContentManager_Random_Text(ContentManager_Random_Text && other) : protocol(other.protocol) {
+        min = other.min;
+        max = other.max;
+        worker = std::move(other.worker);
+    }
+    ContentManager_Random_Text & operator=(ContentManager_Random_Text&& other) {
+        protocol = std::move(other.protocol);
+        min = other.min;
+        max = other.max;
+        worker = std::move(other.worker);
+        return *this;
+    }
     virtual ~ContentManager_Random_Text() {
         protocol.close();
         worker.join();
@@ -30,6 +43,9 @@ public:
             min = size;
         }
     };
+    virtual ContentManagerType getType() const noexcept override {
+        return ContentManagerType::RandomText;
+    }
 protected:
     void Worker() {
         unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -54,4 +70,7 @@ private:
     Protocol & protocol;
     std::thread worker;
     unsigned min, max;
+    
+    ContentManager_Random_Text(const ContentManager_Random_Text &) = delete;
+    ContentManager_Random_Text & operator=(const ContentManager_Random_Text &) = delete;
 };
