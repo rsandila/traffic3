@@ -10,7 +10,10 @@ TEST_CASE("Testing contentmanagerfactory.h", "[content]") {
         std::unique_ptr<Protocol> dummy(new Protocol());
         
         std::unique_ptr<ContentManager> text(test.createContentManager(std::move(dummy)));
+        text->Start();
         REQUIRE(text->getType() == ContentManagerType::RandomText);
-        // std::this_thread::sleep_for(std::chrono::milliseconds(500)); // This sleep is needed to allow the thread to exit before dummy is dtor'd
+        text->Stop();
+        std::this_thread::sleep_for(std::chrono::milliseconds(500)); // This sleep is needed to allow the thread to exit before dummy is dtor'd
+
     }
 }

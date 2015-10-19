@@ -34,7 +34,7 @@ public:
         return *this;
     }
     virtual ~ContentManager_Random_Text() {
-        protocol->close();
+        Stop();
         worker.join();
     }
     virtual bool Stop() override {
