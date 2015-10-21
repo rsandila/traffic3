@@ -56,11 +56,13 @@ bool Listener::Stop() {
 void Listener::listen() {
     if (protocol->listen(host)) {
        std::unique_ptr<Protocol> newProtocol = protocol->waitForNewConnection();
-       if (newProtocol->getState() == Protocol::ProtocolState::OPEN) {
+       if (newProtocol.get() != nullptr && newProtocol->getState() == Protocol::ProtocolState::OPEN) {
            std::unique_ptr<ContentManager> tempContentManager =_contentManagerFactory.createContentManager(std::move(newProtocol));
                 // TODO - configure contentManager
-           tempContentManager->Start();
-           contentManagers.push_back(std::move(tempContentManager));
+           if (tempContentManager.get() != nullptr) {
+               tempContentManager->Start();
+               contentManagers.push_back(std::move(tempContentManager));
+           }
        }
     } else {
        errorState = true;
