@@ -13,7 +13,5 @@ TEST_CASE("Testing contentmanagerfactory.h", "[content]") {
         text->Start();
         REQUIRE(text->getType() == ContentManagerType::RandomText);
         text->Stop();
-        std::this_thread::sleep_for(std::chrono::milliseconds(500)); // This sleep is needed to allow the thread to exit before dummy is dtor'd
-
     }
 }

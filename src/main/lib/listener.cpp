@@ -45,11 +45,16 @@ bool Listener::inErrorState() const noexcept {
 }
 
 bool Listener::Stop() {
-    protocol->close();
+    if (protocol.get() != nullptr) {
+        protocol->close();
+    }
     for (auto manager = contentManagers.begin(); manager != contentManagers.end(); manager++) {
         (*manager)->Stop();
     }
-    thread.join();
+    contentManagers.clear();
+    if (thread.joinable()) {
+        thread.join();
+    }
     return true;
 }
 

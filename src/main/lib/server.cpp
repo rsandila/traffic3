@@ -28,7 +28,9 @@ bool Server::stopPort(Host & host) {
     std::unique_lock<std::mutex> lck(lock);
     for (auto it = listeners.begin(); it != listeners.end(); ++it) {
         if (*(*it) == host) {
-            return (*it)->Stop();
+            bool retVal = (*it)->Stop();
+            listeners.erase(it);
+            return retVal;
         }
     }
     return false;
