@@ -1,5 +1,6 @@
 #include <sys/socket.h>
 #include <poll.h>
+#include <netdb.h>
 #include <netinet/in.h>
 #include "protocol_tcp4.h"
 
@@ -80,17 +81,20 @@ bool ProtocolTCP4::isReady(const ProtocolState & expected, int timeoutInMillisec
     }
 }
 
-bool ProtocolTCP4::listen(const Host & host) {
+bool ProtocolTCP4::listen(const Host & host, const int backlog) {
     std::unique_lock<std::mutex> lck(lock);
     if (state != ProtocolState::CLOSED || type != ProtocolType::NONE) {
         return false;
     }
     this->host = host;
-    socket = ::socket(PF_INET, SOCK_STREAM, 6);
+    struct protoent *pr = getprotobyname("tcp");
+    socket = ::socket(PF_INET, SOCK_STREAM, pr->p_proto);
     if (::bind(socket, host.getSockAddress(), host.getSockAddressLen()) == 0) {
-        type = ProtocolType::SERVER;
-        state = ProtocolState::OPEN;
-        return true;
+        if (::listen(socket, backlog) == 0) {
+            type = ProtocolType::SERVER;
+            state = ProtocolState::OPEN;
+            return true;
+        }
     }
     return false;
 }
@@ -101,7 +105,8 @@ bool ProtocolTCP4::connect(const Host & host) {
         return false;
     }
     this->host = host;
-    socket = ::socket(PF_INET, SOCK_STREAM, 6);
+    struct protoent *pr = getprotobyname("tcp");
+    socket = ::socket(PF_INET, SOCK_STREAM, pr->p_proto);
     if (::connect(socket, host.getSockAddress(), host.getSockAddressLen()) == 0) {
         type = ProtocolType::CLIENT;
         state = ProtocolState::OPEN;

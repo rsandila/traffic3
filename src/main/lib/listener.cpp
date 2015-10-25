@@ -59,7 +59,7 @@ bool Listener::Stop() {
 }
 
 void Listener::listen() {
-    if (protocol->listen(host)) {
+    if (protocol->listen(host, 10)) {
        std::unique_ptr<Protocol> newProtocol = protocol->waitForNewConnection();
        if (newProtocol.get() != nullptr && newProtocol->getState() == Protocol::ProtocolState::OPEN) {
            std::unique_ptr<ContentManager> tempContentManager =_contentManagerFactory.createContentManager(std::move(newProtocol));

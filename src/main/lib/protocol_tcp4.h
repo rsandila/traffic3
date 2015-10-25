@@ -11,7 +11,7 @@ public:
     virtual bool write(const std::vector<char> & data) override;
     virtual ProtocolState getState() override;
     virtual bool isReady(const ProtocolState & expected, int timeoutInMilliseconds) override;
-    virtual bool listen(const Host & host) override;
+    virtual bool listen(const Host & host, const int backlog) override;
     virtual bool connect(const Host & host) override;
     virtual void close() override;
     virtual ProtocolType getType() override;

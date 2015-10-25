@@ -28,7 +28,7 @@ TEST_CASE("Listener test", "[server]") {
     SECTION("Listen success, waitForNewConnection fails") {
         class MockProtocol : public Protocol {
         public:
-            virtual bool listen(const Host & host) { return true; };
+            virtual bool listen(const Host & host, const int backlog) override { return true; };
         };
         class MockProtocolFactory: public ProtocolFactory {
         public:
@@ -55,9 +55,9 @@ TEST_CASE("Listener test", "[server]") {
     SECTION("Listen success, waitForNewConnection success, createContentManager fails") {
         class MockProtocol : public Protocol {
         public:
-            virtual bool listen(const Host & host) { return true; };
-            virtual std::unique_ptr<Protocol> waitForNewConnection() { return std::unique_ptr<Protocol>(new MockProtocol()); };
-            virtual ProtocolState getState() {
+            virtual bool listen(const Host & host, const int backlog) override { return true; };
+            virtual std::unique_ptr<Protocol> waitForNewConnection() override { return std::unique_ptr<Protocol>(new MockProtocol()); };
+            virtual ProtocolState getState() override {
                 return Protocol::ProtocolState::OPEN;
             }
         };
@@ -90,8 +90,8 @@ TEST_CASE("Listener test", "[server]") {
         public:
             MockProtocol() : returnedOne(false) {
             }
-            virtual bool listen(const Host & host) { return true; };
-            virtual std::unique_ptr<Protocol> waitForNewConnection() {
+            virtual bool listen(const Host & host, const int backlog) override { return true; };
+            virtual std::unique_ptr<Protocol> waitForNewConnection() override {
                 if (!returnedOne) {
                     returnedOne = true;
                     return std::unique_ptr<Protocol>(new MockProtocol());
@@ -99,7 +99,7 @@ TEST_CASE("Listener test", "[server]") {
                     return std::unique_ptr<Protocol>(new Protocol());
                 }
             };
-            virtual ProtocolState getState() {
+            virtual ProtocolState getState() override {
                 return Protocol::ProtocolState::OPEN;
             }
             bool returnedOne;

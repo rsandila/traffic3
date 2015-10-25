@@ -8,8 +8,8 @@ TEST_CASE("Server", "[protocol][server]") {
         public:
             MockProtocol() : returnedOne(false) {
             }
-            virtual bool listen(const Host & host) { return true; };
-            virtual std::unique_ptr<Protocol> waitForNewConnection() {
+            virtual bool listen(const Host & host, const int backlog) override { return true; };
+            virtual std::unique_ptr<Protocol> waitForNewConnection() override {
                 if (!returnedOne) {
                     returnedOne = true;
                     return std::unique_ptr<Protocol>(new MockProtocol());
@@ -17,7 +17,7 @@ TEST_CASE("Server", "[protocol][server]") {
                     return std::unique_ptr<Protocol>(new Protocol());
                 }
             };
-            virtual ProtocolState getState() {
+            virtual ProtocolState getState() override {
                 return Protocol::ProtocolState::OPEN;
             }
             bool returnedOne;

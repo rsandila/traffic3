@@ -2,7 +2,7 @@
 
 #include "contentmanagertype.h"
 
-// place holder class
+// place holder class, don't derive from this one, derive from ContentManagerBase
 class ContentManager {
 public:
     ContentManager() {};
