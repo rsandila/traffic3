@@ -39,7 +39,7 @@ project "traffic3_test"
         links { "common" }
 	language "C++"
 	targetdir "test/%{cfg.buildcfg}"
-        includedirs { "%{cfg.basedir}/src/main/lib", "%{cfg.basedir}/3rdparty/Catch/single_include", "%{cfg.basedir}/3rdparty/FakeIt/single_header/catch" }
+        includedirs { "%{cfg.basedir}/src/main/lib", "%{cfg.basedir}/3rdparty/Catch/single_include", "%{cfg.basedir}/3rdparty/FakeIt/single_header/catch", "%{cfg.basedir}/3rdparty/hippomocks/HippoMocks" }
         buildoptions "-std=c++11 -stdlib=libc++"
 	files { "src/test/**.h", "src/test/**.cpp" }
 

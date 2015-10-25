@@ -37,11 +37,11 @@ bool ProtocolTCP4::read(std::vector<char> & data) {
 
 bool ProtocolTCP4::write(const std::vector<char> & data) {
     std::unique_lock<std::mutex> lck(lock);
-    if (state == ProtocolState::CLOSED) {
+    if (state == ProtocolState::CLOSED || data.size() == 0) {
         return false;
     }
     ssize_t numWritten = ::write(socket, &data[0], data.size());
-    return numWritten == data.size();;
+    return numWritten == data.size();
 }
 
 ProtocolTCP4::ProtocolState ProtocolTCP4::getState() {
@@ -118,14 +118,21 @@ ProtocolTCP4::ProtocolType ProtocolTCP4::getType() {
 std::unique_ptr<Protocol> ProtocolTCP4::waitForNewConnection() {
     struct sockaddr_in addr;
     socklen_t addrlen=sizeof(addr);
+    std::unique_lock<std::mutex> lck(lock);
+    if (state == ProtocolState::CLOSED || type != ProtocolType::SERVER) {
+        return std::unique_ptr<Protocol>(nullptr);
+    }
     int newSocket=::accept(socket, (sockaddr *)&addr, &addrlen );
+    if (newSocket < 0) {
+        return std::unique_ptr<Protocol>(nullptr);
+    }
     return std::unique_ptr<Protocol>(new ProtocolTCP4(newSocket, addrlen, (const sockaddr *)&addr));
 }
 
 void ProtocolTCP4::close() {
     std::unique_lock<std::mutex> lck(lock);
     if (state != ProtocolState::CLOSED) {
-        shutdown(socket, SHUT_RDWR);
+        ::shutdown(socket, SHUT_RDWR);
         ::close(socket);
         socket = 0;
         host = Host::ALL_INTERFACES;

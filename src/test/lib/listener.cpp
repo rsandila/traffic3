@@ -1,10 +1,7 @@
 // Tests for Listener class
 #include "catch.hpp"
-#include "fakeit.hpp"
 #include "listener.h"
 #include "protocolfactory.h"
-
-using namespace fakeit;
 
 TEST_CASE("Listener: Unable to listen", "[server]") {
     SECTION("Bad protocolFactory") {
