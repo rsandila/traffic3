@@ -7,7 +7,7 @@
 int main(int argc, char ** argv) {
     // TODO
     ProtocolFactory protocolFactory(ProtocolType::TCP4);
-    ContentManagerFactory contentManagerFactory(ContentManagerType::RandomText);
+    ContentManagerFactory contentManagerFactory(ContentManagerType::RandomText, 100, 100000);
     Server server(protocolFactory, contentManagerFactory);
     Host port10000("0.0.0.0", 10000);
     if (!server.addPort(port10000)) {

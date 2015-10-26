@@ -8,16 +8,26 @@
 
 class ContentManagerFactory {
 public:
-    ContentManagerFactory(const ContentManagerType & _type) : type(_type) {
+    ContentManagerFactory(const ContentManagerType & _type, unsigned _min, unsigned _max) : type(_type),
+            min(_min), max(_max) {
     };
     virtual std::unique_ptr<ContentManager> createContentManager(std::unique_ptr<Protocol> protocol) {
         switch (type) {
             case ContentManagerType::RandomText:
-                return std::unique_ptr<ContentManager>(new ContentManager_Random_Text(std::move(protocol)));
+                return withCustomizations(std::unique_ptr<ContentManager>(new ContentManager_Random_Text(std::move(protocol))));
              default:
                 return std::unique_ptr<ContentManager>(new ContentManager());
         }
     };
+protected:
+    virtual std::unique_ptr<ContentManager> withCustomizations(std::unique_ptr<ContentManager> contentManager) const {
+        if (contentManager.get() != nullptr) {
+            contentManager->setMinimumSize(min);
+            contentManager->setMaximumSize(max);
+        }
+        return std::move(contentManager);
+    }
 private:
+    unsigned min, max;
     ContentManagerType type;
 };

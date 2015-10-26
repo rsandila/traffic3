@@ -50,7 +50,7 @@ TEST_CASE("Server", "[protocol][server]") {
         };
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
-            MockContentManagerFactory() : ContentManagerFactory(ContentManagerType::None) {;};
+            MockContentManagerFactory() : ContentManagerFactory(ContentManagerType::None, 100, 10000) {;};
             virtual std::unique_ptr<ContentManager> createContentManager(std::unique_ptr<Protocol> protocol) {
                 return std::unique_ptr<ContentManager>(new MockContentManager());
             };
