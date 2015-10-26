@@ -55,11 +55,23 @@ TEST_CASE("Listener test", "[server]") {
     SECTION("Listen success, waitForNewConnection success, createContentManager fails") {
         class MockProtocol : public Protocol {
         public:
+            MockProtocol() : shouldReturnConnection(true) {;};
             virtual bool listen(const Host & host, const int backlog) override { return true; };
-            virtual std::unique_ptr<Protocol> waitForNewConnection() override { return std::unique_ptr<Protocol>(new MockProtocol()); };
+            virtual std::unique_ptr<Protocol> waitForNewConnection() override {
+                if (shouldReturnConnection) {
+                    shouldReturnConnection = false;
+                    return std::unique_ptr<Protocol>(new MockProtocol());
+                } else {
+                    return std::unique_ptr<Protocol>(nullptr);
+                }
+            }
             virtual ProtocolState getState() override {
                 return Protocol::ProtocolState::OPEN;
             }
+            virtual void close() override {
+                shouldReturnConnection = false;
+            }
+            bool shouldReturnConnection;
         };
         class MockProtocolFactory: public ProtocolFactory {
         public:

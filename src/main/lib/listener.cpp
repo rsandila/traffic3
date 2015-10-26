@@ -59,6 +59,7 @@ bool Listener::Stop() {
 }
 
 void Listener::listen() {
+    bool exitLoop = false;
     if (protocol->listen(host, 10)) {
         do {
             std::unique_ptr<Protocol> newProtocol = protocol->waitForNewConnection();
@@ -69,9 +70,9 @@ void Listener::listen() {
                     contentManagers.push_back(std::move(tempContentManager));
                 }
             } else {
-                errorState = true;
+                exitLoop = true;
             }
-        } while (!errorState);
+        } while (!exitLoop);
     } else {
         errorState = true;
     }
