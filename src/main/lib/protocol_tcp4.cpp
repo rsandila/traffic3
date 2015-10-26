@@ -135,7 +135,7 @@ std::unique_ptr<Protocol> ProtocolTCP4::waitForNewConnection() {
 }
 
 void ProtocolTCP4::close() {
-    std::unique_lock<std::mutex> lck(lock);
+    // std::unique_lock<std::mutex> lck(lock);
     if (state != ProtocolState::CLOSED) {
         ::shutdown(socket, SHUT_RDWR);
         ::close(socket);
