@@ -2,13 +2,13 @@
 #include <random>
 #include "contentmanager_base.h"
 
-ContentManagerBase::ContentManagerBase(std::unique_ptr<Protocol> _protocol) : started(false),
-        running(false), protocol(std::move(_protocol)), min(0), max(1024000),
+ContentManagerBase::ContentManagerBase(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler) : started(false),
+        running(false), protocol(std::move(_protocol)), min(0), max(1024000), headerHandler(_headerHandler),
         worker(std::thread(std::bind(&ContentManagerBase::Worker, this)))  {
 }
 
 ContentManagerBase::ContentManagerBase(ContentManagerBase && other) :
-        protocol(std::move(other.protocol)) {
+        protocol(std::move(other.protocol)), headerHandler(other.headerHandler) {
     min = other.min;
     max = other.max;
     worker = std::move(other.worker);
@@ -29,6 +29,7 @@ ContentManagerBase & ContentManagerBase::operator=(ContentManagerBase&& other) {
     min = other.min;
     max = other.max;
     worker = std::move(other.worker);
+    headerHandler = other.headerHandler;
     started = false;
     if (other.started) {
         started = true;
@@ -90,15 +91,13 @@ void ContentManagerBase::Worker() noexcept {
         return;
     }
     std::vector<char> inData;
-    inData.resize(1024);
     
     running = true;
-    while (protocol->read(inData)) {
-        // TODO - verify valid header?
+    while (headerHandler.read(protocol, inData)) {
         std::vector<char> outData = ProcessContent(inData);
-        inData.resize(1024);
-        // TODO - prepend header?
-        protocol->write(outData);
+        if (!headerHandler.write(protocol, outData)) {
+            break;
+        }
     }
     CleanupContent();
 }

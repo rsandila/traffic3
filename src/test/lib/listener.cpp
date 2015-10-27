@@ -4,9 +4,10 @@
 #include "protocolfactory.h"
 
 TEST_CASE("Listener: Unable to listen", "[server]") {
+    CommonHeaders commonHeaders;
     SECTION("Bad protocolFactory") {
         ProtocolFactory protocolFactory(ProtocolType::None);
-        ContentManagerFactory contentManagerFactory(ContentManagerType::None, 100, 10000);
+        ContentManagerFactory contentManagerFactory(ContentManagerType::None, 100, 10000, commonHeaders);
         Listener listener(Host::ALL_INTERFACES, protocolFactory, contentManagerFactory);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         REQUIRE(listener.inErrorState());
@@ -14,7 +15,7 @@ TEST_CASE("Listener: Unable to listen", "[server]") {
     SECTION("Compare to Host") {
         Host googleDNS("google-public-dns-a.google.com", 80);
         ProtocolFactory protocolFactory(ProtocolType::None);
-        ContentManagerFactory contentManagerFactory(ContentManagerType::None, 100, 10000);
+        ContentManagerFactory contentManagerFactory(ContentManagerType::None, 100, 10000, commonHeaders);
         Listener listener(Host::ALL_INTERFACES, protocolFactory, contentManagerFactory);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         REQUIRE(listener == Host::ALL_INTERFACES);
@@ -39,7 +40,7 @@ TEST_CASE("Listener test", "[server]") {
         };
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
-            MockContentManagerFactory() : ContentManagerFactory(ContentManagerType::None, 100, 10000) {
+            MockContentManagerFactory() : ContentManagerFactory(ContentManagerType::None, 100, 10000, CommonHeaders()) {
             };
             virtual std::unique_ptr<ContentManager> createContentManager(std::unique_ptr<Protocol> protocol) {
                 FAIL("Should never call createContentManager");
@@ -82,7 +83,7 @@ TEST_CASE("Listener test", "[server]") {
         };
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
-            MockContentManagerFactory() : ContentManagerFactory(ContentManagerType::None, 100, 10000) {
+            MockContentManagerFactory() : ContentManagerFactory(ContentManagerType::None, 100, 10000, CommonHeaders()) {
             };
             virtual std::unique_ptr<ContentManager> createContentManager(std::unique_ptr<Protocol> protocol) {
                 return std::unique_ptr<ContentManager>(nullptr);
@@ -136,7 +137,7 @@ TEST_CASE("Listener test", "[server]") {
         };
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
-            MockContentManagerFactory() : ContentManagerFactory(ContentManagerType::None, 100, 10000) {
+            MockContentManagerFactory() : ContentManagerFactory(ContentManagerType::None, 100, 10000, CommonHeaders()) {
             };
             virtual std::unique_ptr<ContentManager> createContentManager(std::unique_ptr<Protocol> protocol) {
                 return std::unique_ptr<ContentManager>(new MockContentManager());

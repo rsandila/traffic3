@@ -15,8 +15,10 @@ public:
         if (doExit) {
             return false;
         }
-        data.resize(4);
-        memcpy(&data[0], "TR00", 4);
+        REQUIRE(data.size() == 8);
+        memcpy(&data[0], "TRAF", 4);
+        uint32_t size = htonl(8);
+        memcpy(&data[4], &size, sizeof(uint32_t));
         doExit = true;
         return true;
     };
@@ -34,7 +36,8 @@ public:
 TEST_CASE("Test random generating random text", "[content]") {
     SECTION("Test text generated") {
         std::unique_ptr<Protocol> proto(new MockProtocol());
-        ContentManager_Random_Text manager(std::move(proto));
+        CommonHeaders commonHeaders;
+        ContentManager_Random_Text manager(std::move(proto), commonHeaders);
         manager.setMinimumSize(10);
         manager.setMaximumSize(20);
         REQUIRE(manager.Start());

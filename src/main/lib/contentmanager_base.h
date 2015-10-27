@@ -6,11 +6,12 @@
 #include <random>
 #include "contentmanager.h"
 #include "protocol.h"
+#include "commonheaders.h"
 
 // place holder class, derive new ContentManagers from this class
 class ContentManagerBase : public ContentManager {
 public:
-    ContentManagerBase(std::unique_ptr<Protocol> _protocol);
+    ContentManagerBase(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler);
     ContentManagerBase(ContentManagerBase && other);
     ContentManagerBase & operator=(ContentManagerBase&& other);
     virtual ~ContentManagerBase();
@@ -37,6 +38,7 @@ private:
     std::atomic<bool> started;
     std::atomic<bool> running;
     std::atomic<bool> doExitBeforeStart;
+    CommonHeaders & headerHandler;
     
     ContentManagerBase(const ContentManagerBase &) = delete;
     ContentManagerBase & operator=(const ContentManagerBase &) = delete;

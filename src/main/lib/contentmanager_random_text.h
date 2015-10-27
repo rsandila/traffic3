@@ -8,7 +8,7 @@
 // place holder class
 class ContentManager_Random_Text : public ContentManagerBase {
 public:
-    ContentManager_Random_Text(std::unique_ptr<Protocol> _protocol);
+    ContentManager_Random_Text(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler);
     virtual ~ContentManager_Random_Text();
     virtual ContentManagerType getType() const noexcept override;
 protected:
