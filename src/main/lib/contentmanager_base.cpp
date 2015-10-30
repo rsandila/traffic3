@@ -3,7 +3,7 @@
 #include "contentmanager_base.h"
 
 ContentManagerBase::ContentManagerBase(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer) : started(false),
-        running(false), protocol(std::move(_protocol)), min(0), max(1024000), headerHandler(_headerHandler),
+        running(false), protocol(std::move(_protocol)), min(0), max(1024000), headerHandler(_headerHandler), doExitBeforeStart(false),
         worker(std::thread(std::bind((isServer)?&ContentManagerBase::ServerWorker:&ContentManagerBase::ClientWorker, this)))  {
 }
 
@@ -22,6 +22,10 @@ ContentManagerBase::ContentManagerBase(ContentManagerBase && other) :
         running = true;
     }
     other.running = false;
+    doExitBeforeStart = false;
+    if (other.doExitBeforeStart) {
+        doExitBeforeStart = true;
+    }
 }
 
 ContentManagerBase & ContentManagerBase::operator=(ContentManagerBase&& other) {
@@ -39,6 +43,10 @@ ContentManagerBase & ContentManagerBase::operator=(ContentManagerBase&& other) {
         running = true;
     }
     other.running = false;
+    doExitBeforeStart = false;
+    if (other.doExitBeforeStart) {
+        doExitBeforeStart = true;
+    }
     return *this;
 }
 
@@ -73,8 +81,8 @@ void ContentManagerBase::setMinimumSize(unsigned size) noexcept {
 }
 
 void ContentManagerBase::setMaximumSize(unsigned size) noexcept {
-    max = size;
-    if (max < min) {
+    setMax(size);
+    if (getMax() < min) {
         min = size;
     }
 }

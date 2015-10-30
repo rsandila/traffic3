@@ -32,6 +32,9 @@ protected:
     int getMax() const noexcept {
         return max;
     }
+    void setMax(int newMax) noexcept {
+        max = newMax;
+    }
 private:
     std::unique_ptr<Protocol> protocol;
     std::thread worker;
