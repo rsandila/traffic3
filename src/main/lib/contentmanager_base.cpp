@@ -2,9 +2,9 @@
 #include <random>
 #include "contentmanager_base.h"
 
-ContentManagerBase::ContentManagerBase(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler) : started(false),
+ContentManagerBase::ContentManagerBase(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer) : started(false),
         running(false), protocol(std::move(_protocol)), min(0), max(1024000), headerHandler(_headerHandler),
-        worker(std::thread(std::bind(&ContentManagerBase::Worker, this)))  {
+        worker(std::thread(std::bind((isServer)?&ContentManagerBase::ServerWorker:&ContentManagerBase::ClientWorker, this)))  {
 }
 
 ContentManagerBase::ContentManagerBase(ContentManagerBase && other) :
@@ -79,7 +79,30 @@ void ContentManagerBase::setMaximumSize(unsigned size) noexcept {
     }
 }
 
-void ContentManagerBase::Worker() noexcept {
+void ContentManagerBase::ClientWorker() noexcept {
+    while (!started) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        if (doExitBeforeStart) {
+            return;
+        }
+    }
+    
+    if (!PrepareContent()) {
+        return;
+    }
+    std::vector<char> inData;
+    
+    running = true;
+    do {
+        std::vector<char> outData = ProcessContent(inData);
+        if (!headerHandler.write(protocol, outData)) {
+            break;
+        }
+    } while (headerHandler.read(protocol, inData));
+    CleanupContent();
+}
+
+void ContentManagerBase::ServerWorker() noexcept {
     while (!started) {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
         if (doExitBeforeStart) {

@@ -4,9 +4,10 @@
 #include "server.h"
 #include "contentmanagerfactory.h"
 #include "commonheaders.h"
+#include "client.h"
 
-int main(int argc, char ** argv) {
-    // TODO
+
+int beServer() {
     ProtocolFactory protocolFactory(ProtocolType::TCP4);
     ContentManagerFactory contentManagerFactory(ContentManagerType::RandomText, 100, 100000, CommonHeaders());
     Server server(protocolFactory, contentManagerFactory);
@@ -16,4 +17,27 @@ int main(int argc, char ** argv) {
     }
     getchar();
     return 0;
+}
+
+int beClient() {
+    ProtocolFactory protocolFactory(ProtocolType::TCP4);
+    ContentManagerFactory contentManagerFactory(ContentManagerType::RandomText, 100, 100000, CommonHeaders());
+    Host port10000("127.0.0.1", 10000);
+    Client client;
+    if (client.startClients(1, 10, protocolFactory, contentManagerFactory, port10000)) {
+        getchar();
+        return 0;
+    }
+    return 1;
+}
+
+int main(int argc, char ** argv) {
+    // TODO
+    switch (argv[1][0]) {
+            case 's':
+                return beServer();
+            case 'c':
+                return beClient();
+    }
+    return 10;
 }

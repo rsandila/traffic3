@@ -10,7 +10,7 @@ TEST_CASE("Testing contentmanagerfactory.h", "[content]") {
         ContentManagerFactory test(ContentManagerType::RandomText, 100, 100000, commonHeaders);
         std::unique_ptr<Protocol> dummy(new Protocol());
         
-        std::unique_ptr<ContentManager> text(test.createContentManager(std::move(dummy)));
+        std::unique_ptr<ContentManager> text(test.createContentManager(std::move(dummy), true));
         text->Start();
         REQUIRE(text->getType() == ContentManagerType::RandomText);
         text->Stop();

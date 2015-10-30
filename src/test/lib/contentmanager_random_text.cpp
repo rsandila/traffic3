@@ -11,7 +11,6 @@ public:
     MockProtocol() : doExit(false) {
     }
     virtual bool read(std::vector<char> & data) override {
-        // TODO: adjust when we start comparing headers
         if (doExit) {
             return false;
         }
@@ -37,7 +36,7 @@ TEST_CASE("Test random generating random text", "[content]") {
     SECTION("Test text generated") {
         std::unique_ptr<Protocol> proto(new MockProtocol());
         CommonHeaders commonHeaders;
-        ContentManager_Random_Text manager(std::move(proto), commonHeaders);
+        ContentManager_Random_Text manager(std::move(proto), commonHeaders, true);
         manager.setMinimumSize(10);
         manager.setMaximumSize(20);
         REQUIRE(manager.Start());
@@ -48,3 +47,5 @@ TEST_CASE("Test random generating random text", "[content]") {
         REQUIRE(lastWrite.size() <= 20);
     }
 }
+
+// TODO test client and server mode

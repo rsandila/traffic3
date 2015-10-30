@@ -11,7 +11,7 @@
 // place holder class, derive new ContentManagers from this class
 class ContentManagerBase : public ContentManager {
 public:
-    ContentManagerBase(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler);
+    ContentManagerBase(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer);
     ContentManagerBase(ContentManagerBase && other);
     ContentManagerBase & operator=(ContentManagerBase&& other);
     virtual ~ContentManagerBase();
@@ -21,7 +21,8 @@ public:
     virtual void setMaximumSize(unsigned size) noexcept override;
     virtual ContentManagerType getType() const noexcept override = 0;
 protected:
-    void Worker() noexcept;
+    void ServerWorker() noexcept;
+    void ClientWorker() noexcept;
     virtual std::vector<char> ProcessContent(const std::vector<char> & incomingData) noexcept = 0;
     virtual bool PrepareContent() noexcept = 0;
     virtual void CleanupContent() noexcept = 0;

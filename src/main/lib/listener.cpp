@@ -9,13 +9,12 @@
 #include "listener.h"
 
 Listener::Listener(const Host & _host, ProtocolFactory & protocolFactory, ContentManagerFactory & contentManagerFactory) :
-    host(_host), protocol(protocolFactory.createProtocol()), _contentManagerFactory(contentManagerFactory),
+        host(_host), protocol(protocolFactory.createProtocol()), _contentManagerFactory(contentManagerFactory),
     errorState(false), thread(std::thread(std::bind(&Listener::listen, this))) {
 }
 
 Listener::Listener(Listener && other) : host(other.host), protocol(std::move(other.protocol)), errorState(other.errorState),
-        _contentManagerFactory(other._contentManagerFactory), contentManagers(std::move(other.contentManagers)) {
-    thread = std::move(other.thread);
+        _contentManagerFactory(other._contentManagerFactory), contentManagers(std::move(other.contentManagers)), thread(std::move(other.thread)) {
 }
 
 Listener & Listener::operator=(Listener&& other) {
@@ -64,7 +63,7 @@ void Listener::listen() {
         do {
             std::unique_ptr<Protocol> newProtocol = protocol->waitForNewConnection();
             if (newProtocol.get() != nullptr && newProtocol->getState() == Protocol::ProtocolState::OPEN) {
-                std::unique_ptr<ContentManager> tempContentManager =_contentManagerFactory.createContentManager(std::move(newProtocol));
+                std::unique_ptr<ContentManager> tempContentManager =_contentManagerFactory.createContentManager(std::move(newProtocol), true);
                 if (tempContentManager.get() != nullptr) {
                     tempContentManager->Start();
                     contentManagers.push_back(std::move(tempContentManager));
