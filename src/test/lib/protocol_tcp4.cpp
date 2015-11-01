@@ -17,6 +17,7 @@
  USA.
  */
 // Tests for protocol_tcp4.cpp class
+#include <thread>
 #include "catch.hpp"
 #include "hippomocks.h"
 #include "protocol_tcp4.h"
@@ -275,5 +276,52 @@ TEST_CASE("IPV4: close", "[ipv4][protocol]") {
         protocol.close();
         REQUIRE(protocol.getType() == Protocol::ProtocolType::NONE);
         REQUIRE(protocol.getState() == Protocol::ProtocolState::CLOSED);
+    }
+}
+
+TEST_CASE("IPV4: real sending, receiving of data", "[ipv4][protocol]") {
+    SECTION("send/receive") {
+        bool serverSuccess = false;
+        bool testDone = false;
+        bool didTimeout = false;
+        std::vector<char> testBuffer;
+        testBuffer.resize(10);
+        ProtocolTCP4 serverProtocol;
+        Host listenHost("0.0.0.0", 10001);
+        REQUIRE(serverProtocol.listen(listenHost, 10));
+        memcpy(&testBuffer[0], "0123456789", 10);
+        std::thread serverThread([&serverProtocol, &testBuffer, &serverSuccess]() -> void {
+            std::unique_ptr<Protocol> newProtocol = serverProtocol.waitForNewConnection();
+            if (newProtocol.get() != nullptr && newProtocol->isClient() && newProtocol->getState() == Protocol::ProtocolState::OPEN) {
+                if (newProtocol->write(testBuffer)) {
+                    serverSuccess = true;
+                }
+            }
+        });
+        ProtocolTCP4 protocol;
+        Host local("127.0.0.1", 10001);
+        std::thread timeoutThread([&serverProtocol, &protocol, &testDone, &didTimeout]() -> void {
+            int retry = 600;
+            while (--retry > 0 && !testDone) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
+            if (!testDone) {
+                serverProtocol.close();
+                protocol.close();
+                didTimeout = true;
+            }
+        });
+        REQUIRE(protocol.connect(local));
+        std::vector<char> readBuffer;
+        readBuffer.resize(1024);
+        REQUIRE(protocol.read(readBuffer, true));
+        REQUIRE(readBuffer.size() == testBuffer.size());
+        REQUIRE(readBuffer == testBuffer);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        REQUIRE(serverSuccess);
+        testDone = true;
+        serverThread.join();
+        timeoutThread.join();
+        REQUIRE_FALSE(didTimeout);
     }
 }
