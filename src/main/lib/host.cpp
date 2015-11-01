@@ -28,12 +28,12 @@
 const unsigned Host::DEFAULT_PORT = 0;
 Host Host::ALL_INTERFACES(std::string("0.0.0.0"), Host::DEFAULT_PORT);
 
-Host::Host(const std::string & name, unsigned _port) : hostName(name), hasAddr(false), port(_port) {
+Host::Host(const std::string & name, unsigned _port) : hostName(name), port(_port), hasAddr(false), hasAddr6(false) {
     populateToAddr(hostName, _port);
     populateToAddr6(name, _port);
 }
 
-Host::Host(const Host & other) : hostName(other.hostName), hasAddr(other.hasAddr), hasAddr6(other.hasAddr6), port(other.port) {
+Host::Host(const Host & other) : hostName(other.hostName), port(other.port), hasAddr(other.hasAddr), hasAddr6(other.hasAddr6) {
     populateToAddr(hostName, port);
     populateToAddr6(hostName, port);
 }

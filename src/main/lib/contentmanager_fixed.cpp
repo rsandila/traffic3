@@ -18,6 +18,7 @@
  */
 
 #include "contentmanager_fixed.h"
+#include "common.h"
 
 ContentManager_Fixed::ContentManager_Fixed(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer) : ContentManagerBase(std::move(_protocol), _headerHandler, isServer) {
     
@@ -32,6 +33,7 @@ ContentManagerType ContentManager_Fixed::getType() const noexcept {
 }
 
 std::vector<char> ContentManager_Fixed::ProcessContent(const std::vector<char> & incomingData) noexcept {
+    UNUSED(incomingData);
     return fixed;
 }
 

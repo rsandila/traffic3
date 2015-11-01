@@ -19,14 +19,17 @@
 #pragma once
 
 #include "contentmanagertype.h"
+#include "common.h"
 
 // place holder class, don't derive from this one, derive from ContentManagerBase
 class ContentManager {
 public:
     ContentManager() {};
     ContentManager(ContentManager && other) {
+        UNUSED(other);
     };
     ContentManager & operator=(ContentManager&& other) {
+        UNUSED(other);
         return *this;
     }
     virtual bool Stop() {
@@ -36,8 +39,10 @@ public:
         return false;
     }
     virtual void setMinimumSize(unsigned size) noexcept {
+        UNUSED(size);
     };
     virtual void setMaximumSize(unsigned size) noexcept {
+        UNUSED(size);
     };
     virtual ContentManagerType getType() const noexcept {
         return ContentManagerType::None;

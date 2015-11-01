@@ -21,8 +21,8 @@
 #include "logging.h"
 #include "contentmanager_base.h"
 
-ContentManagerBase::ContentManagerBase(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer) : started(false),
-        running(false), protocol(std::move(_protocol)), min(0), max(1024000), headerHandler(_headerHandler), doExitBeforeStart(false),
+ContentManagerBase::ContentManagerBase(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer) :
+        protocol(std::move(_protocol)), min(0), max(1024000), started(false), running(false), doExitBeforeStart(false), headerHandler(_headerHandler),
         worker(std::thread(std::bind((isServer)?&ContentManagerBase::ServerWorker:&ContentManagerBase::ClientWorker, this)))  {
 }
 

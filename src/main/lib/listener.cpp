@@ -31,8 +31,8 @@ Listener::Listener(const Host & _host, ProtocolFactory & protocolFactory, Conten
     errorState(false), thread(std::thread(std::bind(&Listener::listen, this))) {
 }
 
-Listener::Listener(Listener && other) : host(other.host), protocol(std::move(other.protocol)), errorState(other.errorState),
-        _contentManagerFactory(other._contentManagerFactory), contentManagers(std::move(other.contentManagers)), thread(std::move(other.thread)) {
+Listener::Listener(Listener && other) : host(other.host), protocol(std::move(other.protocol)), _contentManagerFactory(other._contentManagerFactory),
+        contentManagers(std::move(other.contentManagers)), errorState(other.errorState), thread(std::move(other.thread)) {
 }
 
 Listener & Listener::operator=(Listener&& other) {

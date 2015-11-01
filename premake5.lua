@@ -3,6 +3,7 @@ workspace "traffic3"
 
 project "common"
 	kind "StaticLib"
+	warnings "Extra"
 	language "C++"
 	targetdir "bin/%{cfg.buildcfg}"
         buildoptions "-std=c++11 -stdlib=libc++"
@@ -19,6 +20,7 @@ project "common"
 
 project "traffic3"
 	kind "ConsoleApp"
+        warnings "Extra"
 	links { "common" }
 	language "C++"
         includedirs { "%{cfg.basedir}/src/main/lib", "%{cfg.basedir}/3rdparty/easyloggingpp/src" }
@@ -36,6 +38,7 @@ project "traffic3"
 
 project "traffic3_test"
 	kind "ConsoleApp"
+        warnings "Extra"
         links { "common" }
 	language "C++"
 	targetdir "test/%{cfg.buildcfg}"

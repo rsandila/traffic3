@@ -19,6 +19,7 @@
 #include "catch.hpp"
 #include "hippomocks.h"
 #include "server.h"
+#include "common.h"
 
 TEST_CASE("Server", "[protocol][server]") {
     SECTION("Working") {
@@ -26,7 +27,7 @@ TEST_CASE("Server", "[protocol][server]") {
         public:
             MockProtocol() : returnedOne(false) {
             }
-            virtual bool listen(const Host & host, const int backlog) override { return true; };
+            virtual bool listen(const Host & host, const int backlog) override { UNUSED(host); UNUSED(backlog); return true; };
             virtual std::unique_ptr<Protocol> waitForNewConnection() override {
                 if (!returnedOne) {
                     returnedOne = true;
@@ -59,8 +60,10 @@ TEST_CASE("Server", "[protocol][server]") {
                 return true;
             }
             virtual void setMinimumSize(unsigned size) noexcept {
+                UNUSED(size);
             };
             virtual void setMaximumSize(unsigned size) noexcept {
+                UNUSED(size);
             };
             virtual ContentManagerType getType() const noexcept {
                 return ContentManagerType::None;
@@ -70,6 +73,8 @@ TEST_CASE("Server", "[protocol][server]") {
         public:
             MockContentManagerFactory() : ContentManagerFactory(ContentManagerType::None, 100, 10000, CommonHeaders()) {;};
             virtual std::unique_ptr<ContentManager> createContentManager(std::unique_ptr<Protocol> protocol, bool isServer) override {
+                UNUSED(protocol);
+                UNUSED(isServer);
                 return std::unique_ptr<ContentManager>(new MockContentManager());
             };
             

@@ -38,8 +38,8 @@ private:
     std::unique_ptr<Protocol> protocol;
     ContentManagerFactory & _contentManagerFactory;
     std::vector<std::unique_ptr<ContentManager>> contentManagers;
-    std::thread thread;
     bool errorState;
+    std::thread thread;
     
     Listener(const Listener &) = delete;
     Listener & operator=(const Listener &) = delete;

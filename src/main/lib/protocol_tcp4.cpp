@@ -56,8 +56,8 @@ bool ProtocolTCP4::read(std::vector<char> & data, bool allowPartialRead) {
         }
         return numRead > 0;
     } else {
-        ssize_t offset = 0;
-        ssize_t numRead;
+        unsigned long offset = 0;
+        unsigned long numRead;
         do {
             numRead = ::read(socket, &data[offset], data.size() - offset);
             if (numRead > 0) {
@@ -74,7 +74,7 @@ bool ProtocolTCP4::write(const std::vector<char> & data) {
     if (state == ProtocolState::CLOSED || data.size() == 0) {
         return false;
     }
-    ssize_t numWritten = ::write(socket, &data[0], data.size());
+    unsigned long numWritten = ::write(socket, &data[0], data.size());
     return numWritten == data.size();
 }
 

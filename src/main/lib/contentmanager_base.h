@@ -45,10 +45,10 @@ protected:
     virtual std::vector<char> ProcessContent(const std::vector<char> & incomingData) noexcept = 0;
     virtual bool PrepareContent() noexcept = 0;
     virtual void CleanupContent() noexcept = 0;
-    int getMin() const noexcept {
+    unsigned long getMin() const noexcept {
         return min;
     }
-    int getMax() const noexcept {
+    unsigned long getMax() const noexcept {
         return max;
     }
     void setMax(int newMax) noexcept {
@@ -56,12 +56,12 @@ protected:
     }
 private:
     std::unique_ptr<Protocol> protocol;
-    std::thread worker;
-    unsigned min, max;
+    unsigned long min, max;
     std::atomic<bool> started;
     std::atomic<bool> running;
     std::atomic<bool> doExitBeforeStart;
     CommonHeaders & headerHandler;
+    std::thread worker;
     
     ContentManagerBase(const ContentManagerBase &) = delete;
     ContentManagerBase & operator=(const ContentManagerBase &) = delete;

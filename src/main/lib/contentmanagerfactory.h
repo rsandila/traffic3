@@ -26,8 +26,8 @@
 
 class ContentManagerFactory {
 public:
-    ContentManagerFactory(const ContentManagerType & _type, unsigned _min, unsigned _max, CommonHeaders _headerHandler) : type(_type),
-            min(_min), max(_max), headerHandler(_headerHandler) {
+    ContentManagerFactory(const ContentManagerType & _type, unsigned _min, unsigned _max, CommonHeaders _headerHandler) :
+            min(_min), max(_max), type(_type), headerHandler(_headerHandler) {
     };
     virtual std::unique_ptr<ContentManager> createContentManager(std::unique_ptr<Protocol> protocol, bool isServer) {
         switch (type) {

@@ -21,6 +21,7 @@
 #include "catch.hpp"
 #include "protocol.h"
 #include "contentmanager_random_text.h"
+#include "common.h"
 
 static std::vector<char> lastWrite;
 static std::atomic<int> order(0);
@@ -40,6 +41,7 @@ public:
     MockProtocol() {
     }
     virtual bool read(std::vector<char> & data, bool allowPartialRead) override {
+        UNUSED(allowPartialRead);
         if (doExit) {
             return false;
         }

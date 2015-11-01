@@ -20,6 +20,7 @@
 #include "catch.hpp"
 #include "hippomocks.h"
 #include "protocol_tcp4.h"
+#include "common.h"
 
 TEST_CASE("IPV4: TCP read test", "[ipv4][protocol]") {
     SECTION("Test read with closed socket") {
@@ -133,7 +134,7 @@ TEST_CASE("IPV4: TCP isReady test", "[ipv4][protocol]") {
         REQUIRE(protocol.connect(Host::ALL_INTERFACES));
         REQUIRE_FALSE(protocol.isReady(Protocol::ProtocolState::CLOSED, 0));
         REQUIRE(protocol.isReady(Protocol::ProtocolState::OPEN, 0));
-        mocks.ExpectCallFunc(::poll).Do([](struct pollfd fds[], nfds_t nfds, int timeout) -> int { fds[0].revents |= POLLRDNORM; return 1; });
+        mocks.ExpectCallFunc(::poll).Do([](struct pollfd fds[], nfds_t nfds, int timeout) -> int { UNUSED(nfds); UNUSED(timeout); fds[0].revents |= POLLRDNORM; return 1; });
         mocks.ExpectCallFunc(::poll).Return(0);
         REQUIRE(protocol.isReady(Protocol::ProtocolState::READ_READY, 0));
         REQUIRE_FALSE(protocol.isReady(Protocol::ProtocolState::READ_READY, 0));
@@ -145,7 +146,7 @@ TEST_CASE("IPV4: TCP isReady test", "[ipv4][protocol]") {
         REQUIRE(protocol.connect(Host::ALL_INTERFACES));
         REQUIRE_FALSE(protocol.isReady(Protocol::ProtocolState::CLOSED, 0));
         REQUIRE(protocol.isReady(Protocol::ProtocolState::OPEN, 0));
-        mocks.ExpectCallFunc(::poll).Do([](struct pollfd fds[], nfds_t nfds, int timeout) -> int { fds[0].revents |= POLLWRNORM; return 1; });
+        mocks.ExpectCallFunc(::poll).Do([](struct pollfd fds[], nfds_t nfds, int timeout) -> int { UNUSED(nfds); UNUSED(timeout); fds[0].revents |= POLLWRNORM; return 1; });
         mocks.ExpectCallFunc(::poll).Return(0);
         REQUIRE(protocol.isReady(Protocol::ProtocolState::WRITE_READY, 0));
         REQUIRE_FALSE(protocol.isReady(Protocol::ProtocolState::WRITE_READY, 0));

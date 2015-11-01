@@ -19,6 +19,7 @@
 // Testing contentmanager_fixed
 #include "catch.hpp"
 #include "contentmanager_fixed.h"
+#include "common.h"
 
 static std::vector<char> fixedLastWrite;
 static std::atomic<int> fixedOrder(0);
@@ -39,6 +40,7 @@ public:
     FixedMockProtocol() {
     }
     virtual bool read(std::vector<char> & data,  bool allowPartialRead) override {
+        UNUSED(allowPartialRead);
         if (fixedDoExit) {
             return false;
         }

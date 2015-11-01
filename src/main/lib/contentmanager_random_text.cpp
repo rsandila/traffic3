@@ -22,9 +22,9 @@
 #include "logging.h"
 
 ContentManager_Random_Text::ContentManager_Random_Text(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer) :
+        ContentManagerBase(std::move(_protocol), _headerHandler, isServer),
         generator(std::chrono::system_clock::now().time_since_epoch().count()),
-        chars(32, 127), distribution(nullptr),
-        ContentManagerBase(std::move(_protocol), _headerHandler, isServer) {
+        chars(32, 127), distribution(nullptr) {
 }
 
 ContentManager_Random_Text::~ContentManager_Random_Text() {
@@ -38,7 +38,7 @@ std::vector<char> ContentManager_Random_Text::ProcessContent(const std::vector<c
     LOG(DEBUG) << "entering with with " << incomingData.size() << std::endl;
     std::vector<char> data;
     data.resize((*distribution)(generator));
-    for (int i = 0; i < data.size(); i++) {
+    for (unsigned long i = 0; i < data.size(); i++) {
         data[i] = chars(generator);
     }
     LOG(DEBUG) << "exiting with with " << data.size() << std::endl;

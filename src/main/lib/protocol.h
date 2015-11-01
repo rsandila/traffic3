@@ -20,6 +20,7 @@
 
 #include <vector>
 #include "host.h"
+#include "common.h"
 
 class Protocol {
 public:
@@ -34,12 +35,12 @@ public:
         CLIENT,
         NONE
     };
-    virtual bool read(std::vector<char> & data, bool allowPartialRead) { return false; };
-    virtual bool write(const std::vector<char> & data) { return false; };
+    virtual bool read(std::vector<char> & data, bool allowPartialRead) { UNUSED(data); UNUSED(allowPartialRead); return false; };
+    virtual bool write(const std::vector<char> & data) { UNUSED(data); return false; };
     virtual ProtocolState getState() { return ProtocolState::CLOSED; };
-    virtual bool isReady(const ProtocolState & expected, int timeoutInMilliseconds) { return false; };
-    virtual bool listen(const Host & host, const int backlog) { return false; };
-    virtual bool connect(const Host & host) { return false; };
+    virtual bool isReady(const ProtocolState & expected, int timeoutInMilliseconds) { UNUSED(expected); UNUSED(timeoutInMilliseconds); return false; };
+    virtual bool listen(const Host & host, const int backlog) { UNUSED(host); UNUSED(backlog); return false; };
+    virtual bool connect(const Host & host) { UNUSED(host); return false; };
     virtual void close() {;};
     virtual bool isServer() { return getType() == ProtocolType::SERVER; };
     virtual bool isClient() { return getType() == ProtocolType::CLIENT; };
