@@ -1,12 +1,14 @@
 #include <arpa/inet.h>
+#include <thread>
 #include "commonheaders.h"
+#include "logging.h"
 
 CommonHeaders::CommonHeaders() {
 }
 
 bool CommonHeaders::read(std::unique_ptr<Protocol> & protocol, std::vector<char> & content) {
     std::vector<char> signature(4 + sizeof(uint32_t));
-    if (protocol->read(signature)) {
+    if (protocol->read(signature, false)) {
         if (signature.size() == (4 + sizeof(uint32_t)) &&
             memcmp(&signature[0], "TRAF", 4) == 0) {
                 // next 4 bytes is length in network order and includes the header
@@ -15,7 +17,10 @@ bool CommonHeaders::read(std::unique_ptr<Protocol> & protocol, std::vector<char>
             if (content.size() == 0) {
                 return true;
             }
-            return protocol->read(content);
+            LOG(DEBUG) << std::this_thread::get_id() << " reading " << length << " " << content.size() << " bytes" << std::endl;
+            return protocol->read(content, false);
+        } else {
+            LOG(WARNING) << std::this_thread::get_id() << " Invalid signature received " << signature.size() << " " << &signature[0] << std::endl;
         }
     }
     return false;

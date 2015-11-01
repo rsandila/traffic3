@@ -4,3 +4,6 @@
 [submodule "3rdparty/hippomocks"]
 	path = 3rdparty/hippomocks
 	url = https://github.com/dascandy/hippomocks.git
+[submodule "3rdparty/easyloggingpp"]
+	path = 3rdparty/easyloggingpp
+	url = https://github.com/easylogging/easyloggingpp.git

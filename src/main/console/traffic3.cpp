@@ -5,7 +5,9 @@
 #include "contentmanagerfactory.h"
 #include "commonheaders.h"
 #include "client.h"
+#include "logging.h"
 
+INITIALIZE_EASYLOGGINGPP
 
 int beServer() {
     ProtocolFactory protocolFactory(ProtocolType::TCP4);
@@ -24,15 +26,18 @@ int beClient() {
     ContentManagerFactory contentManagerFactory(ContentManagerType::RandomText, 100, 100000, CommonHeaders());
     Host port10000("127.0.0.1", 10000);
     Client client;
-    if (client.startClients(1, 10, protocolFactory, contentManagerFactory, port10000)) {
+    if (client.startClients(1, 1, protocolFactory, contentManagerFactory, port10000)) {
         getchar();
         return 0;
+    } else {
+        std::cerr << "Unable to start clients" << std::endl;
     }
     return 1;
 }
 
 int main(int argc, char ** argv) {
     // TODO
+    START_EASYLOGGINGPP(argc, argv);
     switch (argv[1][0]) {
             case 's':
                 return beServer();

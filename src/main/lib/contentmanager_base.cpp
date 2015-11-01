@@ -1,5 +1,5 @@
 #include <thread>
-#include <random>
+#include "logging.h"
 #include "contentmanager_base.h"
 
 ContentManagerBase::ContentManagerBase(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer) : started(false),
@@ -104,9 +104,11 @@ void ContentManagerBase::ClientWorker() noexcept {
     do {
         std::vector<char> outData = ProcessContent(inData);
         if (!headerHandler.write(protocol, outData)) {
+            LOG(WARNING) << std::this_thread::get_id() << " write failed " << errno << std::endl;
             break;
         }
     } while (headerHandler.read(protocol, inData));
+    LOG(WARNING) << std::this_thread::get_id() << " read failed " << errno << std::endl;
     CleanupContent();
 }
 
@@ -127,8 +129,10 @@ void ContentManagerBase::ServerWorker() noexcept {
     while (headerHandler.read(protocol, inData)) {
         std::vector<char> outData = ProcessContent(inData);
         if (!headerHandler.write(protocol, outData)) {
+            LOG(WARNING) << std::this_thread::get_id() << " write failed " << errno << std::endl;
             break;
         }
     }
+    LOG(WARNING) << std::this_thread::get_id() << " read failed " << errno << std::endl;
     CleanupContent();
 }

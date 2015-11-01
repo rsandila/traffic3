@@ -16,7 +16,7 @@ public:
         CLIENT,
         NONE
     };
-    virtual bool read(std::vector<char> & data) { return false; };
+    virtual bool read(std::vector<char> & data, bool allowPartialRead) { return false; };
     virtual bool write(const std::vector<char> & data) { return false; };
     virtual ProtocolState getState() { return ProtocolState::CLOSED; };
     virtual bool isReady(const ProtocolState & expected, int timeoutInMilliseconds) { return false; };

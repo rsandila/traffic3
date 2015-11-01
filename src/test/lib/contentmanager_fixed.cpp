@@ -20,7 +20,7 @@ class FixedMockProtocol: public Protocol {
 public:
     FixedMockProtocol() {
     }
-    virtual bool read(std::vector<char> & data) override {
+    virtual bool read(std::vector<char> & data,  bool allowPartialRead) override {
         if (fixedDoExit) {
             return false;
         }

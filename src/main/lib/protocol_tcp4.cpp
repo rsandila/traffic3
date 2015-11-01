@@ -1,8 +1,10 @@
 #include <sys/socket.h>
 #include <poll.h>
 #include <netdb.h>
+#include <thread>
 #include <netinet/in.h>
 #include "protocol_tcp4.h"
+#include "logging.h"
 
 ProtocolTCP4::ProtocolTCP4() : host(Host::ALL_INTERFACES), type(ProtocolType::NONE),
         socket(-1), state(ProtocolState::CLOSED) {
@@ -24,16 +26,29 @@ ProtocolTCP4::~ProtocolTCP4() {
     close();
 }
 
-bool ProtocolTCP4::read(std::vector<char> & data) {
+bool ProtocolTCP4::read(std::vector<char> & data, bool allowPartialRead) {
     std::unique_lock<std::mutex> lck(lock);
     if (state == ProtocolState::CLOSED) {
         return false;
     }
-    ssize_t numRead = ::read(socket, &data[0], data.size());
-    if (numRead > 0) {
-        data.resize(numRead);
+    if (allowPartialRead) {
+        ssize_t numRead = ::read(socket, &data[0], data.size());
+        if (numRead > 0) {
+            data.resize(numRead);
+        }
+        return numRead > 0;
+    } else {
+        ssize_t offset = 0;
+        ssize_t numRead;
+        do {
+            numRead = ::read(socket, &data[offset], data.size() - offset);
+            if (numRead > 0) {
+                offset += numRead;
+            }
+            LOG(DEBUG) << std::this_thread::get_id() << " read " << numRead << std::endl;
+        } while (numRead > 0 && offset < data.size());
+        return offset == data.size();
     }
-    return numRead > 0;
 }
 
 bool ProtocolTCP4::write(const std::vector<char> & data) {

@@ -10,7 +10,7 @@ TEST_CASE("IPV4: TCP read test", "[ipv4][protocol]") {
         mocks.NeverCallFunc(read);
         std::vector<char> data;
         data.resize(1024);
-        REQUIRE_FALSE(protocol.read(data));
+        REQUIRE_FALSE(protocol.read(data, false));
         REQUIRE(data.size() == 1024);
     }
     SECTION("Test read with connected socket") {
@@ -21,7 +21,7 @@ TEST_CASE("IPV4: TCP read test", "[ipv4][protocol]") {
         mocks.ExpectCallFunc(::read).Return(10);
         std::vector<char> data;
         data.resize(1024);
-        REQUIRE(protocol.read(data));
+        REQUIRE(protocol.read(data, true));
         REQUIRE(data.size() == 10);
     }
     SECTION("Test read failure mode 1 with connected socket") {
@@ -32,7 +32,7 @@ TEST_CASE("IPV4: TCP read test", "[ipv4][protocol]") {
         mocks.ExpectCallFunc(::read).Return(0);
         std::vector<char> data;
         data.resize(1024);
-        REQUIRE_FALSE(protocol.read(data));
+        REQUIRE_FALSE(protocol.read(data, true));
         REQUIRE(data.size() == 1024);
     }
     SECTION("Test read failure mode 2 with connected socket") {
@@ -43,7 +43,7 @@ TEST_CASE("IPV4: TCP read test", "[ipv4][protocol]") {
         mocks.ExpectCallFunc(::read).Return(-1);
         std::vector<char> data;
         data.resize(1024);
-        REQUIRE_FALSE(protocol.read(data));
+        REQUIRE_FALSE(protocol.read(data, true));
         REQUIRE(data.size() == 1024);
     }
 

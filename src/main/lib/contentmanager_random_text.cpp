@@ -1,6 +1,7 @@
 #include <thread>
 #include <random>
 #include "contentmanager_random_text.h"
+#include "logging.h"
 
 ContentManager_Random_Text::ContentManager_Random_Text(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer) :
         generator(std::chrono::system_clock::now().time_since_epoch().count()),
@@ -16,11 +17,13 @@ ContentManagerType ContentManager_Random_Text::getType() const noexcept {
 }
 
 std::vector<char> ContentManager_Random_Text::ProcessContent(const std::vector<char> & incomingData) noexcept {
+    LOG(DEBUG) << "entering with with " << incomingData.size() << std::endl;
     std::vector<char> data;
     data.resize((*distribution)(generator));
     for (int i = 0; i < data.size(); i++) {
         data[i] = chars(generator);
     }
+    LOG(DEBUG) << "exiting with with " << data.size() << std::endl;
     return std::move(data);
 }
 

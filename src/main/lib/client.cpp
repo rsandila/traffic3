@@ -21,6 +21,11 @@ bool Client::startClients(unsigned clientId, unsigned num_clients, ProtocolFacto
             clients.push_back(std::move(_contentManagerFactory.createContentManager(std::move(protocol), false)));
         }
     }
+    for (unsigned cnt = 0; cnt < clients.size(); cnt++) {
+        if (!clients[cnt]->Start()) {
+            return false;
+        }
+    }
     workers[clientId] = std::move(clients);
     return true;
 }

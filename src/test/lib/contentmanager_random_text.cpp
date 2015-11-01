@@ -21,7 +21,7 @@ class MockProtocol: public Protocol {
 public:
     MockProtocol() {
     }
-    virtual bool read(std::vector<char> & data) override {
+    virtual bool read(std::vector<char> & data, bool allowPartialRead) override {
         if (doExit) {
             return false;
         }
