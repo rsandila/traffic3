@@ -17,6 +17,8 @@
  USA.
  */
 // Tests for protocol_tcp4.cpp class
+#include <unistd.h>
+#include <memory.h>
 #include <thread>
 #include "catch.hpp"
 #include "hippomocks.h"

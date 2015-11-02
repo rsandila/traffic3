@@ -17,6 +17,7 @@
  USA.
  */
 // Testing contentmanager_fixed
+#include <memory.h>
 #include "catch.hpp"
 #include "contentmanager_fixed.h"
 #include "common.h"
@@ -55,7 +56,7 @@ public:
     virtual void close() override {
         fixedDoExit = true;
     }
-    
+
     virtual bool write(const std::vector<char> & data) override {
         fixedLastWrite = data;
         fixedAssignOrder(fixedWriteOrder);

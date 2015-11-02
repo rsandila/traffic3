@@ -10,3 +10,6 @@
 [submodule "3rdparty/cmdline"]
 	path = 3rdparty/cmdline
 	url = https://github.com/tanakh/cmdline.git
+[submodule "3rdparty/premake-core"]
+	path = 3rdparty/premake-core
+	url = https://github.com/premake/premake-core.git

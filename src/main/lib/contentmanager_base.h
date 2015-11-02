@@ -23,6 +23,7 @@
 
 #include <thread>
 #include <random>
+#include <atomic>
 #include "contentmanager.h"
 #include "protocol.h"
 #include "commonheaders.h"
@@ -62,7 +63,7 @@ private:
     std::atomic<bool> doExitBeforeStart;
     CommonHeaders & headerHandler;
     std::thread worker;
-    
+
     ContentManagerBase(const ContentManagerBase &) = delete;
     ContentManagerBase & operator=(const ContentManagerBase &) = delete;
 };

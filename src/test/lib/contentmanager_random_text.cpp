@@ -17,6 +17,7 @@
  USA.
  */
 // Testing contentmanager_random_text
+#include <memory.h>
 #include <thread>
 #include "catch.hpp"
 #include "protocol.h"

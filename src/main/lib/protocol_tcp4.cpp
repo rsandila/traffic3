@@ -21,6 +21,7 @@
 #include <netdb.h>
 #include <thread>
 #include <netinet/in.h>
+#include <unistd.h>
 #include "protocol_tcp4.h"
 #include "logging.h"
 
@@ -127,7 +128,7 @@ bool ProtocolTCP4::listen(const Host & host, const int backlog) {
     // setsockopt(socket, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval));
     if (::bind(socket, host.getSockAddress(), host.getSockAddressLen()) == 0) {
         if (::listen(socket, backlog) == 0) {
-            
+
             type = ProtocolType::SERVER;
             state = ProtocolState::OPEN;
             return true;

@@ -19,6 +19,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include "host.h"
 #include "common.h"
 
