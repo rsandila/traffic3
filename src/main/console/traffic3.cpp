@@ -25,43 +25,87 @@
 #include "commonheaders.h"
 #include "client.h"
 #include "logging.h"
+#include "cmdline.h"
 
 INITIALIZE_EASYLOGGINGPP
 
-int beServer() {
+ContentManagerType mapStringToContentManagerType(const std::string & value) {
+    switch (value[0]) {
+            case 'r':
+                if (value == "randomtext") {
+                    return ContentManagerType::RandomText;
+                }
+                break;
+            case 'f':
+                if (value == "fixed") {
+                    return ContentManagerType::Fixed;
+                }
+                break;
+    }
+    return ContentManagerType::None;
+}
+
+int beServer(const cmdline::parser & options) {
     ProtocolFactory protocolFactory(ProtocolType::TCP4);
-    ContentManagerFactory contentManagerFactory(ContentManagerType::RandomText, 100, 100000, CommonHeaders());
+    ContentManagerFactory contentManagerFactory(mapStringToContentManagerType(options.get<std::string>("type")), options.get<unsigned>("min"), options.get<unsigned>("max"), CommonHeaders());
     Server server(protocolFactory, contentManagerFactory);
-    Host port10000("0.0.0.0", 10000);
+    Host port10000(options.get<std::string>("interface"), options.get<unsigned>("port"));
     if (!server.addPort(port10000)) {
-        std::cerr << "Unable to listen on port 10000 TCP" << std::endl;
+        std::cerr << "Unable to listen on port " << options.get<unsigned>("port") << " TCP on interface " << options.get<std::string>("interface") << std::endl;
+        return 1;
     }
     getchar();
     return 0;
 }
 
-int beClient() {
+int beClient(const cmdline::parser & options) {
     ProtocolFactory protocolFactory(ProtocolType::TCP4);
-    ContentManagerFactory contentManagerFactory(ContentManagerType::RandomText, 100, 100000, CommonHeaders());
-    Host port10000("127.0.0.1", 10000);
+    ContentManagerFactory contentManagerFactory(mapStringToContentManagerType(options.get<std::string>("type")), options.get<unsigned>("min"), options.get<unsigned>("max"), CommonHeaders());
+    Host port10000(options.get<std::string>("host"), options.get<unsigned>("port"));
     Client client;
-    if (client.startClients(1, 1, protocolFactory, contentManagerFactory, port10000)) {
+    if (client.startClients(1, options.get<unsigned>("count"), protocolFactory, contentManagerFactory, port10000)) {
         getchar();
         return 0;
     } else {
-        std::cerr << "Unable to start clients" << std::endl;
+        std::cerr << "Unable to start clients on " << options.get<unsigned>("port") << " TCP to server " << options.get<std::string>("host") << std::endl;
     }
     return 1;
 }
 
+void print_usage(const std::string argv0) {
+    std::cerr << std::endl << "\tUsage: " << argv0 << " server|client ...." << std::endl;
+}
+
 int main(int argc, char ** argv) {
     // TODO
+    enum class ModeType {
+        InvalidMode,
+        ServerMode,
+        ClientMode
+    };
+    std::map<std::string, ModeType> modeMap { {"server", ModeType::ServerMode}, {"client", ModeType::ClientMode} };
+    cmdline::parser options;
+    options.add<std::string>("mode", 'o', "Mode [server|client]", true);
+    options.add<std::string>("type", 't', "ContentManager type [randomtext|fixed]", false, "randomtext");
+    options.add<unsigned>("port", 'p', "Port to connect to or listen on", true);
+    options.add<unsigned>("min", 'm', "Minimum value to configure contentmanager with", false, 100);
+    options.add<unsigned>("max", 'a', "Maximum value to configure contentmanager with", false, 100000);
+    options.add<std::string>("host", 'h', "Host to connect to", false, "127.0.0.1");
+    options.add<unsigned>("count", 'c', "Number of clients to use", false, 1);
+    options.add<std::string>("interface", 'i', "Interface IP to listen on", false, "0.0.0.0");
+    options.parse_check(argc, argv);
+
     START_EASYLOGGINGPP(argc, argv);
-    switch (argv[1][0]) {
-            case 's':
-                return beServer();
-            case 'c':
-                return beClient();
+    
+    switch (modeMap[options.get<std::string>("mode")]) {
+        case ModeType::ServerMode:
+            return beServer(options);
+        case ModeType::ClientMode:
+            return beClient(options);
+        default:
+            std::cerr << "Unknown mode: " << options.get<std::string>("mode");
+            print_usage(argv[0]);
+            break;
     }
     return 10;
 }

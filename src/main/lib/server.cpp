@@ -37,8 +37,12 @@ bool Server::addPort(Host & host) {
             return false;
         }
     }
-    listeners.push_back(std::unique_ptr<Listener>(new Listener(host, protocolFactory, contentFactory)));
-    return true;
+    std::unique_ptr<Listener> newListener(new Listener(host, protocolFactory, contentFactory));
+    if (!newListener->inErrorState()) {
+        listeners.push_back(std::move(newListener));
+        return true;
+    }
+    return false;
 }
 
 

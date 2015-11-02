@@ -45,7 +45,7 @@ bool Client::startClients(unsigned clientId, unsigned num_clients, ProtocolFacto
         }
     }
     workers[clientId] = std::move(clients);
-    return true;
+    return workers[clientId].size() == num_clients;
 }
 
 bool Client::stopClients(unsigned clientId) {

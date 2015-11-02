@@ -41,7 +41,7 @@ std::vector<char> ContentManager_Random_Text::ProcessContent(const std::vector<c
     for (unsigned long i = 0; i < data.size(); i++) {
         data[i] = chars(generator);
     }
-    LOG(DEBUG) << "exiting with with " << data.size() << std::endl;
+    LOG(DEBUG) << "exiting with " << data.size() << std::endl;
     return std::move(data);
 }
 

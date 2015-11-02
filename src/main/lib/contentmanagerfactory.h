@@ -22,6 +22,7 @@
 #include "protocol.h"
 #include "contentmanager.h"
 #include "contentmanager_random_text.h"
+#include "contentmanager_fixed.h"
 #include "contentmanagertype.h"
 
 class ContentManagerFactory {
@@ -33,6 +34,8 @@ public:
         switch (type) {
             case ContentManagerType::RandomText:
                 return withCustomizations(std::unique_ptr<ContentManager>(new ContentManager_Random_Text(std::move(protocol), headerHandler, isServer)));
+            case ContentManagerType::Fixed:
+                return withCustomizations(std::unique_ptr<ContentManager>(new ContentManager_Fixed(std::move(protocol), headerHandler, isServer)));
              default:
                 return std::unique_ptr<ContentManager>(new ContentManager());
         }

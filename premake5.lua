@@ -21,7 +21,7 @@ project "traffic3"
 	kind "ConsoleApp"
 	links { "common" }
 	language "C++"
-  includedirs { "%{cfg.basedir}/src/main/lib", "%{cfg.basedir}/3rdparty/easyloggingpp/src" }
+  includedirs { "%{cfg.basedir}/src/main/lib", "%{cfg.basedir}/3rdparty/easyloggingpp/src", "%{cfg.basedir}/3rdparty/cmdline" }
   targetdir "bin/%{cfg.buildcfg}"
 	files { "src/main/console/**.h", "src/main/console/**.cpp" }
 

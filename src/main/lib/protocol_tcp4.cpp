@@ -122,8 +122,12 @@ bool ProtocolTCP4::listen(const Host & host, const int backlog) {
     this->host = host;
     struct protoent *pr = getprotobyname("tcp");
     socket = ::socket(PF_INET, SOCK_STREAM, pr->p_proto);
+    int optval = 1;
+    setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+    // setsockopt(socket, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval));
     if (::bind(socket, host.getSockAddress(), host.getSockAddressLen()) == 0) {
         if (::listen(socket, backlog) == 0) {
+            
             type = ProtocolType::SERVER;
             state = ProtocolState::OPEN;
             return true;

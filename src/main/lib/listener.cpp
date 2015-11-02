@@ -25,6 +25,7 @@
 #include "contentmanagerfactory.h"
 #include "protocolfactory.h"
 #include "listener.h"
+#include "logging.h"
 
 Listener::Listener(const Host & _host, ProtocolFactory & protocolFactory, ContentManagerFactory & contentManagerFactory) :
         host(_host), protocol(protocolFactory.createProtocol()), _contentManagerFactory(contentManagerFactory),
@@ -87,10 +88,12 @@ void Listener::listen() {
                     contentManagers.push_back(std::move(tempContentManager));
                 }
             } else {
+                LOG(WARNING) << " exiting listening loop for " << host << std::endl;
                 exitLoop = true;
             }
         } while (!exitLoop);
     } else {
+        LOG(WARNING) << " listen on " << host << " exiting because of listen error " << std::endl;
         errorState = true;
     }
     
