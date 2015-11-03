@@ -1,7 +1,9 @@
 #!/bin/bash
 
+pushd ..
 git submodule init
 git submodule update
+popd
 OS=linux
 case `uname` in
   Linux)
