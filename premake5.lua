@@ -1,11 +1,10 @@
 workspace "traffic3"
 	configurations { "Debug", "Release" }
 	warnings "Extra"
-	buildoptions "-std=c++11"
 	if os.is("macosx") then
-		buildoptions "-stdlib=libc++"
+		buildoptions "-std=c++11 -stdlib=libc++"
 	else
-		buildoptions "-std=c++11"
+		buildoptions "-std=c++0x"
 		links { "pthread" }
 	end
 	filter "configurations:Debug"
