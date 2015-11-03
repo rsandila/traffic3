@@ -1,0 +1,9 @@
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+
+script:
+  - cd 3rdparty
+  - ./build.sh
