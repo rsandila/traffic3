@@ -1,8 +1,8 @@
 #!/bin/bash
 
 pushd ..
-git submodule init
-git submodule update
+git submodule init || exit 9
+git submodule update || exit 8
 popd
 OS=linux
 case `uname` in
@@ -14,12 +14,12 @@ case `uname` in
     ;;
 esac
 pushd premake-core
-git submodule init
-git submodule update
-make -f Bootstrap.mak ${OS}
+git submodule init || exit 7
+git submodule update || exit 6
+make -f Bootstrap.mak ${OS} || exit 5
 popd
 pushd ..
-./3rdparty/premake-core/bin/release/premake5 gmake
-make clean all
-./test/Debug/traffic3_test
+./3rdparty/premake-core/bin/release/premake5 gmake || exit 4
+make clean all || exit 2
+./test/Debug/traffic3_test || exit 3
 popd

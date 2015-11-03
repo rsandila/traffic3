@@ -2,8 +2,17 @@ language: cpp
 
 compiler:
   - gcc
-  - clang
+
+sudo: false
 
 script:
-  - cd 3rdparty
-  - ./build.sh
+  - git submodule init
+  - git submodule update
+  - cd 3rdparty/premake-core
+  - git submodule init
+  - git submodule update
+  - make -f Bootstrap.mak linux
+  - cd ../..
+  - ./3rdparty/premake-core/bin/release/premake5 gmake
+  - make clean all
+  - ./test/Debug/traffic3_test
