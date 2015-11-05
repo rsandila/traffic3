@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Robert Sandilands (Pty) Ltd.
+ * Copyright (C) 2015 Robert Sandilands
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include "contentmanager.h"
 #include "contentmanager_random_text.h"
 #include "contentmanager_fixed.h"
+#include "contentmanager_echo.h"
 #include "contentmanagertype.h"
 
 class ContentManagerFactory {
@@ -36,7 +37,9 @@ public:
                 return withCustomizations(std::unique_ptr<ContentManager>(new ContentManager_Random_Text(std::move(protocol), headerHandler, isServer)));
             case ContentManagerType::Fixed:
                 return withCustomizations(std::unique_ptr<ContentManager>(new ContentManager_Fixed(std::move(protocol), headerHandler, isServer)));
-             default:
+            case ContentManagerType::Echo:
+                return withCustomizations(std::unique_ptr<ContentManager>(new ContentManager_Echo(std::move(protocol), headerHandler, isServer)));
+            default:
                 return std::unique_ptr<ContentManager>(new ContentManager());
         }
     };

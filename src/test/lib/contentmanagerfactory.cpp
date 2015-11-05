@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Robert Sandilands (Pty) Ltd.
+ * Copyright (C) 2015 Robert Sandilands
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,6 +42,16 @@ TEST_CASE("Testing contentmanagerfactory.h", "[content]") {
         text->Start();
         REQUIRE(text->getType() == ContentManagerType::Fixed);
         text->Stop();
-
     }
+    SECTION("Test echo") {
+        CommonHeaders commonHeaders;
+        ContentManagerFactory test(ContentManagerType::Echo, 100, 100000, commonHeaders);
+        std::unique_ptr<Protocol> dummy(new Protocol());
+        
+        std::unique_ptr<ContentManager> text(test.createContentManager(std::move(dummy), true));
+        text->Start();
+        REQUIRE(text->getType() == ContentManagerType::Echo);
+        text->Stop();
+    }
+
 }

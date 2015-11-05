@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Robert Sandilands (Pty) Ltd.
+ * Copyright (C) 2015 Robert Sandilands 
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

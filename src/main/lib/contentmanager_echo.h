@@ -18,22 +18,22 @@
  */
 #pragma once
 
+#include <thread>
+#include <random>
+#include "contentmanager_base.h"
 #include "protocol.h"
-#include "protocol_tcp4.h"
-#include "protocoltype.h"
 
-class ProtocolFactory {
+// place holder class
+class ContentManager_Echo : public ContentManagerBase {
 public:
-    ProtocolFactory(const ProtocolType & _type) : type(_type) {
-    };
-    virtual std::unique_ptr<Protocol> createProtocol() {
-        switch (type) {
-            case ProtocolType::TCP4:
-                return std::unique_ptr<Protocol>(new ProtocolTCP4());
-            default:
-                return std::unique_ptr<Protocol>(new Protocol());
-        }
-    };
+    ContentManager_Echo(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer);
+    virtual ~ContentManager_Echo();
+    virtual ContentManagerType getType() const noexcept override;
+    void setMaximumSize(unsigned size) noexcept override;
+protected:
+    virtual std::vector<char> ProcessContent(const std::vector<char> & incomingData) noexcept override;
+    virtual bool PrepareContent() noexcept override;
+    virtual void CleanupContent() noexcept override;
 private:
-    ProtocolType type;
+    std::vector<char> fixed;
 };

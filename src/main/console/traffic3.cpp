@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003 Robert Sandilands (Pty) Ltd.
+ * Copyright (C) 2015 Robert Sandilands
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,6 +39,10 @@ ContentManagerType mapStringToContentManagerType(const std::string & value) {
             case 'f':
                 if (value == "fixed") {
                     return ContentManagerType::Fixed;
+                }
+            case 'e':
+                if (value == "echo") {
+                    return ContentManagerType::Echo;
                 }
                 break;
     }
@@ -86,7 +90,7 @@ int main(int argc, char ** argv) {
     std::map<std::string, ModeType> modeMap { {"server", ModeType::ServerMode}, {"client", ModeType::ClientMode} };
     cmdline::parser options;
     options.add<std::string>("mode", 'o', "Mode [server|client]", true);
-    options.add<std::string>("type", 't', "ContentManager type [randomtext|fixed]", false, "randomtext");
+    options.add<std::string>("type", 't', "ContentManager type [randomtext|fixed|echo]", false, "randomtext");
     options.add<unsigned>("port", 'p', "Port to connect to or listen on", true);
     options.add<unsigned>("min", 'm', "Minimum value to configure contentmanager with", false, 100);
     options.add<unsigned>("max", 'a', "Maximum value to configure contentmanager with", false, 100000);
