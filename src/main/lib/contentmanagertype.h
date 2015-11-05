@@ -20,6 +20,7 @@
 
 enum class ContentManagerType {
     RandomText,
+    RandomBinary,
     Fixed,
     Echo,
     None

@@ -11,7 +11,7 @@ Serious work in progress.
 
 Currently builds on my Mac OS X, Ubuntu 14 LTS and CentOS 7 systems.
 
-Will not work in FreeBSD until premake5 is ported to FreeBSD.
+Will not work on FreeBSD until premake5 is ported to FreeBSD.
 
 Travis CI Status:
 [![Build Status](https://travis-ci.org/rsandila/traffic3.svg?branch=master)](https://travis-ci.org/rsandila/traffic3.svg?branch=master)
@@ -29,8 +29,8 @@ Travis CI Status:
 
 ## Version 3.0
 
-1. Add echo contentmanager
-1. Add random (binary) contentmanager
+1. ~~Add echo contentmanager~~
+1. ~~Add random (binary) contentmanager~~
 1. Add UDP4
 1. Add TCP6
 1. Add UDP6
