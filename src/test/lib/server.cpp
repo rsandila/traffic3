@@ -51,21 +51,21 @@ TEST_CASE("Server", "[protocol][server]") {
         static int contentManagerCounterStart = 0;
         static int contentManagerCounterStop = 0;
         class MockContentManager: public ContentManager {
-            virtual bool Stop() {
+            virtual bool Stop() override {
                 contentManagerCounterStop++;
                 return true;
             };
-            virtual bool Start() {
+            virtual bool Start() override {
                 contentManagerCounterStart++;
                 return true;
             }
-            virtual void setMinimumSize(unsigned size) noexcept {
+            virtual void setMinimumSize(unsigned long size) noexcept override {
                 UNUSED(size);
             };
-            virtual void setMaximumSize(unsigned size) noexcept {
+            virtual void setMaximumSize(unsigned long size) noexcept override {
                 UNUSED(size);
             };
-            virtual ContentManagerType getType() const noexcept {
+            virtual ContentManagerType getType() const noexcept override {
                 return ContentManagerType::None;
             }
         };

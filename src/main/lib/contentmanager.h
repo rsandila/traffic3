@@ -32,16 +32,17 @@ public:
         UNUSED(other);
         return *this;
     }
+    virtual ~ContentManager() {;};
     virtual bool Stop() {
         return false;
     };
     virtual bool Start() {
         return false;
     }
-    virtual void setMinimumSize(unsigned size) noexcept {
+    virtual void setMinimumSize(unsigned long size) noexcept {
         UNUSED(size);
     };
-    virtual void setMaximumSize(unsigned size) noexcept {
+    virtual void setMaximumSize(unsigned long size) noexcept {
         UNUSED(size);
     };
     virtual ContentManagerType getType() const noexcept {
@@ -51,3 +52,4 @@ private:
     ContentManager(const ContentManager &) = delete;
     ContentManager & operator=(const ContentManager &) = delete;
 };
+

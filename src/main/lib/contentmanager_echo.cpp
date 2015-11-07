@@ -44,6 +44,6 @@ bool ContentManager_Echo::PrepareContent() noexcept {
 void ContentManager_Echo::CleanupContent() noexcept {
 }
 
-void ContentManager_Echo::setMaximumSize(unsigned size) noexcept {
+void ContentManager_Echo::setMaximumSize(unsigned long size) noexcept {
     setMax(size);
 }

@@ -20,11 +20,12 @@
 
 #include <mutex>
 #include "protocol.h"
+#include "protocoltype.h"
 
-class ProtocolTCP4: public Protocol {
+class ProtocolUDP4: public Protocol {
 public:
-    ProtocolTCP4();
-    virtual ~ProtocolTCP4();
+    ProtocolUDP4();
+    virtual ~ProtocolUDP4();
     virtual bool read(std::vector<char> & data, bool allowPartialRead) override;
     virtual bool write(const std::vector<char> & data) override;
     virtual ProtocolState getState() override;
@@ -41,9 +42,9 @@ protected:
     int socket;
     ProtocolState state;
 private:
-    ProtocolTCP4(int socket, socklen_t len, const struct sockaddr * addr);
-    ProtocolTCP4(const ProtocolTCP4 &) = delete;
-    ProtocolTCP4 & operator=(const ProtocolTCP4 &) = delete;
-    ProtocolTCP4(ProtocolTCP4 && other);
+    ProtocolUDP4(int socket, socklen_t len, const struct sockaddr * addr);
+    ProtocolUDP4(const ProtocolUDP4 &) = delete;
+    ProtocolUDP4 & operator=(const ProtocolUDP4 &) = delete;
+    ProtocolUDP4(ProtocolUDP4 && other);
 };
 

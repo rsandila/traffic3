@@ -51,6 +51,6 @@ bool ContentManager_Fixed::PrepareContent() noexcept {
 void ContentManager_Fixed::CleanupContent() noexcept {
 }
 
-void ContentManager_Fixed::setMaximumSize(unsigned size) noexcept {
+void ContentManager_Fixed::setMaximumSize(unsigned long size) noexcept {
     setMax(size);
 }

@@ -24,6 +24,9 @@
 CommonHeaders::CommonHeaders() {
 }
 
+CommonHeaders::~CommonHeaders() {
+}
+
 bool CommonHeaders::read(std::unique_ptr<Protocol> & protocol, std::vector<char> & content) {
     std::vector<char> signature(4 + sizeof(uint32_t));
     if (protocol->read(signature, false)) {

@@ -238,9 +238,15 @@ TEST_CASE("IPV4: waitForNewConnection", "[ipv4][protocol]") {
     SECTION("wait if accept works") {
         MockRepository mocks;
         ProtocolTCP4 protocol;
+        mocks.ExpectCallFunc(::socket).Return(1);
+        mocks.ExpectCallFunc(::setsockopt).With(_, _, _, _, _).Return(0);
         mocks.ExpectCallFunc(::bind).Return(0);
         mocks.ExpectCallFunc(::listen).Return(0);
         mocks.ExpectCallFunc(::accept).Return(1);
+        mocks.ExpectCallFunc(::shutdown).Return(0);
+        mocks.ExpectCallFunc(::close).Return(0);
+        mocks.ExpectCallFunc(::shutdown).Return(0);
+        mocks.ExpectCallFunc(::close).Return(0);
         REQUIRE(protocol.listen(Host::ALL_INTERFACES, 10));
         REQUIRE(protocol.getType() == Protocol::ProtocolType::SERVER);
         REQUIRE(protocol.getState() == Protocol::ProtocolState::OPEN);

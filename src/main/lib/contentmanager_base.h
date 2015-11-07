@@ -37,8 +37,8 @@ public:
     virtual ~ContentManagerBase();
     virtual bool Stop() noexcept override;
     virtual bool Start() noexcept override;
-    virtual void setMinimumSize(unsigned size) noexcept override;
-    virtual void setMaximumSize(unsigned size) noexcept override;
+    virtual void setMinimumSize(unsigned long size) noexcept override;
+    virtual void setMaximumSize(unsigned long size) noexcept override;
     virtual ContentManagerType getType() const noexcept override = 0;
 protected:
     void ServerWorker() noexcept;
@@ -52,7 +52,7 @@ protected:
     unsigned long getMax() const noexcept {
         return max;
     }
-    void setMax(int newMax) noexcept {
+    void setMax(unsigned long newMax) noexcept {
         max = newMax;
     }
 private:

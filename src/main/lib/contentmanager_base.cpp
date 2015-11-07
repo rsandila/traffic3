@@ -83,7 +83,9 @@ bool ContentManagerBase::Stop() noexcept {
         }
         protocol->close();
     }
-    worker.join();
+    if (worker.joinable()) {
+        worker.join();
+    }
     return true;
 }
 
@@ -95,11 +97,11 @@ bool ContentManagerBase::Start() noexcept {
     return true;
 }
 
-void ContentManagerBase::setMinimumSize(unsigned size) noexcept {
+void ContentManagerBase::setMinimumSize(unsigned long size) noexcept {
     min = size;
 }
 
-void ContentManagerBase::setMaximumSize(unsigned size) noexcept {
+void ContentManagerBase::setMaximumSize(unsigned long size) noexcept {
     setMax(size);
     if (getMax() < min) {
         min = size;

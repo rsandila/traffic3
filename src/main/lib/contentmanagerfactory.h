@@ -32,6 +32,7 @@ public:
     ContentManagerFactory(const ContentManagerType & _type, unsigned _min, unsigned _max, CommonHeaders _headerHandler) :
             min(_min), max(_max), type(_type), headerHandler(_headerHandler) {
     };
+    virtual ~ContentManagerFactory() {;};
     virtual std::unique_ptr<ContentManager> createContentManager(std::unique_ptr<Protocol> protocol, bool isServer) {
         switch (type) {
             case ContentManagerType::RandomText:

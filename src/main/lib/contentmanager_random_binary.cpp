@@ -46,7 +46,7 @@ std::vector<char> ContentManager_Random_Binary::ProcessContent(const std::vector
 }
 
 bool ContentManager_Random_Binary::PrepareContent() noexcept {
-    distribution = std::move(std::unique_ptr<std::uniform_int_distribution<int>>(new std::uniform_int_distribution<int>(getMin(), getMax())));
+    distribution = std::move(std::unique_ptr<std::uniform_int_distribution<int>>(new std::uniform_int_distribution<int>(getMin(), (int)getMax())));
     return true;
 }
 

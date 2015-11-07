@@ -20,16 +20,20 @@
 
 #include "protocol.h"
 #include "protocol_tcp4.h"
+#include "protocol_udp4.h"
 #include "protocoltype.h"
 
 class ProtocolFactory {
 public:
     ProtocolFactory(const ProtocolType & _type) : type(_type) {
     };
+    virtual ~ProtocolFactory() {;};
     virtual std::unique_ptr<Protocol> createProtocol() {
         switch (type) {
             case ProtocolType::TCP4:
                 return std::unique_ptr<Protocol>(new ProtocolTCP4());
+            case ProtocolType::UDP4:
+                return std::unique_ptr<Protocol>(new ProtocolUDP4());
             default:
                 return std::unique_ptr<Protocol>(new Protocol());
         }

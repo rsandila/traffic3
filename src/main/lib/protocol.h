@@ -36,6 +36,7 @@ public:
         CLIENT,
         NONE
     };
+    virtual ~Protocol() {;};
     virtual bool read(std::vector<char> & data, bool allowPartialRead) { UNUSED(data); UNUSED(allowPartialRead); return false; };
     virtual bool write(const std::vector<char> & data) { UNUSED(data); return false; };
     virtual ProtocolState getState() { return ProtocolState::CLOSED; };
