@@ -19,6 +19,7 @@
 #pragma once
 
 #include <mutex>
+#include <atomic>
 #include "protocol.h"
 #include "protocoltype.h"
 
