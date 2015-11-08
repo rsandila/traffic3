@@ -32,7 +32,8 @@ TEST_CASE("IPV4: TCP read test", "[ipv4][protocol]") {
         mocks.NeverCallFunc(read);
         std::vector<char> data;
         data.resize(1024);
-        REQUIRE_FALSE(protocol.read(data, false));
+        Host hostState = Host::ALL_INTERFACES;
+        REQUIRE_FALSE(protocol.read(data, false, hostState));
         REQUIRE(data.size() == 1024);
     }
     SECTION("Test read with connected socket") {
@@ -43,7 +44,8 @@ TEST_CASE("IPV4: TCP read test", "[ipv4][protocol]") {
         mocks.ExpectCallFunc(::read).Return(10);
         std::vector<char> data;
         data.resize(1024);
-        REQUIRE(protocol.read(data, true));
+        Host hostState = Host::ALL_INTERFACES;
+        REQUIRE(protocol.read(data, true, hostState));
         REQUIRE(data.size() == 10);
     }
     SECTION("Test read failure mode 1 with connected socket") {
@@ -54,7 +56,8 @@ TEST_CASE("IPV4: TCP read test", "[ipv4][protocol]") {
         mocks.ExpectCallFunc(::read).Return(0);
         std::vector<char> data;
         data.resize(1024);
-        REQUIRE_FALSE(protocol.read(data, true));
+        Host hostState = Host::ALL_INTERFACES;
+        REQUIRE_FALSE(protocol.read(data, true, hostState));
         REQUIRE(data.size() == 1024);
     }
     SECTION("Test read failure mode 2 with connected socket") {
@@ -65,7 +68,8 @@ TEST_CASE("IPV4: TCP read test", "[ipv4][protocol]") {
         mocks.ExpectCallFunc(::read).Return(-1);
         std::vector<char> data;
         data.resize(1024);
-        REQUIRE_FALSE(protocol.read(data, true));
+        Host hostState = Host::ALL_INTERFACES;
+        REQUIRE_FALSE(protocol.read(data, true, hostState));
         REQUIRE(data.size() == 1024);
     }
 
@@ -78,7 +82,8 @@ TEST_CASE("IPV4: TCP write test", "[ipv4][protocol]") {
         mocks.NeverCallFunc(::write);
         std::vector<char> data;
         data.resize(1024);
-        REQUIRE_FALSE(protocol.write(data));
+        Host hostState = Host::ALL_INTERFACES;
+        REQUIRE_FALSE(protocol.write(data, hostState));
         REQUIRE(data.size() == 1024);
     }
     SECTION("Test write with connected socket") {
@@ -89,7 +94,8 @@ TEST_CASE("IPV4: TCP write test", "[ipv4][protocol]") {
         mocks.ExpectCallFunc(::write).Return(10);
         std::vector<char> data;
         data.resize(10);
-        REQUIRE(protocol.write(data));
+        Host hostState = Host::ALL_INTERFACES;
+        REQUIRE(protocol.write(data, hostState));
         REQUIRE(data.size() == 10);
     }
     SECTION("Test write failure mode 1 with connected socket") {
@@ -100,7 +106,8 @@ TEST_CASE("IPV4: TCP write test", "[ipv4][protocol]") {
         mocks.ExpectCallFunc(::write).Return(0);
         std::vector<char> data;
         data.resize(1024);
-        REQUIRE_FALSE(protocol.write(data));
+        Host hostState = Host::ALL_INTERFACES;
+        REQUIRE_FALSE(protocol.write(data, hostState));
         REQUIRE(data.size() == 1024);
     }
     SECTION("Test write failure mode 2 with connected socket") {
@@ -111,7 +118,8 @@ TEST_CASE("IPV4: TCP write test", "[ipv4][protocol]") {
         mocks.ExpectCallFunc(::write).Return(-1);
         std::vector<char> data;
         data.resize(1024);
-        REQUIRE_FALSE(protocol.write(data));
+        Host hostState = Host::ALL_INTERFACES;
+        REQUIRE_FALSE(protocol.write(data, hostState));
         REQUIRE(data.size() == 1024);
     }
 
@@ -301,7 +309,8 @@ TEST_CASE("IPV4: real sending, receiving of data", "[ipv4][protocol]") {
         std::thread serverThread([&serverProtocol, &testBuffer, &serverSuccess]() -> void {
             std::unique_ptr<Protocol> newProtocol = serverProtocol.waitForNewConnection();
             if (newProtocol.get() != nullptr && newProtocol->isClient() && newProtocol->getState() == Protocol::ProtocolState::OPEN) {
-                if (newProtocol->write(testBuffer)) {
+                Host hostState = Host::ALL_INTERFACES;
+                if (newProtocol->write(testBuffer, hostState)) {
                     serverSuccess = true;
                 }
             }
@@ -322,7 +331,8 @@ TEST_CASE("IPV4: real sending, receiving of data", "[ipv4][protocol]") {
         REQUIRE(protocol.connect(local));
         std::vector<char> readBuffer;
         readBuffer.resize(1024);
-        REQUIRE(protocol.read(readBuffer, true));
+        Host hostState = Host::ALL_INTERFACES;
+        REQUIRE(protocol.read(readBuffer, true, hostState));
         REQUIRE(readBuffer.size() == testBuffer.size());
         REQUIRE(readBuffer == testBuffer);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));

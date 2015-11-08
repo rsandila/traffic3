@@ -25,8 +25,8 @@ class ProtocolTCP4: public Protocol {
 public:
     ProtocolTCP4();
     virtual ~ProtocolTCP4();
-    virtual bool read(std::vector<char> & data, bool allowPartialRead) override;
-    virtual bool write(const std::vector<char> & data) override;
+    virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) override;
+    virtual bool write(const std::vector<char> & data, const Host & hostState) override;
     virtual ProtocolState getState() override;
     virtual bool isReady(const ProtocolState & expected, int timeoutInMilliseconds) override;
     virtual bool listen(const Host & host, const int backlog) override;

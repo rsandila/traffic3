@@ -45,7 +45,8 @@ ProtocolTCP4::~ProtocolTCP4() {
     close();
 }
 
-bool ProtocolTCP4::read(std::vector<char> & data, bool allowPartialRead) {
+bool ProtocolTCP4::read(std::vector<char> & data, bool allowPartialRead, Host & hostState) {
+    UNUSED(hostState);
     std::unique_lock<std::mutex> lck(lock);
     if (state == ProtocolState::CLOSED) {
         return false;
@@ -70,7 +71,8 @@ bool ProtocolTCP4::read(std::vector<char> & data, bool allowPartialRead) {
     }
 }
 
-bool ProtocolTCP4::write(const std::vector<char> & data) {
+bool ProtocolTCP4::write(const std::vector<char> & data, const Host & hostState) {
+    UNUSED(hostState);
     std::unique_lock<std::mutex> lck(lock);
     if (state == ProtocolState::CLOSED || data.size() == 0) {
         return false;

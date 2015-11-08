@@ -40,8 +40,9 @@ class EchoMockProtocol: public Protocol {
 public:
     EchoMockProtocol() : firstRead(false) {
     }
-    virtual bool read(std::vector<char> & data,  bool allowPartialRead) override {
+    virtual bool read(std::vector<char> & data,  bool allowPartialRead, Host & hostState) override {
         UNUSED(allowPartialRead);
+        UNUSED(hostState);
         if (echoDoExit) {
             return false;
         }
@@ -63,7 +64,8 @@ public:
         echoDoExit = true;
     }
     
-    virtual bool write(const std::vector<char> & data) override {
+    virtual bool write(const std::vector<char> & data, const Host & hostState) override {
+        UNUSED(hostState);
         echoLastWrite = data;
         echoAssignOrder(echoWriteOrder);
         return true;

@@ -41,8 +41,9 @@ class MockProtocol: public Protocol {
 public:
     MockProtocol() {
     }
-    virtual bool read(std::vector<char> & data, bool allowPartialRead) override {
+    virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) override {
         UNUSED(allowPartialRead);
+        UNUSED(hostState);
         if (doExit) {
             return false;
         }
@@ -58,7 +59,8 @@ public:
         doExit = true;
     }
 
-    virtual bool write(const std::vector<char> & data) override {
+    virtual bool write(const std::vector<char> & data, const Host & hostState) override {
+        UNUSED(hostState);
         lastWrite = data;
         assignOrder(writeOrder);
         return true;

@@ -37,8 +37,10 @@ public:
         NONE
     };
     virtual ~Protocol() {;};
-    virtual bool read(std::vector<char> & data, bool allowPartialRead) { UNUSED(data); UNUSED(allowPartialRead); return false; };
-    virtual bool write(const std::vector<char> & data) { UNUSED(data); return false; };
+    virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) { UNUSED(data);
+        UNUSED(allowPartialRead); UNUSED(hostState); return false; };
+    virtual bool write(const std::vector<char> & data, const Host & hostState) { UNUSED(data); UNUSED(hostState);
+        return false; };
     virtual ProtocolState getState() { return ProtocolState::CLOSED; };
     virtual bool isReady(const ProtocolState & expected, int timeoutInMilliseconds) { UNUSED(expected); UNUSED(timeoutInMilliseconds); return false; };
     virtual bool listen(const Host & host, const int backlog) { UNUSED(host); UNUSED(backlog); return false; };

@@ -26,8 +26,8 @@ class ProtocolUDP4: public Protocol {
 public:
     ProtocolUDP4();
     virtual ~ProtocolUDP4();
-    virtual bool read(std::vector<char> & data, bool allowPartialRead) override;
-    virtual bool write(const std::vector<char> & data) override;
+    virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) override;
+    virtual bool write(const std::vector<char> & data, const Host & hostState) override;
     virtual ProtocolState getState() override;
     virtual bool isReady(const ProtocolState & expected, int timeoutInMilliseconds) override;
     virtual bool listen(const Host & host, const int backlog) override;
@@ -41,6 +41,9 @@ protected:
     std::mutex lock;
     int socket;
     ProtocolState state;
+    std::atomic<int> numConnections;
+
+    virtual bool realListen(const Host & host);
 private:
     ProtocolUDP4(int socket, socklen_t len, const struct sockaddr * addr);
     ProtocolUDP4(const ProtocolUDP4 &) = delete;

@@ -26,11 +26,11 @@
 #include "logging.h"
 
 ProtocolUDP4::ProtocolUDP4() : host(Host::ALL_INTERFACES), type(ProtocolType::NONE),
-        socket(-1), state(ProtocolState::CLOSED) {
+        socket(-1), state(ProtocolState::CLOSED), numConnections(0) {
 }
 
 ProtocolUDP4::ProtocolUDP4(int newSocket, socklen_t len, const struct sockaddr * addr) : host(len, addr),
-type(ProtocolType::CLIENT), socket(newSocket), state(ProtocolState::OPEN) {
+        type(ProtocolType::CLIENT), socket(newSocket), state(ProtocolState::OPEN) {
 }
 
 ProtocolUDP4::ProtocolUDP4(ProtocolUDP4 && other) : host(other.host),
@@ -45,41 +45,35 @@ ProtocolUDP4::~ProtocolUDP4() {
     close();
 }
 
-bool ProtocolUDP4::read(std::vector<char> & data, bool allowPartialRead) {
+bool ProtocolUDP4::read(std::vector<char> & data, bool allowPartialRead, Host & hostState) {
     std::unique_lock<std::mutex> lck(lock);
     if (state == ProtocolState::CLOSED) {
         return false;
     }
-    /*
-     slen=sizeof( addr );
-     result=::recvfrom( sock, data, len, rflag, (struct sockaddr *)&addr, &slen );
-     */
+    struct sockaddr addr;
+    socklen_t addr_len = sizeof(addr);
+    ssize_t numRead = ::recvfrom(socket, &data[0], data.size(), (allowPartialRead)?0:MSG_WAITALL, &addr, &addr_len);
+    LOG(DEBUG) << std::this_thread::get_id() << " read " << numRead << std::endl;
+    if (numRead < 0) {
+        return false;
+    }
+    hostState = Host(addr_len, &addr);
     if (allowPartialRead) {
-        ssize_t numRead = ::read(socket, &data[0], data.size());
-        if (numRead > 0) {
-            data.resize(numRead);
-        }
         return numRead > 0;
     } else {
-        unsigned long offset = 0;
-        unsigned long numRead;
-        do {
-            numRead = ::read(socket, &data[offset], data.size() - offset);
-            if (numRead > 0) {
-                offset += numRead;
-            }
-            LOG(DEBUG) << std::this_thread::get_id() << " read " << numRead << std::endl;
-        } while (numRead > 0 && offset < data.size());
-        return offset == data.size();
+        return (unsigned long)numRead == data.size();
     }
 }
 
-bool ProtocolUDP4::write(const std::vector<char> & data) {
+bool ProtocolUDP4::write(const std::vector<char> & data, const Host & hostState) {
     std::unique_lock<std::mutex> lck(lock);
     if (state == ProtocolState::CLOSED || data.size() == 0) {
         return false;
     }
-    unsigned long numWritten =::sendto(socket, &data[0], data.size(), 0, host.getSockAddress(), host.getSockAddressLen());
+    Host activeHost = (hostState == Host::ALL_INTERFACES)?host:hostState;
+    unsigned long numWritten =::sendto(socket, &data[0], data.size(), 0, activeHost.getSockAddress(),
+                                       activeHost.getSockAddressLen());
+    LOG(DEBUG) << std::this_thread::get_id() << " wrote " << numWritten << std::endl;
     return numWritten == data.size();
 }
 
@@ -121,6 +115,15 @@ bool ProtocolUDP4::isReady(const ProtocolState & expected, int timeoutInMillisec
 
 bool ProtocolUDP4::listen(const Host & localHost, const int backlog) {
     std::unique_lock<std::mutex> lck(lock);
+    UNUSED(backlog);
+    this->host = localHost;
+    type = ProtocolType::SERVER;
+    state = ProtocolState::OPEN;
+    return true;
+}
+
+bool ProtocolUDP4::realListen(const Host & localHost) {
+    std::unique_lock<std::mutex> lck(lock);
     if (state != ProtocolState::CLOSED || type != ProtocolType::NONE) {
         return false;
     }
@@ -133,11 +136,9 @@ bool ProtocolUDP4::listen(const Host & localHost, const int backlog) {
     int optval = 1;
     setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
     if (::bind(socket, host.getSockAddress(), host.getSockAddressLen()) == 0) {
-        if (::listen(socket, backlog) == 0) {
-            type = ProtocolType::SERVER;
-            state = ProtocolState::OPEN;
-            return true;
-        }
+        type = ProtocolType::CLIENT;
+        state = ProtocolState::OPEN;
+        return true;
     }
     return false;
 }
@@ -153,13 +154,18 @@ bool ProtocolUDP4::connect(const Host & localHost) {
     if (socket < 0) {
         return false;
     }
-    if (::connect(socket, host.getSockAddress(), host.getSockAddressLen()) < 0) {
-        ::close(socket);
-        return false;
+    int optval = 1;
+    setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+    if (::bind(socket, host.getSockAddress(), host.getSockAddressLen()) == 0) {
+        if (::connect(socket, host.getSockAddress(), host.getSockAddressLen()) < 0) {
+            ::close(socket);
+            return false;
+        }
+        type = ProtocolType::CLIENT;
+        state = ProtocolState::OPEN;
+        return true;
     }
-    type = ProtocolType::CLIENT;
-    state = ProtocolState::OPEN;
-    return true;
+    return false;
 }
 
 void ProtocolUDP4::close() {
@@ -179,7 +185,18 @@ Protocol::ProtocolType ProtocolUDP4::getType() {
 }
 
 std::unique_ptr<Protocol> ProtocolUDP4::waitForNewConnection() {
-    // TODO
+    if (numConnections == 0) {
+        numConnections++;
+        std::unique_ptr<ProtocolUDP4> returnValue(new ProtocolUDP4());
+        if (returnValue->realListen(host)) {
+            return std::move(returnValue);
+        } else {
+            return std::unique_ptr<Protocol>(nullptr);
+        }
+    }
+    while (state != ProtocolState::CLOSED) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
     return std::unique_ptr<Protocol>(nullptr);
 }
 

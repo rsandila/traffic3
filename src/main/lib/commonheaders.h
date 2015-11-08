@@ -26,8 +26,8 @@ class CommonHeaders {
 public:
     CommonHeaders();
     virtual ~CommonHeaders();
-    virtual bool read(std::unique_ptr<Protocol> & protocol, std::vector<char> & content);
-    virtual bool write(std::unique_ptr<Protocol> & protocol, const std::vector<char> & content);
+    virtual bool read(std::unique_ptr<Protocol> & protocol, std::vector<char> & content, Host & hostState);
+    virtual bool write(std::unique_ptr<Protocol> & protocol, const std::vector<char> & content, const Host & hostState);
     virtual unsigned getVersion() const;
 protected:
 private:
