@@ -57,6 +57,9 @@ bool ProtocolUDP4::read(std::vector<char> & data, bool allowPartialRead, Host & 
     if (numRead < 0) {
         return false;
     }
+    if (numRead > 0) {
+        data.resize(numRead);
+    }
     hostState = Host(addr_len, &addr);
     if (allowPartialRead) {
         return numRead > 0;
