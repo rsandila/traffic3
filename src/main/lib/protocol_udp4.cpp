@@ -52,7 +52,12 @@ bool ProtocolUDP4::read(std::vector<char> & data, bool allowPartialRead, Host & 
     }
     struct sockaddr addr;
     socklen_t addr_len = sizeof(addr);
-    ssize_t numRead = ::recvfrom(socket, &data[0], data.size(), (allowPartialRead)?0:MSG_WAITALL, &addr, &addr_len);
+    ssize_t numRead;
+    if (type == ProtocolType::CLIENT) {
+      numRead = ::recv(socket, &data[0], data.size(), (allowPartialRead)?0:MSG_WAITALL);
+    } else {
+      numRead = ::recvfrom(socket, &data[0], data.size(), (allowPartialRead)?0:MSG_WAITALL, &addr, &addr_len);
+    }
     LOG(DEBUG) << std::this_thread::get_id() << " read " << numRead << std::endl;
     if (numRead < 0) {
         return false;
@@ -60,7 +65,11 @@ bool ProtocolUDP4::read(std::vector<char> & data, bool allowPartialRead, Host & 
     if (numRead > 0) {
         data.resize(numRead);
     }
-    hostState = Host(addr_len, &addr);
+    if (type == ProtocolType::CLIENT) {
+      hostState = host;
+    } else {
+      hostState = Host(addr_len, &addr);
+    }
     if (allowPartialRead) {
         return numRead > 0;
     } else {
@@ -210,4 +219,3 @@ std::unique_ptr<Protocol> ProtocolUDP4::waitForNewConnection() {
     }
     return std::unique_ptr<Protocol>(nullptr);
 }
-
