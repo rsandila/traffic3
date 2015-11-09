@@ -129,3 +129,60 @@ TEST_CASE("IPV4: UDP write test", "[ipv4][protocol]") {
         REQUIRE(data.size() == 1024);
     }
 }
+
+TEST_CASE("IPV4: real sending, receiving of UDP data", "[ipv4][protocol]") {
+    SECTION("send/receive") {
+        bool serverSuccess = false;
+        bool testDone = false;
+        bool didTimeout = false;
+        std::vector<char> testBuffer, testBuffer2;
+        testBuffer.resize(10);
+        testBuffer2.resize(10);
+        ProtocolUDP4 serverProtocol;
+        Host listenHost("0.0.0.0", 10001);
+        REQUIRE(serverProtocol.listen(listenHost, 10));
+        memcpy(&testBuffer[0],  "0123456789", 10);
+        memcpy(&testBuffer2[0], "1234567890", 10);
+        std::thread serverThread([&serverProtocol, &testBuffer, &serverSuccess, &testBuffer2]() -> void {
+            std::unique_ptr<Protocol> newProtocol = serverProtocol.waitForNewConnection();
+            if (newProtocol.get() != nullptr && newProtocol->isClient() && newProtocol->getState() == Protocol::ProtocolState::OPEN) {
+                Host hostState = Host::ALL_INTERFACES;
+                std::vector<char> readBuffer;
+                readBuffer.resize(1024);
+                if (newProtocol->read(readBuffer, false, hostState)) {
+                    serverSuccess = (readBuffer == testBuffer2);
+                    if (newProtocol->write(testBuffer, hostState)) {
+                        serverSuccess &= true;
+                    }
+                }
+            }
+        });
+        ProtocolUDP4 protocol;
+        Host local("127.0.0.1", 10001);
+        std::thread timeoutThread([&serverProtocol, &protocol, &testDone, &didTimeout]() -> void {
+            int retry = 600;
+            while (--retry > 0 && !testDone) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
+            if (!testDone) {
+                serverProtocol.close();
+                protocol.close();
+                didTimeout = true;
+            }
+        });
+        REQUIRE(protocol.connect(local));
+        std::vector<char> readBuffer;
+        readBuffer.resize(1024);
+        Host hostState = Host::ALL_INTERFACES;
+        REQUIRE(protocol.write(testBuffer2, hostState));
+        REQUIRE(protocol.read(readBuffer, false, hostState));
+        REQUIRE(readBuffer.size() == testBuffer.size());
+        REQUIRE(readBuffer == testBuffer);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        REQUIRE(serverSuccess);
+        testDone = true;
+        serverThread.join();
+        timeoutThread.join();
+        REQUIRE_FALSE(didTimeout);
+    }
+}

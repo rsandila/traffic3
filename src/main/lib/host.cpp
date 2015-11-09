@@ -36,8 +36,16 @@ Host::Host(const std::string & name, unsigned _port) : hostName(name), port(_por
 }
 
 Host::Host(const Host & other) : hostName(other.hostName), port(other.port), hasAddr(other.hasAddr), hasAddr6(other.hasAddr6) {
-    populateToAddr(hostName, port);
-    populateToAddr6(hostName, port);
+    if (hasAddr) {
+        memcpy(&addr, &other.addr, sizeof(addr));
+    } else {
+        populateToAddr(hostName, port);
+    }
+    if (hasAddr6) {
+        memcpy(&addr6, &other.addr6, sizeof(addr6));
+    } else {
+        populateToAddr6(hostName, port);
+    }
 }
 
 Host::Host(socklen_t len, const struct sockaddr * otherAddr, bool isIPV4) : hostName(""),
@@ -78,6 +86,9 @@ socklen_t Host::getSockAddressLen6() const noexcept {
 }
 
 bool Host::populateToAddr(const std::string & name, unsigned _port) {
+    if (name.empty()) {
+        return false;
+    }
     memset(&addr, 0, sizeof(addr));
     addr.sin_family=AF_INET;
     addr.sin_port=0;
@@ -95,6 +106,9 @@ bool Host::populateToAddr(const std::string & name, unsigned _port) {
 }
 
 bool Host::populateToAddr6(const std::string & name, unsigned _port) {
+    if (name.empty()) {
+        return false;
+    }
     memset(&addr6, 0, sizeof(addr6));
     addr6.sin6_family=AF_INET6;
     addr6.sin6_port=0;

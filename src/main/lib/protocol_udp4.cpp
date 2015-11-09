@@ -26,15 +26,15 @@
 #include "logging.h"
 
 ProtocolUDP4::ProtocolUDP4() : host(Host::ALL_INTERFACES), type(ProtocolType::NONE),
-        socket(-1), state(ProtocolState::CLOSED), numConnections(0) {
+        socket(-1), state(ProtocolState::CLOSED), numConnections(0), didRealListen(false) {
 }
 
 ProtocolUDP4::ProtocolUDP4(int newSocket, socklen_t len, const struct sockaddr * addr) : host(len, addr),
-        type(ProtocolType::CLIENT), socket(newSocket), state(ProtocolState::OPEN) {
+        type(ProtocolType::CLIENT), socket(newSocket), state(ProtocolState::OPEN), didRealListen(false) {
 }
 
 ProtocolUDP4::ProtocolUDP4(ProtocolUDP4 && other) : host(other.host),
-type(other.type), socket(other.socket), state(other.state) {
+type(other.type), socket(other.socket), state(other.state), didRealListen(other.didRealListen) {
     other.socket = -1;
     other.host = Host::ALL_INTERFACES;
     other.type = ProtocolType::NONE;
@@ -73,9 +73,13 @@ bool ProtocolUDP4::write(const std::vector<char> & data, const Host & hostState)
     if (state == ProtocolState::CLOSED || data.size() == 0) {
         return false;
     }
-    Host activeHost = (hostState == Host::ALL_INTERFACES)?host:hostState;
-    unsigned long numWritten =::sendto(socket, &data[0], data.size(), 0, activeHost.getSockAddress(),
-                                       activeHost.getSockAddressLen());
+    unsigned long numWritten;
+    if (!didRealListen) {
+        numWritten = ::send(socket, &data[0], data.size(), 0);
+    } else {
+        numWritten =::sendto(socket, &data[0], data.size(), 0, hostState.getSockAddress(),
+                             hostState.getSockAddressLen());
+    }
     LOG(DEBUG) << std::this_thread::get_id() << " wrote " << numWritten << std::endl;
     return numWritten == data.size();
 }
@@ -141,6 +145,7 @@ bool ProtocolUDP4::realListen(const Host & localHost) {
     if (::bind(socket, host.getSockAddress(), host.getSockAddressLen()) == 0) {
         type = ProtocolType::CLIENT;
         state = ProtocolState::OPEN;
+        didRealListen = true;
         return true;
     }
     return false;
@@ -158,8 +163,11 @@ bool ProtocolUDP4::connect(const Host & localHost) {
         return false;
     }
     int optval = 1;
+    struct sockaddr addr;
+    socklen_t addr_len = sizeof(addr);
+    memset(&addr, 0, addr_len);
     setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
-    if (::bind(socket, host.getSockAddress(), host.getSockAddressLen()) == 0) {
+    if (::bind(socket, &addr, addr_len) == 0) {
         if (::connect(socket, host.getSockAddress(), host.getSockAddressLen()) < 0) {
             ::close(socket);
             return false;

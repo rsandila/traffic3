@@ -43,6 +43,7 @@ protected:
     int socket;
     ProtocolState state;
     std::atomic<int> numConnections;
+    bool didRealListen;
 
     virtual bool realListen(const Host & host);
 private:
