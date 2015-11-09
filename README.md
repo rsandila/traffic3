@@ -41,6 +41,7 @@ This assumes running in a terminal at the root of the source code tree.
 1. Change to previous folder (`cd -`)
 1. Run `./3rdparty/premake-core/bin/release/premake5 xcode4`
 1. Run `open open traffic3.xcworkspace`
+
 # TODO
 
 ## Version 3.0
