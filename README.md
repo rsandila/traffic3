@@ -25,6 +25,23 @@ Travis CI Status:
 1. git
 1. gmake
 
+# How to Build
+
+This assumes running in a terminal at the root of the source code tree.
+
+## gmake
+
+1. Change to 3rdparty folder
+1. Run `./build.sh`
+
+## xcode
+
+1. Change to 3rdparty folder
+1. Run `./build.sh`
+1. Change to previous folder (`cd -`)
+1. Run `./3rdparty/premake-core/bin/release/premake5 xcode4`
+1. Run `open open traffic3.xcworkspace`
+
 # TODO
 
 ## Version 3.0
