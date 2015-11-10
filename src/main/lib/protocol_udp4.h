@@ -43,9 +43,6 @@ protected:
     int socket;
     ProtocolState state;
     std::atomic<int> numConnections;
-    bool didRealListen;
-
-    virtual bool realListen(const Host & host);
 private:
     ProtocolUDP4(int socket, socklen_t len, const struct sockaddr * addr);
     ProtocolUDP4(const ProtocolUDP4 &) = delete;

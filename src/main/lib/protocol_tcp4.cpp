@@ -30,7 +30,7 @@ ProtocolTCP4::ProtocolTCP4() : host(Host::ALL_INTERFACES), type(ProtocolType::NO
 }
 
 ProtocolTCP4::ProtocolTCP4(int newSocket, socklen_t len, const struct sockaddr * addr) : host(len, addr),
-        type(ProtocolType::CLIENT), socket(newSocket), state(ProtocolState::OPEN) {
+        type(ProtocolType::SERVER_CLIENT), socket(newSocket), state(ProtocolState::OPEN) {
 }
 
 ProtocolTCP4::ProtocolTCP4(ProtocolTCP4 && other) : host(other.host),
@@ -130,7 +130,6 @@ bool ProtocolTCP4::listen(const Host & localHost, const int backlog) {
     // setsockopt(socket, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval));
     if (::bind(socket, host.getSockAddress(), host.getSockAddressLen()) == 0) {
         if (::listen(socket, backlog) == 0) {
-
             type = ProtocolType::SERVER;
             state = ProtocolState::OPEN;
             return true;

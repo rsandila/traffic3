@@ -261,7 +261,7 @@ TEST_CASE("IPV4: waitForNewConnection", "[ipv4][protocol]") {
         std::unique_ptr<Protocol> newProtocol = protocol.waitForNewConnection();
         REQUIRE(newProtocol.get() != nullptr);
         REQUIRE(newProtocol->getState() == Protocol::ProtocolState::OPEN);
-        REQUIRE(newProtocol->getType() == Protocol::ProtocolType::CLIENT);
+        REQUIRE(newProtocol->getType() == Protocol::ProtocolType::SERVER_CLIENT);
     }
     SECTION("wait if accept fails") {
         MockRepository mocks;

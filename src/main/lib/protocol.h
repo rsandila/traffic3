@@ -34,6 +34,7 @@ public:
     enum class ProtocolType {
         SERVER,
         CLIENT,
+        SERVER_CLIENT,
         NONE
     };
     virtual ~Protocol() {;};
@@ -47,7 +48,7 @@ public:
     virtual bool connect(const Host & host) { UNUSED(host); return false; };
     virtual void close() {;};
     virtual bool isServer() { return getType() == ProtocolType::SERVER; };
-    virtual bool isClient() { return getType() == ProtocolType::CLIENT; };
+    virtual bool isClient() { return getType() == ProtocolType::CLIENT || getType() == ProtocolType::SERVER_CLIENT; };
     virtual ProtocolType getType() { return ProtocolType::NONE; };
     virtual std::unique_ptr<Protocol> waitForNewConnection() { return std::unique_ptr<Protocol>(new Protocol()); };
 protected:

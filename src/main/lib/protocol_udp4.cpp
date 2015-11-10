@@ -26,15 +26,15 @@
 #include "logging.h"
 
 ProtocolUDP4::ProtocolUDP4() : host(Host::ALL_INTERFACES), type(ProtocolType::NONE),
-        socket(-1), state(ProtocolState::CLOSED), numConnections(0), didRealListen(false) {
+        socket(-1), state(ProtocolState::CLOSED), numConnections(0) {
 }
 
 ProtocolUDP4::ProtocolUDP4(int newSocket, socklen_t len, const struct sockaddr * addr) : host(len, addr),
-        type(ProtocolType::CLIENT), socket(newSocket), state(ProtocolState::OPEN), didRealListen(false) {
+        type(ProtocolType::SERVER_CLIENT), socket(newSocket), state(ProtocolState::OPEN) {
 }
 
 ProtocolUDP4::ProtocolUDP4(ProtocolUDP4 && other) : host(other.host),
-type(other.type), socket(other.socket), state(other.state), didRealListen(other.didRealListen) {
+type(other.type), socket(other.socket), state(other.state) {
     other.socket = -1;
     other.host = Host::ALL_INTERFACES;
     other.type = ProtocolType::NONE;
@@ -74,11 +74,11 @@ bool ProtocolUDP4::write(const std::vector<char> & data, const Host & hostState)
         return false;
     }
     unsigned long numWritten;
-    if (!didRealListen) {
-        numWritten = ::send(socket, &data[0], data.size(), 0);
-    } else {
-        numWritten =::sendto(socket, &data[0], data.size(), 0, hostState.getSockAddress(),
+    if (type == ProtocolType::SERVER_CLIENT) {
+        numWritten = ::sendto(socket, &data[0], data.size(), 0, hostState.getSockAddress(),
                              hostState.getSockAddressLen());
+    } else {
+        numWritten = ::send(socket, &data[0], data.size(), 0);
     }
     LOG(DEBUG) << std::this_thread::get_id() << " wrote " << numWritten << std::endl;
     return numWritten == data.size();
@@ -121,15 +121,7 @@ bool ProtocolUDP4::isReady(const ProtocolState & expected, int timeoutInMillisec
 }
 
 bool ProtocolUDP4::listen(const Host & localHost, const int backlog) {
-    std::unique_lock<std::mutex> lck(lock);
     UNUSED(backlog);
-    this->host = localHost;
-    type = ProtocolType::SERVER;
-    state = ProtocolState::OPEN;
-    return true;
-}
-
-bool ProtocolUDP4::realListen(const Host & localHost) {
     std::unique_lock<std::mutex> lck(lock);
     if (state != ProtocolState::CLOSED || type != ProtocolType::NONE) {
         return false;
@@ -143,9 +135,8 @@ bool ProtocolUDP4::realListen(const Host & localHost) {
     int optval = 1;
     setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
     if (::bind(socket, host.getSockAddress(), host.getSockAddressLen()) == 0) {
-        type = ProtocolType::CLIENT;
+        type = ProtocolType::SERVER;
         state = ProtocolState::OPEN;
-        didRealListen = true;
         return true;
     }
     return false;
@@ -167,22 +158,21 @@ bool ProtocolUDP4::connect(const Host & localHost) {
     socklen_t addr_len = sizeof(addr);
     memset(&addr, 0, addr_len);
     setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
-    if (::bind(socket, &addr, addr_len) == 0) {
-        if (::connect(socket, host.getSockAddress(), host.getSockAddressLen()) < 0) {
-            ::close(socket);
-            return false;
-        }
-        type = ProtocolType::CLIENT;
-        state = ProtocolState::OPEN;
-        return true;
+    if (::connect(socket, host.getSockAddress(), host.getSockAddressLen()) < 0) {
+        ::close(socket);
+        return false;
     }
-    return false;
+    type = ProtocolType::CLIENT;
+    state = ProtocolState::OPEN;
+    return true;
 }
 
 void ProtocolUDP4::close() {
     if (state != ProtocolState::CLOSED) {
-        ::shutdown(socket, SHUT_RDWR);
-        ::close(socket);
+        if (type != ProtocolType::SERVER_CLIENT) {
+            ::shutdown(socket, SHUT_RDWR);
+            ::close(socket);
+        }
         socket = 0;
         host = Host::ALL_INTERFACES;
         type = ProtocolType::NONE;
@@ -198,12 +188,8 @@ Protocol::ProtocolType ProtocolUDP4::getType() {
 std::unique_ptr<Protocol> ProtocolUDP4::waitForNewConnection() {
     if (numConnections == 0) {
         numConnections++;
-        std::unique_ptr<ProtocolUDP4> returnValue(new ProtocolUDP4());
-        if (returnValue->realListen(host)) {
-            return std::move(returnValue);
-        } else {
-            return std::unique_ptr<Protocol>(nullptr);
-        }
+        std::unique_ptr<ProtocolUDP4> returnValue(new ProtocolUDP4(socket, host.getSockAddressLen(), host.getSockAddress()));
+        return std::move(returnValue);
     }
     while (state != ProtocolState::CLOSED) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
