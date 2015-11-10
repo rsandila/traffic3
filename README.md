@@ -31,7 +31,7 @@ Travis CI Status:
 
 1. ~~Add echo contentmanager~~
 1. ~~Add random (binary) contentmanager~~
-1. Add UDP4
+1. ~~Add UDP4~~
 1. Add TCP6
 1. Add UDP6
 

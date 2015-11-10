@@ -52,13 +52,31 @@ ContentManagerType mapStringToContentManagerType(const std::string & value) {
     return ContentManagerType::None;
 }
 
+ProtocolType mapStringToProtocolType(const std::string & value) {
+    switch (value[0]) {
+        case 't':
+            if (value == "tcp4") {
+                return ProtocolType::TCP4;
+            }
+            break;
+        case 'u':
+            if (value == "udp4") {
+                return ProtocolType::UDP4;
+            }
+            break;
+        default:
+            break;
+    }
+    return ProtocolType::None;
+}
+
 int beServer(const cmdline::parser & options) {
-    ProtocolFactory protocolFactory(ProtocolType::TCP4);
+    ProtocolFactory protocolFactory(mapStringToProtocolType(options.get<std::string>("protocol")));
     ContentManagerFactory contentManagerFactory(mapStringToContentManagerType(options.get<std::string>("type")), options.get<unsigned>("min"), options.get<unsigned>("max"), CommonHeaders());
     Server server(protocolFactory, contentManagerFactory);
     Host port10000(options.get<std::string>("interface"), options.get<unsigned>("port"));
     if (!server.addPort(port10000)) {
-        std::cerr << "Unable to listen on port " << options.get<unsigned>("port") << " TCP on interface " << options.get<std::string>("interface") << std::endl;
+        std::cerr << "Unable to listen on port " << options.get<unsigned>("port") << " " << options.get<std::string>("protocol") << " on interface " << options.get<std::string>("interface") << std::endl;
         return 1;
     }
     getchar();
@@ -66,7 +84,7 @@ int beServer(const cmdline::parser & options) {
 }
 
 int beClient(const cmdline::parser & options) {
-    ProtocolFactory protocolFactory(ProtocolType::TCP4);
+    ProtocolFactory protocolFactory(mapStringToProtocolType(options.get<std::string>("protocol")));
     ContentManagerFactory contentManagerFactory(mapStringToContentManagerType(options.get<std::string>("type")), options.get<unsigned>("min"), options.get<unsigned>("max"), CommonHeaders());
     Host port10000(options.get<std::string>("host"), options.get<unsigned>("port"));
     Client client;
@@ -74,7 +92,7 @@ int beClient(const cmdline::parser & options) {
         getchar();
         return 0;
     } else {
-        std::cerr << "Unable to start clients on " << options.get<unsigned>("port") << " TCP to server " << options.get<std::string>("host") << std::endl;
+        std::cerr << "Unable to start clients on " << options.get<unsigned>("port") << " " << options.get<std::string>("protocol") << " on interface " << options.get<std::string>("interface") << " to server " << options.get<std::string>("host") << std::endl;
     }
     return 1;
 }
@@ -93,6 +111,7 @@ int main(int argc, char ** argv) {
     std::map<std::string, ModeType> modeMap { {"server", ModeType::ServerMode}, {"client", ModeType::ClientMode} };
     cmdline::parser options;
     options.add<std::string>("mode", 'o', "Mode [server|client]", true);
+    options.add<std::string>("protocol", 'r', "Protocol [tcp4|udp4]", false, "tcp4");
     options.add<std::string>("type", 't', "ContentManager type [randomtext|randombinary|fixed|echo]", false, "randomtext");
     options.add<unsigned>("port", 'p', "Port to connect to or listen on", true);
     options.add<unsigned>("min", 'm', "Minimum value to configure contentmanager with", false, 100);

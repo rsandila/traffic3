@@ -160,7 +160,6 @@ TEST_CASE("IPV4: real sending, receiving of UDP data", "[ipv4][protocol]") {
         });
         ProtocolUDP4 protocol;
         Host local("127.0.0.1", 10001);
-        /*
         std::thread timeoutThread([&serverProtocol, &protocol, &testDone, &didTimeout]() -> void {
             int retry = 600;
             while (--retry > 0 && !testDone) {
@@ -171,7 +170,7 @@ TEST_CASE("IPV4: real sending, receiving of UDP data", "[ipv4][protocol]") {
                 protocol.close();
                 didTimeout = true;
             }
-        }); */
+        });
         REQUIRE(protocol.connect(local));
         std::vector<char> readBuffer;
         readBuffer.resize(1024);
@@ -184,7 +183,7 @@ TEST_CASE("IPV4: real sending, receiving of UDP data", "[ipv4][protocol]") {
         REQUIRE(serverSuccess);
         testDone = true;
         serverThread.join();
-        // timeoutThread.join();
+        timeoutThread.join();
         REQUIRE_FALSE(didTimeout);
     }
 }
