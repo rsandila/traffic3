@@ -49,7 +49,7 @@ This assumes running in a terminal at the root of the source code tree.
 1. ~~Add echo contentmanager~~
 1. ~~Add random (binary) contentmanager~~
 1. ~~Add UDP4~~
-1. Add TCP6
+1. ~~Add TCP6~~
 1. Add UDP6
 
 ## Version 3.1

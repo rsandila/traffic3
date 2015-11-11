@@ -21,6 +21,7 @@
 #include "protocol.h"
 #include "protocol_tcp4.h"
 #include "protocol_udp4.h"
+#include "protocol_tcp6.h"
 #include "protocoltype.h"
 
 class ProtocolFactory {
@@ -32,6 +33,8 @@ public:
         switch (type) {
             case ProtocolType::TCP4:
                 return std::unique_ptr<Protocol>(new ProtocolTCP4());
+            case ProtocolType::TCP6:
+                return std::unique_ptr<Protocol>(new ProtocolTCP6());
             case ProtocolType::UDP4:
                 return std::unique_ptr<Protocol>(new ProtocolUDP4());
             default:
