@@ -19,22 +19,25 @@
 #pragma once
 
 #include <mutex>
+#include <atomic>
 #include "protocol.h"
+#include "protocoltype.h"
 
-class ProtocolTCP4: public Protocol {
+class ProtocolUDP6: public Protocol {
 public:
-    ProtocolTCP4();
-    virtual ~ProtocolTCP4();
+    ProtocolUDP6();
+    virtual ~ProtocolUDP6();
     virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) override;
     virtual bool write(const std::vector<char> & data, const Host & hostState) override;
     virtual bool listen(const Host & host, const int backlog) override;
     virtual bool connect(const Host & host) override;
     virtual std::unique_ptr<Protocol> waitForNewConnection() override;
 protected:
+    std::atomic<int> numConnections;
 private:
-    ProtocolTCP4(int socket, socklen_t len, const struct sockaddr * addr);
-    ProtocolTCP4(const ProtocolTCP4 &) = delete;
-    ProtocolTCP4 & operator=(const ProtocolTCP4 &) = delete;
-    ProtocolTCP4(ProtocolTCP4 && other);
+    ProtocolUDP6(int socket, socklen_t len, const struct sockaddr * addr);
+    ProtocolUDP6(const ProtocolUDP6 &) = delete;
+    ProtocolUDP6 & operator=(const ProtocolUDP6 &) = delete;
+    ProtocolUDP6(ProtocolUDP6 && other);
 };
 

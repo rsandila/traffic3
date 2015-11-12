@@ -22,6 +22,7 @@
 #include "protocol_tcp4.h"
 #include "protocol_udp4.h"
 #include "protocol_tcp6.h"
+#include "protocol_udp6.h"
 #include "protocoltype.h"
 
 class ProtocolFactory {
@@ -37,6 +38,8 @@ public:
                 return std::unique_ptr<Protocol>(new ProtocolTCP6());
             case ProtocolType::UDP4:
                 return std::unique_ptr<Protocol>(new ProtocolUDP4());
+            case ProtocolType::UDP6:
+                return std::unique_ptr<Protocol>(new ProtocolUDP6());
             default:
                 return std::unique_ptr<Protocol>(new Protocol());
         }

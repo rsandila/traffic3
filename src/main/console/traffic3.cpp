@@ -117,7 +117,7 @@ int main(int argc, char ** argv) {
     std::map<std::string, ModeType> modeMap { {"server", ModeType::ServerMode}, {"client", ModeType::ClientMode} };
     cmdline::parser options;
     options.add<std::string>("mode", 'o', "Mode [server|client]", true);
-    options.add<std::string>("protocol", 'r', "Protocol [tcp4|udp4|tcp6]", false, "tcp4");
+    options.add<std::string>("protocol", 'r', "Protocol [tcp4|udp4|tcp6|udp6]", false, "tcp4");
     options.add<std::string>("type", 't', "ContentManager type [randomtext|randombinary|fixed|echo]", false, "randomtext");
     options.add<unsigned>("port", 'p', "Port to connect to or listen on", true);
     options.add<unsigned>("min", 'm', "Minimum value to configure contentmanager with", false, 100);
