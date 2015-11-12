@@ -22,35 +22,35 @@
 #include <thread>
 #include <netinet/in.h>
 #include <unistd.h>
-#include "protocol_udp4.h"
+#include "protocol_udp6.h"
 #include "logging.h"
 
-ProtocolUDP4::ProtocolUDP4() : Protocol(), numConnections(0) {
+ProtocolUDP6::ProtocolUDP6() : Protocol(), numConnections(0) {
 }
 
-ProtocolUDP4::ProtocolUDP4(int newSocket, socklen_t len, const struct sockaddr * addr) : Protocol(newSocket, len, addr, true) {
+ProtocolUDP6::ProtocolUDP6(int newSocket, socklen_t len, const struct sockaddr * addr) : Protocol(newSocket, len, addr, false) {
 }
 
-ProtocolUDP4::ProtocolUDP4(ProtocolUDP4 && other) : Protocol(other.host, other.type, other.socket, other.state), numConnections
-        (other.numConnections.exchange(0)) {
+ProtocolUDP6::ProtocolUDP6(ProtocolUDP6 && other) : Protocol(other.host, other.type, other.socket, other.state),
+        numConnections(other.numConnections.exchange(0)) {
     other.socket = -1;
     other.host = Host::ALL_INTERFACES;
     other.type = ProtocolType::NONE;
     other.state = ProtocolState::CLOSED;
 }
 
-ProtocolUDP4::~ProtocolUDP4() {
+ProtocolUDP6::~ProtocolUDP6() {
     close();
 }
 
-bool ProtocolUDP4::read(std::vector<char> & data, bool allowPartialRead, Host & hostState) {
+bool ProtocolUDP6::read(std::vector<char> & data, bool allowPartialRead, Host & hostState) {
     std::unique_lock<std::mutex> lck(lock);
     if (state == ProtocolState::CLOSED) {
         return false;
     }
-    struct sockaddr addr;
+    struct sockaddr_in6 addr;
     socklen_t addr_len = sizeof(addr);
-    ssize_t numRead = ::recvfrom(socket, &data[0], data.size(), (allowPartialRead)?0:MSG_WAITALL, &addr, &addr_len);
+    ssize_t numRead = ::recvfrom(socket, &data[0], data.size(), (allowPartialRead)?0:MSG_WAITALL, (struct sockaddr *)&addr, &addr_len);
     LOG(DEBUG) << std::this_thread::get_id() << " read " << numRead << std::endl;
     if (numRead < 0) {
         return false;
@@ -58,7 +58,7 @@ bool ProtocolUDP4::read(std::vector<char> & data, bool allowPartialRead, Host & 
     if (numRead > 0) {
         data.resize(numRead);
     }
-    hostState = Host(addr_len, &addr);
+    hostState = Host(addr_len, (struct sockaddr *)&addr, false);
     if (allowPartialRead) {
         return numRead > 0;
     } else {
@@ -66,15 +66,15 @@ bool ProtocolUDP4::read(std::vector<char> & data, bool allowPartialRead, Host & 
     }
 }
 
-bool ProtocolUDP4::write(const std::vector<char> & data, const Host & hostState) {
+bool ProtocolUDP6::write(const std::vector<char> & data, const Host & hostState) {
     std::unique_lock<std::mutex> lck(lock);
     if (state == ProtocolState::CLOSED || data.size() == 0) {
         return false;
     }
     unsigned long numWritten;
     if (type == ProtocolType::SERVER_CLIENT) {
-        numWritten = ::sendto(socket, &data[0], data.size(), 0, hostState.getSockAddress(),
-                             hostState.getSockAddressLen());
+        numWritten = ::sendto(socket, &data[0], data.size(), 0, hostState.getSockAddress6(),
+                             hostState.getSockAddressLen6());
     } else {
         numWritten = ::send(socket, &data[0], data.size(), 0);
     }
@@ -82,7 +82,7 @@ bool ProtocolUDP4::write(const std::vector<char> & data, const Host & hostState)
     return numWritten == data.size();
 }
 
-bool ProtocolUDP4::listen(const Host & localHost, const int backlog) {
+bool ProtocolUDP6::listen(const Host & localHost, const int backlog) {
     UNUSED(backlog);
     std::unique_lock<std::mutex> lck(lock);
     if (state != ProtocolState::CLOSED || type != ProtocolType::NONE) {
@@ -90,13 +90,13 @@ bool ProtocolUDP4::listen(const Host & localHost, const int backlog) {
     }
     this->host = localHost;
     struct protoent *pr = getprotobyname("udp");
-    socket = ::socket(PF_INET, SOCK_DGRAM, pr->p_proto);
+    socket = ::socket(PF_INET6, SOCK_DGRAM, pr->p_proto);
     if (socket < 0) {
         return false;
     }
     int optval = 1;
     setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
-    if (::bind(socket, host.getSockAddress(), host.getSockAddressLen()) == 0) {
+    if (::bind(socket, host.getSockAddress6(), host.getSockAddressLen6()) == 0) {
         type = ProtocolType::SERVER;
         state = ProtocolState::OPEN;
         return true;
@@ -104,23 +104,23 @@ bool ProtocolUDP4::listen(const Host & localHost, const int backlog) {
     return false;
 }
 
-bool ProtocolUDP4::connect(const Host & localHost) {
+bool ProtocolUDP6::connect(const Host & localHost) {
     std::unique_lock<std::mutex> lck(lock);
     if (state != ProtocolState::CLOSED || type != ProtocolType::NONE) {
         return false;
     }
     this->host = localHost;
     struct protoent *pr = getprotobyname("udp");
-    socket = ::socket(PF_INET, SOCK_DGRAM, pr->p_proto);
+    socket = ::socket(PF_INET6, SOCK_DGRAM, pr->p_proto);
     if (socket < 0) {
         return false;
     }
     int optval = 1;
-    struct sockaddr addr;
+    struct sockaddr_in6 addr;
     socklen_t addr_len = sizeof(addr);
     memset(&addr, 0, addr_len);
     setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
-    if (::connect(socket, host.getSockAddress(), host.getSockAddressLen()) < 0) {
+    if (::connect(socket, host.getSockAddress6(), host.getSockAddressLen6()) < 0) {
         ::close(socket);
         return false;
     }
@@ -129,10 +129,10 @@ bool ProtocolUDP4::connect(const Host & localHost) {
     return true;
 }
 
-std::unique_ptr<Protocol> ProtocolUDP4::waitForNewConnection() {
+std::unique_ptr<Protocol> ProtocolUDP6::waitForNewConnection() {
     if (numConnections == 0) {
         numConnections++;
-        std::unique_ptr<ProtocolUDP4> returnValue(new ProtocolUDP4(socket, host.getSockAddressLen(), host.getSockAddress()));
+        std::unique_ptr<ProtocolUDP6> returnValue(new ProtocolUDP6(socket, host.getSockAddressLen6(), host.getSockAddress6()));
         return std::move(returnValue);
     }
     while (state != ProtocolState::CLOSED) {

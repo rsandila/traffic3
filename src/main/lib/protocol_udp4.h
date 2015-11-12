@@ -29,19 +29,10 @@ public:
     virtual ~ProtocolUDP4();
     virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) override;
     virtual bool write(const std::vector<char> & data, const Host & hostState) override;
-    virtual ProtocolState getState() override;
-    virtual bool isReady(const ProtocolState & expected, int timeoutInMilliseconds) override;
     virtual bool listen(const Host & host, const int backlog) override;
     virtual bool connect(const Host & host) override;
-    virtual void close() override;
-    virtual ProtocolType getType() override;
     virtual std::unique_ptr<Protocol> waitForNewConnection() override;
 protected:
-    Host host;
-    ProtocolType type;
-    std::mutex lock;
-    int socket;
-    ProtocolState state;
     std::atomic<int> numConnections;
 private:
     ProtocolUDP4(int socket, socklen_t len, const struct sockaddr * addr);

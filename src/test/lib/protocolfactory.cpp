@@ -27,4 +27,25 @@ TEST_CASE("Protocol Factory", "[protocol]") {
         REQUIRE(protocol.get() != nullptr);
         REQUIRE(dynamic_cast<ProtocolTCP4 *>(protocol.get()) != nullptr);
     }
+    
+    SECTION("UDP4") {
+        ProtocolFactory factory(ProtocolType::UDP4);
+        std::unique_ptr<Protocol> protocol = factory.createProtocol();
+        REQUIRE(protocol.get() != nullptr);
+        REQUIRE(dynamic_cast<ProtocolUDP4 *>(protocol.get()) != nullptr);
+    }
+    
+    SECTION("TCP6") {
+        ProtocolFactory factory(ProtocolType::TCP6);
+        std::unique_ptr<Protocol> protocol = factory.createProtocol();
+        REQUIRE(protocol.get() != nullptr);
+        REQUIRE(dynamic_cast<ProtocolTCP6 *>(protocol.get()) != nullptr);
+    }
+    
+    SECTION("UDP6") {
+        ProtocolFactory factory(ProtocolType::UDP6);
+        std::unique_ptr<Protocol> protocol = factory.createProtocol();
+        REQUIRE(protocol.get() != nullptr);
+        REQUIRE(dynamic_cast<ProtocolUDP6 *>(protocol.get()) != nullptr);
+    }
 }

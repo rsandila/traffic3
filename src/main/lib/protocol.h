@@ -20,6 +20,7 @@
 
 #include <vector>
 #include <memory>
+#include <mutex>
 #include "host.h"
 #include "common.h"
 
@@ -37,20 +38,31 @@ public:
         SERVER_CLIENT,
         NONE
     };
+    Protocol() : host(Host::ALL_INTERFACES), type(ProtocolType::NONE),
+        socket(-1), state(ProtocolState::CLOSED) {;}
+    Protocol(Host otherHost, ProtocolType otherType, int otherSocket, ProtocolState otherState) :
+        host(otherHost), type(otherType), socket(otherSocket), state(otherState) {;}
+    Protocol(int newSocket, socklen_t len, const struct sockaddr * addr, bool isIPV4) : host(len, addr, isIPV4),
+        type(ProtocolType::SERVER_CLIENT), socket(newSocket), state(ProtocolState::OPEN) {;}
     virtual ~Protocol() {;};
     virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) { UNUSED(data);
         UNUSED(allowPartialRead); UNUSED(hostState); return false; };
     virtual bool write(const std::vector<char> & data, const Host & hostState) { UNUSED(data); UNUSED(hostState);
         return false; };
-    virtual ProtocolState getState() { return ProtocolState::CLOSED; };
-    virtual bool isReady(const ProtocolState & expected, int timeoutInMilliseconds) { UNUSED(expected); UNUSED(timeoutInMilliseconds); return false; };
+    virtual ProtocolState getState();
+    virtual bool isReady(const ProtocolState & expected, int timeoutInMilliseconds);
     virtual bool listen(const Host & host, const int backlog) { UNUSED(host); UNUSED(backlog); return false; };
     virtual bool connect(const Host & host) { UNUSED(host); return false; };
-    virtual void close() {;};
+    virtual void close();
     virtual bool isServer() { return getType() == ProtocolType::SERVER; };
     virtual bool isClient() { return getType() == ProtocolType::CLIENT || getType() == ProtocolType::SERVER_CLIENT; };
-    virtual ProtocolType getType() { return ProtocolType::NONE; };
+    virtual ProtocolType getType();
     virtual std::unique_ptr<Protocol> waitForNewConnection() { return std::unique_ptr<Protocol>(new Protocol()); };
 protected:
+    Host host;
+    ProtocolType type;
+    std::mutex lock;
+    int socket;
+    ProtocolState state;
 private:
 };
