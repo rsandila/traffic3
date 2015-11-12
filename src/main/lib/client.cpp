@@ -23,7 +23,11 @@ Client::Client() {
 }
 
 Client::~Client() {
-    
+    for (auto it = workers.begin(); it != workers.end(); it++) {
+        for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
+            (*it2)->Stop();
+        }
+    }
 }
 
 bool Client::startClients(unsigned clientId, unsigned num_clients, ProtocolFactory & _protocolFactory, ContentManagerFactory & _contentManagerFactory,
