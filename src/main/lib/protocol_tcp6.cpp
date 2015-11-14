@@ -54,12 +54,7 @@ bool ProtocolTCP6::read(std::vector<char> & data, bool allowPartialRead, Host & 
         return false;
     }
     if (allowPartialRead) {
-#ifndef _MSC_VER
-		// TODO - test if this will work in Windows/Mac
-		long int numRead = ::read(socket, &data[0], data.size());
-#else
-		size_t numRead = ::recv(socket, &data[0], data.size(), 0);
-#endif
+		long int numRead = ::recv(socket, &data[0], data.size(), 0);
         if (numRead > 0) {
             data.resize(numRead);
         }
@@ -68,12 +63,7 @@ bool ProtocolTCP6::read(std::vector<char> & data, bool allowPartialRead, Host & 
         unsigned long offset = 0;
         long int numRead;
         do {
-#ifndef _MSC_VER
-			// TODO - test if this will work in Windows/Mac
-            numRead = ::read(socket, &data[offset], data.size() - offset);
-#else
 			numRead = ::recv(socket, &data[offset], data.size() - offset, MSG_WAITALL);
-#endif
             if (numRead > 0) {
                 offset += numRead;
             }
@@ -89,11 +79,7 @@ bool ProtocolTCP6::write(const std::vector<char> & data, const Host & hostState)
     if (state == ProtocolState::CLOSED || data.size() == 0) {
         return false;
     }
-#ifndef _MSC_VER
-	unsigned long numWritten = ::write(socket, &data[0], data.size());
-#else
 	unsigned long numWritten = ::send(socket, &data[0], data.size(), 0);
-#endif
     return numWritten == data.size();
 }
 

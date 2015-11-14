@@ -31,11 +31,7 @@ TEST_CASE("IPV4: TCP read test", "[ipv4][protocol]") {
     SECTION("Test read with closed socket") {
         MockRepository mocks;
         ProtocolTCP4 protocol;
-#ifndef _MSC_VER
-        mocks.NeverCallFunc(read);
-#else
-		mocks.NeverCallFunc(recv);
-#endif
+        mocks.NeverCallFunc(::recv);
         std::vector<char> data;
         data.resize(1024);
         Host hostState = Host::ALL_INTERFACES;
@@ -47,11 +43,7 @@ TEST_CASE("IPV4: TCP read test", "[ipv4][protocol]") {
         ProtocolTCP4 protocol;
         mocks.ExpectCallFunc(::connect).Return(0);
         REQUIRE(protocol.connect(Host::ALL_INTERFACES));
-#ifndef _MSC_VER
-        mocks.ExpectCallFunc(::read).Return(10);
-#else
 		mocks.ExpectCallFunc(::recv).Return(10);
-#endif
         std::vector<char> data;
         data.resize(1024);
         Host hostState = Host::ALL_INTERFACES;
@@ -63,11 +55,7 @@ TEST_CASE("IPV4: TCP read test", "[ipv4][protocol]") {
         ProtocolTCP4 protocol;
         mocks.ExpectCallFunc(::connect).Return(0);
         REQUIRE(protocol.connect(Host::ALL_INTERFACES));
-#ifndef _MSC_VER
-        mocks.ExpectCallFunc(::read).Return(0);
-#else
 		mocks.ExpectCallFunc(::recv).Return(0);
-#endif
         std::vector<char> data;
         data.resize(1024);
         Host hostState = Host::ALL_INTERFACES;
@@ -79,11 +67,7 @@ TEST_CASE("IPV4: TCP read test", "[ipv4][protocol]") {
         ProtocolTCP4 protocol;
         mocks.ExpectCallFunc(::connect).Return(0);
         REQUIRE(protocol.connect(Host::ALL_INTERFACES));
-#ifndef _MSC_VER
-        mocks.ExpectCallFunc(::read).Return(-1);
-#else
 		mocks.ExpectCallFunc(::recv).Return(-1);
-#endif
         std::vector<char> data;
         data.resize(1024);
         Host hostState = Host::ALL_INTERFACES;
@@ -97,11 +81,7 @@ TEST_CASE("IPV4: TCP write test", "[ipv4][protocol]") {
     SECTION("Test write with closed socket") {
         MockRepository mocks;
         ProtocolTCP4 protocol;
-#ifndef _MSC_VER
-        mocks.NeverCallFunc(::write);
-#else
-		mocks.NeverCallFunc(::recv);
-#endif
+		mocks.NeverCallFunc(::send);
         std::vector<char> data;
         data.resize(1024);
         Host hostState = Host::ALL_INTERFACES;
@@ -113,11 +93,7 @@ TEST_CASE("IPV4: TCP write test", "[ipv4][protocol]") {
         ProtocolTCP4 protocol;
         mocks.ExpectCallFunc(::connect).Return(0);
         REQUIRE(protocol.connect(Host::ALL_INTERFACES));
-#ifndef _MSC_VER
-        mocks.ExpectCallFunc(::write).Return(10);
-#else
-		mocks.ExpectCallFunc(::recv).Return(10);
-#endif
+		mocks.ExpectCallFunc(::send).Return(10);
         std::vector<char> data;
         data.resize(10);
         Host hostState = Host::ALL_INTERFACES;
@@ -129,11 +105,7 @@ TEST_CASE("IPV4: TCP write test", "[ipv4][protocol]") {
         ProtocolTCP4 protocol;
         mocks.ExpectCallFunc(::connect).Return(0);
         REQUIRE(protocol.connect(Host::ALL_INTERFACES));
-#ifndef _MSC_VER
-        mocks.ExpectCallFunc(::write).Return(0);
-#else
-		mocks.ExpectCallFunc(::recv).Return(0);
-#endif
+		mocks.ExpectCallFunc(::send).Return(0);
         std::vector<char> data;
         data.resize(1024);
         Host hostState = Host::ALL_INTERFACES;
@@ -145,11 +117,7 @@ TEST_CASE("IPV4: TCP write test", "[ipv4][protocol]") {
         ProtocolTCP4 protocol;
         mocks.ExpectCallFunc(::connect).Return(0);
         REQUIRE(protocol.connect(Host::ALL_INTERFACES));
-#ifndef _MSC_VER
-        mocks.ExpectCallFunc(::write).Return(-1);
-#else
 		mocks.ExpectCallFunc(::send).Return(-1);
-#endif
         std::vector<char> data;
         data.resize(1024);
         Host hostState = Host::ALL_INTERFACES;

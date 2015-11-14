@@ -54,12 +54,7 @@ bool ProtocolTCP4::read(std::vector<char> & data, bool allowPartialRead, Host & 
         return false;
     }
     if (allowPartialRead) {
-#ifndef _MSC_VER
-		// TODO - test on linux/mac osx
-        ssize_t numRead = ::read(socket, &data[0], data.size());
-#else
 		long int numRead = ::recv(socket, &data[0], data.size(), 0);
-#endif
         if (numRead > 0) {
             data.resize(numRead);
         }
@@ -68,11 +63,7 @@ bool ProtocolTCP4::read(std::vector<char> & data, bool allowPartialRead, Host & 
         unsigned long offset = 0;
         unsigned long numRead;
         do {
-#ifndef _MSC_VER
-            numRead = ::read(socket, &data[offset], data.size() - offset);
-#else
 			numRead = ::recv(socket, &data[offset], data.size() - offset, MSG_WAITALL);
-#endif
             if (numRead > 0) {
                 offset += numRead;
             }
@@ -88,11 +79,7 @@ bool ProtocolTCP4::write(const std::vector<char> & data, const Host & hostState)
     if (state == ProtocolState::CLOSED || data.size() == 0) {
         return false;
     }
-#ifndef _MSC_VER
-    unsigned long numWritten = ::write(socket, &data[0], data.size());
-#else
 	unsigned long numWritten = ::send(socket, &data[0], data.size(), 0);
-#endif
     return numWritten == data.size();
 }
 

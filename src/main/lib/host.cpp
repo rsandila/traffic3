@@ -93,82 +93,44 @@ bool Host::populateToAddr(const std::string & name, unsigned _port) {
     if (name.empty()) {
         return false;
     }
-#ifdef _MSC_VER
-// TODO - check if this works in Linux/Mac
 	struct addrinfo hints;
-	struct addrinfo *result, *rp;
+	struct addrinfo *result;
 	memset(&hints, 0, sizeof(struct addrinfo));
-	hints.ai_family = AF_INET;    /* Allow IPv4 or IPv6 */
-	hints.ai_socktype = 0; /* Datagram socket */
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = 0;
 	hints.ai_flags = 0;
-	hints.ai_protocol = 0;          /* Any protocol */
+	hints.ai_protocol = 0;
 
 	if (getaddrinfo(name.c_str(), nullptr, &hints, &result) == 0) {
-		memset(&addr, 0, sizeof(addr));
-		addr.sin_family = result->ai_family;
-		memcpy(&addr.sin_addr, result->ai_addr, sizeof(addr.sin_addr));
+        memcpy(&addr, result->ai_addr, sizeof(addr));
 		addr.sin_port = htons(_port);
 		freeaddrinfo(result);
+        hasAddr = true;
 		return true;
 	}
 	return false;
-#else
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_family=AF_INET;
-    addr.sin_port=0;
-    if (inet_pton(addr.sin_family, name.c_str(), &addr.sin_addr) <= 0) {
-        struct hostent * h = gethostbyname2(name.c_str(), addr.sin_family);
-        if (h) {
-            memcpy(&addr.sin_addr, h->h_addr_list[0], sizeof(addr.sin_addr));
-        } else {
-            return false;
-        }
-    }
-    addr.sin_port = htons(_port);
-    hasAddr = true;
-    return true;
-#endif
 }
 
 bool Host::populateToAddr6(const std::string & name, unsigned _port) {
     if (name.empty()) {
         return false;
     }
-#ifdef _MSC_VER
-	// TODO - check if this works in Linux/Mac
 	struct addrinfo hints;
-	struct addrinfo *result, *rp;
+	struct addrinfo *result;
 	memset(&hints, 0, sizeof(struct addrinfo));
-	hints.ai_family = AF_INET6;    /* Allow IPv4 or IPv6 */
-	hints.ai_socktype = 0; /* Datagram socket */
+	hints.ai_family = AF_INET6;
+	hints.ai_socktype = 0;
 	hints.ai_flags = 0;
-	hints.ai_protocol = 0;          /* Any protocol */
+	hints.ai_protocol = 0;
 
 	if (getaddrinfo(name.c_str(), nullptr, &hints, &result) == 0) {
-		memset(&addr, 0, sizeof(addr));
-		addr.sin_family = result->ai_family;
-		memcpy(&addr.sin_addr, result->ai_addr, sizeof(addr.sin_addr));
-		addr.sin_port = htons(_port);
+        memcpy(&addr6, result->ai_addr, sizeof(addr6));
+		addr6.sin6_port = htons(_port);
 		freeaddrinfo(result);
+        hasAddr6 = true;
 		return true;
-}
-	return false;
-#else
-	memset(&addr6, 0, sizeof(addr6));
-    addr6.sin6_family=AF_INET6;
-    addr6.sin6_port=0;
-    if (inet_pton(addr6.sin6_family, name.c_str(), &addr6.sin6_addr) <= 0) {
-        struct hostent * h = gethostbyname2(name.c_str(), addr6.sin6_family);
-        if (h) {
-            memcpy(&addr6.sin6_addr, h->h_addr_list[0], sizeof(addr6.sin6_addr));
-        } else {
-            return false;
-        }
     }
-    addr6.sin6_port = htons(_port);
-    hasAddr6 = true;
-    return true;
-#endif
+	return false;
 }
 
 bool Host::operator==(const Host & other) const {
