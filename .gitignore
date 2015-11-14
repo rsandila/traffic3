@@ -2,7 +2,8 @@ obj/
 .DS_Store
 traffic3.xcodeproj/
 traffic3.xcworkspace/
-bin/
+bin/Debug/
+bin/Release/`
 /test/
 Makefile
 *.make
