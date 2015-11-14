@@ -16,20 +16,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  USA.
  */
-
+#ifdef _MSC_VER
+#include <WinSock2.h>
+#endif
 #include <thread>
 #include "logging.h"
 #include "contentmanager_base.h"
 
 ContentManagerBase::ContentManagerBase(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer) :
-        protocol(std::move(_protocol)), min(0), max(1024000), started(false), running(false), doExitBeforeStart(false), headerHandler(_headerHandler),
+        protocol(std::move(_protocol)), minimum(0), maximum(1024000), started(false), running(false), doExitBeforeStart(false), headerHandler(_headerHandler),
         worker(std::thread(std::bind((isServer)?&ContentManagerBase::ServerWorker:&ContentManagerBase::ClientWorker, this)))  {
 }
 
 ContentManagerBase::ContentManagerBase(ContentManagerBase && other) :
         protocol(std::move(other.protocol)), headerHandler(other.headerHandler) {
-    min = other.min;
-    max = other.max;
+    minimum = other.minimum;
+    maximum = other.maximum;
     worker = std::move(other.worker);
     started = false;
     if (other.started) {
@@ -49,8 +51,8 @@ ContentManagerBase::ContentManagerBase(ContentManagerBase && other) :
 
 ContentManagerBase & ContentManagerBase::operator=(ContentManagerBase&& other) {
     protocol = std::move(other.protocol);
-    min = other.min;
-    max = other.max;
+    minimum = other.minimum;
+    maximum = other.maximum;
     worker = std::move(other.worker);
     headerHandler = other.headerHandler;
     started = false;
@@ -98,13 +100,13 @@ bool ContentManagerBase::Start() noexcept {
 }
 
 void ContentManagerBase::setMinimumSize(unsigned long size) noexcept {
-    min = size;
+    minimum = size;
 }
 
 void ContentManagerBase::setMaximumSize(unsigned long size) noexcept {
     setMax(size);
-    if (getMax() < min) {
-        min = size;
+    if (getMax() < minimum) {
+        minimum = size;
     }
 }
 

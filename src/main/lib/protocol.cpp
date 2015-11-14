@@ -16,8 +16,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  USA.
  */
+#ifndef _MSC_VER
 #include <poll.h>
 #include <unistd.h>
+#else
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#endif
 #include "protocol.h"
 
 bool Protocol::isReady(const ProtocolState & expected, int timeoutInMilliseconds) {
@@ -31,20 +36,28 @@ bool Protocol::isReady(const ProtocolState & expected, int timeoutInMilliseconds
         case Protocol::ProtocolState::OPEN:
             return state == ProtocolState::OPEN;
         case Protocol::ProtocolState::READ_READY:
+#ifndef _MSC_VER
             fd.events = POLLRDNORM;
             if (poll(&fd, 1, timeoutInMilliseconds) > 0) {
                 if (fd.revents & POLLRDNORM) {
                     return true;
                 }
             }
+#else
+			// TODO implement select
+#endif
             return false;
         case Protocol::ProtocolState::WRITE_READY:
+#ifndef _MSC_VER
             fd.events = POLLWRNORM;
             if (poll(&fd, 1, timeoutInMilliseconds) > 0) {
                 if (fd.revents & POLLWRNORM) {
                     return true;
                 }
             }
+#else
+			// TODO implement select
+#endif
             return false;
         default:
             return false;
@@ -54,8 +67,13 @@ bool Protocol::isReady(const ProtocolState & expected, int timeoutInMilliseconds
 void Protocol::close() {
     // std::unique_lock<std::mutex> lck(lock);
     if (state != ProtocolState::CLOSED) {
+#ifndef _MSC_VER
         ::shutdown(socket, SHUT_RDWR);
         ::close(socket);
+#else
+		::shutdown(socket, SD_BOTH);
+		::closesocket(socket);
+#endif
         socket = 0;
         host = Host::ALL_INTERFACES;
         type = ProtocolType::NONE;

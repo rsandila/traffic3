@@ -16,7 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  USA.
  */
+#ifndef _MSC_VER
 #include <arpa/inet.h>
+#else
+#include <WinSock2.h>
+#endif
 #include <thread>
 #include "commonheaders.h"
 #include "logging.h"

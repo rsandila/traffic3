@@ -51,8 +51,8 @@ public:
         return false; };
     virtual ProtocolState getState();
     virtual bool isReady(const ProtocolState & expected, int timeoutInMilliseconds);
-    virtual bool listen(const Host & host, const int backlog) { UNUSED(host); UNUSED(backlog); return false; };
-    virtual bool connect(const Host & host) { UNUSED(host); return false; };
+    virtual bool listen(const Host & localHost, const int backlog) { UNUSED(localHost); UNUSED(backlog); return false; };
+    virtual bool connect(const Host & localHost) { UNUSED(localHost); return false; };
     virtual void close();
     virtual bool isServer() { return getType() == ProtocolType::SERVER; };
     virtual bool isClient() { return getType() == ProtocolType::CLIENT || getType() == ProtocolType::SERVER_CLIENT; };

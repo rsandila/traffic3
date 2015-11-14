@@ -35,6 +35,6 @@ protected:
     virtual void CleanupContent() noexcept override;
 private:
     std::default_random_engine generator;
-    std::uniform_int_distribution<char> chars;
+    std::uniform_int_distribution<uint16_t> chars;
     std::unique_ptr<std::uniform_int_distribution<int>> distribution;
 };

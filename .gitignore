@@ -9,3 +9,9 @@ Makefile
 *.xcodeproj
 
 *.log
+*.suo
+*.vcxproj
+common.vcxproj.user
+*.opensdf
+traffic3.sdf
+*.sln

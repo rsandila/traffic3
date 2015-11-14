@@ -17,7 +17,9 @@
  USA.
  */
 // Tests for protocol_udp4.cpp class
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif
 #include <memory.h>
 #include <thread>
 #include "catch.hpp"

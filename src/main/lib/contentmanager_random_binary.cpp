@@ -39,7 +39,7 @@ std::vector<char> ContentManager_Random_Binary::ProcessContent(const std::vector
     std::vector<char> data;
     data.resize((*distribution)(generator));
     for (unsigned long i = 0; i < data.size(); i++) {
-        data[i] = chars(generator);
+        data[i] = (char)chars(generator);
     }
     LOG(DEBUG) << "exiting with " << data.size() << std::endl;
     return std::move(data);

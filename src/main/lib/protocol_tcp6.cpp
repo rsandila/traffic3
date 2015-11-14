@@ -16,12 +16,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  USA.
  */
+#ifndef _MSC_VER
 #include <sys/socket.h>
 #include <poll.h>
 #include <netdb.h>
-#include <thread>
 #include <netinet/in.h>
 #include <unistd.h>
+#else
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#endif
+#include <thread>
 #include "protocol_tcp6.h"
 #include "logging.h"
 
@@ -49,7 +54,12 @@ bool ProtocolTCP6::read(std::vector<char> & data, bool allowPartialRead, Host & 
         return false;
     }
     if (allowPartialRead) {
-        ssize_t numRead = ::read(socket, &data[0], data.size());
+#ifndef _MSC_VER
+		// TODO - test if this will work in Windows/Mac
+		size_t numRead = ::read(socket, &data[0], data.size());
+#else
+		size_t numRead = ::recv(socket, &data[0], data.size(), 0);
+#endif
         if (numRead > 0) {
             data.resize(numRead);
         }
@@ -58,7 +68,12 @@ bool ProtocolTCP6::read(std::vector<char> & data, bool allowPartialRead, Host & 
         unsigned long offset = 0;
         unsigned long numRead;
         do {
+#ifndef _MSC_VER
+			// TODO - test if this will work in Windows/Mac
             numRead = ::read(socket, &data[offset], data.size() - offset);
+#else
+			numRead = ::recv(socket, &data[offset], data.size() - offset, MSG_WAITALL);
+#endif
             if (numRead > 0) {
                 offset += numRead;
             }
@@ -74,7 +89,11 @@ bool ProtocolTCP6::write(const std::vector<char> & data, const Host & hostState)
     if (state == ProtocolState::CLOSED || data.size() == 0) {
         return false;
     }
-    unsigned long numWritten = ::write(socket, &data[0], data.size());
+#ifndef _MSC_VER
+	unsigned long numWritten = ::write(socket, &data[0], data.size());
+#else
+	unsigned long numWritten = ::send(socket, &data[0], data.size(), 0);
+#endif
     return numWritten == data.size();
 }
 
@@ -86,7 +105,7 @@ bool ProtocolTCP6::listen(const Host & localHost, const int backlog) {
     this->host = localHost;
     struct protoent *pr = getprotobyname("tcp");
     socket = ::socket(PF_INET6, SOCK_STREAM, pr->p_proto);
-    int optval = 1;
+    char optval = 1;
     ::setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
     // setsockopt(socket, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval));
     if (::bind(socket, host.getSockAddress6(), host.getSockAddressLen6()) == 0) {

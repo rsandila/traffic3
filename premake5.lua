@@ -1,12 +1,18 @@
 workspace "traffic3"
+	architecture ( "x86_64" )
 	configurations { "Debug", "Release" }
 	warnings "Extra"
 	if os.is("macosx") then
 		buildoptions "-std=c++11 -stdlib=libc++"
 	else
-		buildoptions "-std=c++0x"
-		links { "pthread" }
+		if not os.is("windows") then
+		   buildoptions "-std=c++0x"
+		   links { "pthread" }
+		else
+			links { "Ws2_32" }
+		end
 	end
+	flags { "StaticRuntime", "MultiProcessorCompile" }
 	filter "configurations:Debug"
         defines { "DEBUG" }
         flags { "Symbols" }

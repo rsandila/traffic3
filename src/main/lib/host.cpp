@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  USA.
  */
+#ifndef _MSC_VER
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -23,6 +24,9 @@
 #include <netdb.h>
 #include <string.h>
 #include <unistd.h>
+#else
+#include <WinSock2.h>
+#endif
 #include <iostream>
 #include <stdexcept>
 #include "host.h"
@@ -89,6 +93,26 @@ bool Host::populateToAddr(const std::string & name, unsigned _port) {
     if (name.empty()) {
         return false;
     }
+#ifdef _MSC_VER
+// TODO - check if this works in Linux/Mac
+	struct addrinfo hints;
+	struct addrinfo *result, *rp;
+	memset(&hints, 0, sizeof(struct addrinfo));
+	hints.ai_family = AF_INET;    /* Allow IPv4 or IPv6 */
+	hints.ai_socktype = 0; /* Datagram socket */
+	hints.ai_flags = 0;
+	hints.ai_protocol = 0;          /* Any protocol */
+
+	if (getaddrinfo(name.c_str(), nullptr, &hints, &result) == 0) {
+		memset(&addr, 0, sizeof(addr));
+		addr.sin_family = result->ai_family;
+		memcpy(&addr.sin_addr, result->ai_addr, sizeof(addr.sin_addr));
+		addr.sin_port = htons(_port);
+		freeaddrinfo(result);
+		return true;
+	}
+	return false;
+#else
     memset(&addr, 0, sizeof(addr));
     addr.sin_family=AF_INET;
     addr.sin_port=0;
@@ -103,13 +127,34 @@ bool Host::populateToAddr(const std::string & name, unsigned _port) {
     addr.sin_port = htons(_port);
     hasAddr = true;
     return true;
+#endif
 }
 
 bool Host::populateToAddr6(const std::string & name, unsigned _port) {
     if (name.empty()) {
         return false;
     }
-    memset(&addr6, 0, sizeof(addr6));
+#ifdef _MSC_VER
+	// TODO - check if this works in Linux/Mac
+	struct addrinfo hints;
+	struct addrinfo *result, *rp;
+	memset(&hints, 0, sizeof(struct addrinfo));
+	hints.ai_family = AF_INET6;    /* Allow IPv4 or IPv6 */
+	hints.ai_socktype = 0; /* Datagram socket */
+	hints.ai_flags = 0;
+	hints.ai_protocol = 0;          /* Any protocol */
+
+	if (getaddrinfo(name.c_str(), nullptr, &hints, &result) == 0) {
+		memset(&addr, 0, sizeof(addr));
+		addr.sin_family = result->ai_family;
+		memcpy(&addr.sin_addr, result->ai_addr, sizeof(addr.sin_addr));
+		addr.sin_port = htons(_port);
+		freeaddrinfo(result);
+		return true;
+}
+	return false;
+#else
+	memset(&addr6, 0, sizeof(addr6));
     addr6.sin6_family=AF_INET6;
     addr6.sin6_port=0;
     if (inet_pton(addr6.sin6_family, name.c_str(), &addr6.sin6_addr) <= 0) {
@@ -123,6 +168,7 @@ bool Host::populateToAddr6(const std::string & name, unsigned _port) {
     addr6.sin6_port = htons(_port);
     hasAddr6 = true;
     return true;
+#endif
 }
 
 bool Host::operator==(const Host & other) const {

@@ -16,12 +16,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  USA.
  */
+#ifndef _MSC_VER
 #include <sys/socket.h>
 #include <poll.h>
 #include <netdb.h>
-#include <thread>
 #include <netinet/in.h>
 #include <unistd.h>
+#else
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#endif
+#include <thread>
 #include "protocol_udp6.h"
 #include "logging.h"
 
@@ -50,7 +55,7 @@ bool ProtocolUDP6::read(std::vector<char> & data, bool allowPartialRead, Host & 
     }
     struct sockaddr_in6 addr;
     socklen_t addr_len = sizeof(addr);
-    ssize_t numRead = ::recvfrom(socket, &data[0], data.size(), (allowPartialRead)?0:MSG_WAITALL, (struct sockaddr *)&addr, &addr_len);
+    size_t numRead = ::recvfrom(socket, &data[0], data.size(), (allowPartialRead)?0:MSG_WAITALL, (struct sockaddr *)&addr, &addr_len);
     LOG(DEBUG) << std::this_thread::get_id() << " read " << numRead << std::endl;
     if (numRead < 0) {
         return false;
@@ -94,7 +99,7 @@ bool ProtocolUDP6::listen(const Host & localHost, const int backlog) {
     if (socket < 0) {
         return false;
     }
-    int optval = 1;
+    char optval = 1;
     setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
     if (::bind(socket, host.getSockAddress6(), host.getSockAddressLen6()) == 0) {
         type = ProtocolType::SERVER;
@@ -115,13 +120,17 @@ bool ProtocolUDP6::connect(const Host & localHost) {
     if (socket < 0) {
         return false;
     }
-    int optval = 1;
+    char optval = 1;
     struct sockaddr_in6 addr;
     socklen_t addr_len = sizeof(addr);
     memset(&addr, 0, addr_len);
     setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
     if (::connect(socket, host.getSockAddress6(), host.getSockAddressLen6()) < 0) {
+#ifndef _MSC_VER
         ::close(socket);
+#else
+		::closesocket(socket);
+#endif
         return false;
     }
     type = ProtocolType::CLIENT;

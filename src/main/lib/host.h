@@ -18,9 +18,14 @@
  */
 #pragma once
 
+#ifndef _MSC_VER
 #include <sys/socket.h>
 #include <poll.h>
 #include <netinet/in.h>
+#else
+#include <winsock2.h>
+#include <WS2tcpip.h>
+#endif
 #include <string>
 
 class Host {

@@ -47,17 +47,17 @@ protected:
     virtual bool PrepareContent() noexcept = 0;
     virtual void CleanupContent() noexcept = 0;
     unsigned long getMin() const noexcept {
-        return min;
+        return minimum;
     }
     unsigned long getMax() const noexcept {
-        return max;
+        return maximum;
     }
     void setMax(unsigned long newMax) noexcept {
-        max = newMax;
+        maximum = newMax;
     }
 private:
     std::unique_ptr<Protocol> protocol;
-    unsigned long min, max;
+    unsigned long minimum, maximum;
     std::atomic<bool> started;
     std::atomic<bool> running;
     std::atomic<bool> doExitBeforeStart;
