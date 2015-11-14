@@ -55,7 +55,7 @@ bool ProtocolUDP6::read(std::vector<char> & data, bool allowPartialRead, Host & 
     }
     struct sockaddr_in6 addr;
     socklen_t addr_len = sizeof(addr);
-    size_t numRead = ::recvfrom(socket, &data[0], data.size(), (allowPartialRead)?0:MSG_WAITALL, (struct sockaddr *)&addr, &addr_len);
+    long int numRead = ::recvfrom(socket, &data[0], data.size(), (allowPartialRead)?0:MSG_WAITALL, (struct sockaddr *)&addr, &addr_len);
     LOG(DEBUG) << std::this_thread::get_id() << " read " << numRead << std::endl;
     if (numRead < 0) {
         return false;
@@ -76,7 +76,7 @@ bool ProtocolUDP6::write(const std::vector<char> & data, const Host & hostState)
     if (state == ProtocolState::CLOSED || data.size() == 0) {
         return false;
     }
-    unsigned long numWritten;
+    unsigned long int numWritten;
     if (type == ProtocolType::SERVER_CLIENT) {
         numWritten = ::sendto(socket, &data[0], data.size(), 0, hostState.getSockAddress6(),
                              hostState.getSockAddressLen6());

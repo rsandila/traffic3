@@ -64,9 +64,9 @@ TEST_CASE("IPV6: TCP read test", "[ipv6][protocol]") {
         mocks.ExpectCallFunc(::connect).Return(0);
         REQUIRE(protocol.connect(Host::ALL_INTERFACES));
 #ifndef _MSC_VER
-		mocks.ExpectCallFunc(::read).Return(10);
+		mocks.ExpectCallFunc(::read).Return(0);
 #else
-		mocks.ExpectCallFunc(::recv).Return(10);
+		mocks.ExpectCallFunc(::recv).Return(0);
 #endif
 		std::vector<char> data;
         data.resize(1024);

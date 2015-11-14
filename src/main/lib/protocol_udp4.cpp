@@ -55,7 +55,7 @@ bool ProtocolUDP4::read(std::vector<char> & data, bool allowPartialRead, Host & 
     }
     struct sockaddr addr;
     socklen_t addr_len = sizeof(addr);
-    size_t numRead = ::recvfrom(socket, &data[0], data.size(), (allowPartialRead)?0:MSG_WAITALL, &addr, &addr_len);
+    long int numRead = ::recvfrom(socket, &data[0], data.size(), (allowPartialRead)?0:MSG_WAITALL, &addr, &addr_len);
     LOG(DEBUG) << std::this_thread::get_id() << " read " << numRead << std::endl;
     if (numRead < 0) {
         return false;

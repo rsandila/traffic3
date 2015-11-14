@@ -56,7 +56,7 @@ bool ProtocolTCP6::read(std::vector<char> & data, bool allowPartialRead, Host & 
     if (allowPartialRead) {
 #ifndef _MSC_VER
 		// TODO - test if this will work in Windows/Mac
-		size_t numRead = ::read(socket, &data[0], data.size());
+		long int numRead = ::read(socket, &data[0], data.size());
 #else
 		size_t numRead = ::recv(socket, &data[0], data.size(), 0);
 #endif
@@ -66,7 +66,7 @@ bool ProtocolTCP6::read(std::vector<char> & data, bool allowPartialRead, Host & 
         return numRead > 0;
     } else {
         unsigned long offset = 0;
-        unsigned long numRead;
+        long int numRead;
         do {
 #ifndef _MSC_VER
 			// TODO - test if this will work in Windows/Mac
@@ -105,7 +105,11 @@ bool ProtocolTCP6::listen(const Host & localHost, const int backlog) {
     this->host = localHost;
     struct protoent *pr = getprotobyname("tcp");
     socket = ::socket(PF_INET6, SOCK_STREAM, pr->p_proto);
+#ifndef _MSC_VER
+    int optval = 1;
+#else
     char optval = 1;
+#endif
     ::setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
     // setsockopt(socket, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval));
     if (::bind(socket, host.getSockAddress6(), host.getSockAddressLen6()) == 0) {

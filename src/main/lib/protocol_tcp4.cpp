@@ -56,9 +56,9 @@ bool ProtocolTCP4::read(std::vector<char> & data, bool allowPartialRead, Host & 
     if (allowPartialRead) {
 #ifndef _MSC_VER
 		// TODO - test on linux/mac osx
-        size_t numRead = ::read(socket, &data[0], data.size());
+        ssize_t numRead = ::read(socket, &data[0], data.size());
 #else
-		size_t numRead = ::recv(socket, &data[0], data.size(), 0);
+		long int numRead = ::recv(socket, &data[0], data.size(), 0);
 #endif
         if (numRead > 0) {
             data.resize(numRead);
@@ -104,7 +104,11 @@ bool ProtocolTCP4::listen(const Host & localHost, const int backlog) {
     this->host = localHost;
     struct protoent *pr = getprotobyname("tcp");
     socket = ::socket(PF_INET, SOCK_STREAM, pr->p_proto);
+#ifndef _MSC_VER
+    int optval = 1;
+#else
     char optval = 1;
+#endif
     ::setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
     // setsockopt(socket, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval));
     if (::bind(socket, host.getSockAddress(), host.getSockAddressLen()) == 0) {
