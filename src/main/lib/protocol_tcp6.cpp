@@ -30,98 +30,24 @@
 #include "protocol_tcp6.h"
 #include "logging.h"
 
-ProtocolTCP6::ProtocolTCP6() : Protocol() {
+ProtocolTCP6::ProtocolTCP6() : ProtocolTCP() {
 }
 
-ProtocolTCP6::ProtocolTCP6(int newSocket, socklen_t len, const struct sockaddr * addr) : Protocol(newSocket, len, addr, false) {
+ProtocolTCP6::ProtocolTCP6(int newSocket, socklen_t len, const struct sockaddr * addr) : ProtocolTCP(newSocket, len, addr, false) {
 }
 
-ProtocolTCP6::ProtocolTCP6(ProtocolTCP6 && other) : Protocol(other.host, other.type, other.socket, other.state) {
-    other.socket = -1;
-    other.host = Host::ALL_INTERFACES;
-    other.type = ProtocolType::NONE;
-    other.state = ProtocolState::CLOSED;
+ProtocolTCP6::ProtocolTCP6(ProtocolTCP6 && other) : ProtocolTCP(std::move(other)) {
 }
 
 ProtocolTCP6::~ProtocolTCP6() {
-    close();
-}
-
-bool ProtocolTCP6::read(std::vector<char> & data, bool allowPartialRead, Host & hostState) {
-    UNUSED(hostState);
-    std::unique_lock<std::mutex> lck(lock);
-    if (state == ProtocolState::CLOSED) {
-        return false;
-    }
-    if (allowPartialRead) {
-		long int numRead = ::recv(socket, &data[0], data.size(), 0);
-        if (numRead > 0) {
-            data.resize(numRead);
-        }
-        return numRead > 0;
-    } else {
-        unsigned long offset = 0;
-        long int numRead;
-        do {
-			numRead = ::recv(socket, &data[offset], data.size() - offset, MSG_WAITALL);
-            if (numRead > 0) {
-                offset += numRead;
-            }
-            LOG(DEBUG) << std::this_thread::get_id() << " read " << numRead << std::endl;
-        } while (numRead > 0 && offset < data.size());
-        return offset == data.size();
-    }
-}
-
-bool ProtocolTCP6::write(const std::vector<char> & data, const Host & hostState) {
-    UNUSED(hostState);
-    std::unique_lock<std::mutex> lck(lock);
-    if (state == ProtocolState::CLOSED || data.size() == 0) {
-        return false;
-    }
-	unsigned long numWritten = ::send(socket, &data[0], data.size(), 0);
-    return numWritten == data.size();
 }
 
 bool ProtocolTCP6::listen(const Host & localHost, const int backlog) {
-    std::unique_lock<std::mutex> lck(lock);
-    if (state != ProtocolState::CLOSED || type != ProtocolType::NONE) {
-        return false;
-    }
-    this->host = localHost;
-    struct protoent *pr = getprotobyname("tcp");
-    socket = ::socket(PF_INET6, SOCK_STREAM, pr->p_proto);
-#ifndef _MSC_VER
-    int optval = 1;
-#else
-    char optval = 1;
-#endif
-    ::setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
-    // setsockopt(socket, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval));
-    if (::bind(socket, host.getSockAddress6(), host.getSockAddressLen6()) == 0) {
-        if (::listen(socket, backlog) == 0) {
-            type = ProtocolType::SERVER;
-            state = ProtocolState::OPEN;
-            return true;
-        }
-    }
-    return false;
+	return realListen(localHost, PF_INET6, localHost.getSockAddress6(), localHost.getSockAddressLen6(), backlog);
 }
 
 bool ProtocolTCP6::connect(const Host & localHost) {
-    std::unique_lock<std::mutex> lck(lock);
-    if (state != ProtocolState::CLOSED || type != ProtocolType::NONE) {
-        return false;
-    }
-    this->host = localHost;
-    struct protoent *pr = getprotobyname("tcp");
-    socket = ::socket(PF_INET6, SOCK_STREAM, pr->p_proto);
-    if (::connect(socket, host.getSockAddress6(), host.getSockAddressLen6()) == 0) {
-        type = ProtocolType::CLIENT;
-        state = ProtocolState::OPEN;
-        return true;
-    }
-    return false;
+	return realConnect(localHost, PF_INET6, localHost.getSockAddress6(), localHost.getSockAddressLen6());
 }
 
 std::unique_ptr<Protocol> ProtocolTCP6::waitForNewConnection() {

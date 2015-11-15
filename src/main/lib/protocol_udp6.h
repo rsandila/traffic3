@@ -20,15 +20,13 @@
 
 #include <mutex>
 #include <atomic>
-#include "protocol.h"
+#include "protocol_udp.h"
 #include "protocoltype.h"
 
-class ProtocolUDP6: public Protocol {
+class ProtocolUDP6: public ProtocolUDP {
 public:
     ProtocolUDP6();
     virtual ~ProtocolUDP6();
-    virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) override;
-    virtual bool write(const std::vector<char> & data, const Host & hostState) override;
     virtual bool listen(const Host & host, const int backlog) override;
     virtual bool connect(const Host & host) override;
     virtual std::unique_ptr<Protocol> waitForNewConnection() override;
