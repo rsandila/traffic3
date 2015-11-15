@@ -21,9 +21,6 @@
 #define ELPP_THREAD_SAFE
 #define ELPP_FORCE_USE_STD_THREAD
 #ifdef _MSC_VER
-// To work around issue https://github.com/easylogging/easyloggingpp/issues/282
-#define ELPP_COMPILER_MSVC 1
-#define ELPP_OS_WINDOWS 1
 #endif
 #include "easylogging++.h"
 

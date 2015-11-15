@@ -27,9 +27,21 @@
 
 bool Protocol::isReady(const ProtocolState & expected, int timeoutInMilliseconds) {
     std::unique_lock<std::mutex> lck(lock);
+#ifndef _MSC_VER
     pollfd fd;
     fd.fd = socket;
     fd.revents = 0;
+#else
+	fd_set fdSet;
+	struct timeval timeVal;
+	memset(&fdSet, 0, sizeof(fd_set));
+	FD_SET(socket, &fdSet);
+	timeVal.tv_usec = timeoutInMilliseconds * 1000;
+	if (timeVal.tv_usec > 1000000) {
+		timeVal.tv_sec = timeVal.tv_usec / 1000000;
+		timeVal.tv_usec %= 1000000;
+	}
+#endif
     switch (expected) {
         case Protocol::ProtocolState::CLOSED:
             return state == ProtocolState::CLOSED;
@@ -44,7 +56,9 @@ bool Protocol::isReady(const ProtocolState & expected, int timeoutInMilliseconds
                 }
             }
 #else
-			// TODO implement select
+			if (select(1, &fdSet, nullptr, nullptr, &timeVal) == 1) {
+				return true;
+			}
 #endif
             return false;
         case Protocol::ProtocolState::WRITE_READY:
@@ -56,7 +70,9 @@ bool Protocol::isReady(const ProtocolState & expected, int timeoutInMilliseconds
                 }
             }
 #else
-			// TODO implement select
+			if (select(1, nullptr, &fdSet, nullptr, &timeVal) == 1) {
+				return true;
+			}
 #endif
             return false;
         default:

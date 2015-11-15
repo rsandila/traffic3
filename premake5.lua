@@ -1,5 +1,7 @@
 workspace "traffic3"
-	architecture ( "x86_64" )
+	if not os.is("windows") then
+		architecture ( "x86_64" )
+	end
 	configurations { "Debug", "Release" }
 	warnings "Extra"
 	if os.is("macosx") then

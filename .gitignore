@@ -16,3 +16,4 @@ common.vcxproj.user
 *.opensdf
 traffic3.sdf
 *.sln
+*.user

@@ -31,6 +31,21 @@
 #include <stdexcept>
 #include "host.h"
 
+#ifdef _MSC_VER
+
+class WindowsInit {
+public:
+	WindowsInit() {
+		WSADATA wsaData;
+		WSAStartup(MAKEWORD(2, 2), &wsaData);
+	}
+	~WindowsInit() {
+		WSACleanup();
+	}
+};
+
+static WindowsInit globalWindowsInit;
+#endif
 const unsigned Host::DEFAULT_PORT = 0;
 Host Host::ALL_INTERFACES(std::string("0.0.0.0"), Host::DEFAULT_PORT);
 

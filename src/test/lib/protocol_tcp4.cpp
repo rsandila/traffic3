@@ -151,7 +151,8 @@ TEST_CASE("IPV4: TCP isReady test", "[ipv4][protocol]") {
         mocks.ExpectCallFunc(::poll).Do([](struct pollfd fds[], nfds_t nfds, int timeout) -> int { UNUSED(nfds); UNUSED(timeout); fds[0].revents |= POLLRDNORM; return 1; });
         mocks.ExpectCallFunc(::poll).Return(0);
 #else
-		// TODO - implement when we have implemented select
+		mocks.ExpectCallFunc(::select).Return(1);
+		mocks.ExpectCallFunc(::select).Return(0);
 #endif
         REQUIRE(protocol.isReady(Protocol::ProtocolState::READ_READY, 0));
         REQUIRE_FALSE(protocol.isReady(Protocol::ProtocolState::READ_READY, 0));
@@ -167,7 +168,8 @@ TEST_CASE("IPV4: TCP isReady test", "[ipv4][protocol]") {
         mocks.ExpectCallFunc(::poll).Do([](struct pollfd fds[], nfds_t nfds, int timeout) -> int { UNUSED(nfds); UNUSED(timeout); fds[0].revents |= POLLWRNORM; return 1; });
         mocks.ExpectCallFunc(::poll).Return(0);
 #else
-		// TODO implement when we have implemented select
+		mocks.ExpectCallFunc(::select).Return(1);
+		mocks.ExpectCallFunc(::select).Return(0);
 #endif
         REQUIRE(protocol.isReady(Protocol::ProtocolState::WRITE_READY, 0));
         REQUIRE_FALSE(protocol.isReady(Protocol::ProtocolState::WRITE_READY, 0));
