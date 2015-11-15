@@ -10,3 +10,6 @@
 [submodule "3rdparty/premake-core"]
 	path = 3rdparty/premake-core
 	url = https://github.com/premake/premake-core.git
+[submodule "3rdparty/easyloggingpp"]
+	path = 3rdparty/easyloggingpp
+	url = https://github.com/rsandila/easyloggingpp.git
