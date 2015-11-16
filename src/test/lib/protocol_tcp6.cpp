@@ -220,6 +220,7 @@ TEST_CASE("IPV6: TCP connect", "[ipv6][protocol]") {
         MockRepository mocks;
         ProtocolTCP6 protocol;
         mocks.ExpectCallFunc(::bind).Return(0);
+		mocks.ExpectCallFunc(::listen).Return(0);
         mocks.NeverCallFunc(::connect);
         REQUIRE(protocol.listen(Host::ALL_INTERFACES6, 10));
         REQUIRE_FALSE(protocol.connect(Host::ALL_INTERFACES6));

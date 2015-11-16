@@ -221,6 +221,7 @@ TEST_CASE("IPV4: TCP connect", "[ipv4][protocol]") {
         ProtocolTCP4 protocol;
         mocks.ExpectCallFunc(::bind).Return(0);
         mocks.NeverCallFunc(::connect);
+		mocks.ExpectCallFunc(::listen).Return(0);
         REQUIRE(protocol.listen(Host::ALL_INTERFACES4, 10));
         REQUIRE_FALSE(protocol.connect(Host::ALL_INTERFACES4));
     }
