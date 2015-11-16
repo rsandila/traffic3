@@ -90,7 +90,7 @@ const struct sockaddr * Host::getPreferredSockAddress() const {
             return getSockAddress4();
         case ProtocolPreference::IPV6:
             return getSockAddress6();
-        case ProtocolPreference::ANY:
+        default:
             if (hasAddr6) {
                 return getSockAddress6();
             } else {
@@ -119,7 +119,7 @@ socklen_t Host::getPreferedSockAddressLen() const noexcept {
             return getSockAddressLen4();
         case ProtocolPreference::IPV6:
             return getSockAddressLen6();
-        case ProtocolPreference::ANY:
+        default:
             if (hasAddr6) {
                 return getSockAddressLen6();
             } else {
@@ -142,7 +142,7 @@ int Host::getPreferredSocketDomain() const noexcept {
             return AF_INET;
         case ProtocolPreference::IPV6:
             return AF_INET6;
-        case ProtocolPreference::ANY:
+        default:
             if (hasAddr6) {
                 return AF_INET6;
             } else {
