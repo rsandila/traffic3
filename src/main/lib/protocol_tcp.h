@@ -27,11 +27,11 @@ public:
 	virtual ~ProtocolTCP();
 	virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) override;
 	virtual bool write(const std::vector<char> & data, const Host & hostState) override;
+    virtual bool listen(const Host & localHost, const int backlog) override;
+    virtual bool connect(const Host & localHost) override;
 protected:
 	ProtocolTCP(int socket, socklen_t len, const struct sockaddr * addr, bool isIPV4);
 	ProtocolTCP(ProtocolTCP && other);
-	virtual bool realListen(const Host & localHost, const int af, const struct sockaddr * addr, const int addr_len, const int backlog);
-	virtual bool realConnect(const Host & localHost, const int af, const struct sockaddr * addr, const int addr_len);
 private:
 	ProtocolTCP(const ProtocolTCP &) = delete;
 	ProtocolTCP & operator=(const ProtocolTCP &) = delete;

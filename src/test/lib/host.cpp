@@ -31,36 +31,36 @@
 
 TEST_CASE("Validate IPV4 host constructors", "[host][ipv4]") {
     SECTION("IPV4: Test name based constructor") {
-        Host googleDNS("google-public-dns-a.google.com", 80);
-        const struct sockaddr_in * addr = (const struct sockaddr_in *)googleDNS.getSockAddress();
+        Host googleDNS("google-public-dns-a.google.com", 80, Host::ProtocolPreference::IPV4);
+        const struct sockaddr_in * addr = (const struct sockaddr_in *)googleDNS.getSockAddress4();
         REQUIRE(addr != nullptr);
-        REQUIRE(googleDNS.getSockAddressLen() == sizeof(*addr));
+        REQUIRE(googleDNS.getSockAddressLen4() == sizeof(*addr));
         char expectedAddress[] = { 8, 8, 8, 8 };
         REQUIRE(memcmp(&addr->sin_addr, expectedAddress, 4) == 0);
     }
     SECTION("IPV4: Test copy constructor") {
-        Host googleDNS("google-public-dns-a.google.com", 80);
+        Host googleDNS("google-public-dns-a.google.com", 80, Host::ProtocolPreference::IPV4);
         Host copy(googleDNS);
-        const struct sockaddr_in * addr = (const struct sockaddr_in *)copy.getSockAddress();
+        const struct sockaddr_in * addr = (const struct sockaddr_in *)copy.getSockAddress4();
         REQUIRE(addr != nullptr);
-        REQUIRE(copy.getSockAddressLen() == sizeof(*addr));
+        REQUIRE(copy.getSockAddressLen4() == sizeof(*addr));
         char expectedAddress[] = { 8, 8, 8, 8 };
         REQUIRE(memcmp(&addr->sin_addr, expectedAddress, 4) == 0);
     }
     SECTION("IPV4: Test sock_addr constructor") {
-        Host googleDNS("google-public-dns-a.google.com", 80);
-        Host copy(googleDNS.getSockAddressLen(), googleDNS.getSockAddress());
-        const struct sockaddr_in * addr = (const struct sockaddr_in *)copy.getSockAddress();
+        Host googleDNS("google-public-dns-a.google.com", 80, Host::ProtocolPreference::IPV4);
+        Host copy(googleDNS.getSockAddressLen4(), googleDNS.getSockAddress4());
+        const struct sockaddr_in * addr = (const struct sockaddr_in *)copy.getSockAddress4();
         REQUIRE(addr != nullptr);
-        REQUIRE(copy.getSockAddressLen() == sizeof(*addr));
+        REQUIRE(copy.getSockAddressLen4() == sizeof(*addr));
         char expectedAddress[] = { 8, 8, 8, 8 };
         REQUIRE(memcmp(&addr->sin_addr, expectedAddress, 4) == 0);
     }
     SECTION("IPV4: Test == operator") {
-        Host googleDNS1("google-public-dns-a.google.com", 80);
-        Host googleDNS2("google-public-dns-a.google.com", 80);
-        Host googleDNS3("google-public-dns-a.google.com", 443);
-        Host localHost("localhost", 80);
+        Host googleDNS1("google-public-dns-a.google.com", 80, Host::ProtocolPreference::IPV4);
+        Host googleDNS2("google-public-dns-a.google.com", 80, Host::ProtocolPreference::IPV4);
+        Host googleDNS3("google-public-dns-a.google.com", 443, Host::ProtocolPreference::IPV4);
+        Host localHost("localhost", 80, Host::ProtocolPreference::IPV4);
 
         REQUIRE(googleDNS1 == googleDNS2);
         REQUIRE_FALSE(googleDNS1 == googleDNS3);
@@ -70,7 +70,7 @@ TEST_CASE("Validate IPV4 host constructors", "[host][ipv4]") {
 
 TEST_CASE("Validate IPV6 host constructors", "[host][ipv6]") {
     SECTION("IPV6: Test name based constructor") {
-        Host googleDNS("google-public-dns-a.google.com", 80);
+        Host googleDNS("google-public-dns-a.google.com", 80, Host::ProtocolPreference::IPV6);
         const struct sockaddr_in6 * addr = (const struct sockaddr_in6 *)googleDNS.getSockAddress6();
         REQUIRE(addr != nullptr);
         REQUIRE(googleDNS.getSockAddressLen6() == sizeof(*addr));
@@ -78,7 +78,7 @@ TEST_CASE("Validate IPV6 host constructors", "[host][ipv6]") {
         REQUIRE(memcmp(&addr->sin6_addr, expectedAddress, 16) == 0);
     }
     SECTION("IPV6: Test copy constructor") {
-        Host googleDNS("google-public-dns-a.google.com", 80);
+        Host googleDNS("google-public-dns-a.google.com", 80, Host::ProtocolPreference::IPV6);
         Host copy(googleDNS);
         const struct sockaddr_in6 * addr = (const struct sockaddr_in6 *)copy.getSockAddress6();
         REQUIRE(addr != nullptr);
@@ -87,7 +87,7 @@ TEST_CASE("Validate IPV6 host constructors", "[host][ipv6]") {
         REQUIRE(memcmp(&addr->sin6_addr, expectedAddress, 16) == 0);
     }
     SECTION("IPV6: Test sock_addr constructor") {
-        Host googleDNS("google-public-dns-a.google.com", 80);
+        Host googleDNS("google-public-dns-a.google.com", 80, Host::ProtocolPreference::IPV6);
         Host copy(googleDNS.getSockAddressLen6(), googleDNS.getSockAddress6(), false);
         const struct sockaddr_in6 * addr = (const struct sockaddr_in6 *)copy.getSockAddress6();
         REQUIRE(addr != nullptr);

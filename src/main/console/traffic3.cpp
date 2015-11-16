@@ -82,11 +82,36 @@ ProtocolType mapStringToProtocolType(const std::string & value) {
     return ProtocolType::None;
 }
 
+Host::ProtocolPreference mapStringToProtocolPreference(const std::string & value) {
+    switch (value[0]) {
+        case 't':
+            if (value == "tcp4") {
+                return Host::ProtocolPreference::IPV4;
+            }
+            if (value == "tcp6") {
+                return Host::ProtocolPreference::IPV6;
+            }
+            break;
+        case 'u':
+            if (value == "udp4") {
+                return Host::ProtocolPreference::IPV4;
+            }
+            if (value == "udp6") {
+                return Host::ProtocolPreference::IPV6;
+            }
+            break;
+        default:
+            break;
+    }
+    return Host::ProtocolPreference::ANY;
+    
+}
+
 int beServer(const cmdline::parser & options) {
     ProtocolFactory protocolFactory(mapStringToProtocolType(options.get<std::string>("protocol")));
     ContentManagerFactory contentManagerFactory(mapStringToContentManagerType(options.get<std::string>("type")), options.get<unsigned>("min"), options.get<unsigned>("max"), CommonHeaders());
     Server server(protocolFactory, contentManagerFactory);
-    Host port10000(options.get<std::string>("interface"), options.get<unsigned>("port"));
+    Host port10000(options.get<std::string>("interface"), options.get<unsigned>("port"), mapStringToProtocolPreference(options.get<std::string>("protocol")));
     if (!server.addPort(port10000)) {
         std::cerr << "Unable to listen on port " << options.get<unsigned>("port") << " " << options.get<std::string>("protocol") << " on interface " << options.get<std::string>("interface") << std::endl;
         return 1;
@@ -98,7 +123,7 @@ int beServer(const cmdline::parser & options) {
 int beClient(const cmdline::parser & options) {
     ProtocolFactory protocolFactory(mapStringToProtocolType(options.get<std::string>("protocol")));
     ContentManagerFactory contentManagerFactory(mapStringToContentManagerType(options.get<std::string>("type")), options.get<unsigned>("min"), options.get<unsigned>("max"), CommonHeaders());
-    Host port10000(options.get<std::string>("host"), options.get<unsigned>("port"));
+    Host port10000(options.get<std::string>("host"), options.get<unsigned>("port"), mapStringToProtocolPreference(options.get<std::string>("protocol")));
     Client client;
     if (client.startClients(1, options.get<unsigned>("count"), protocolFactory, contentManagerFactory, port10000)) {
         getchar();

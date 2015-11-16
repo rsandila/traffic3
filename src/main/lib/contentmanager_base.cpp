@@ -123,7 +123,7 @@ void ContentManagerBase::ClientWorker() noexcept {
     }
     std::vector<char> inData;
     
-    Host hostState = Host::ALL_INTERFACES;
+    Host hostState = Host::ALL_INTERFACES6;
     running = true;
     do {
         std::vector<char> outData = ProcessContent(inData);
@@ -149,7 +149,7 @@ void ContentManagerBase::ServerWorker() noexcept {
     }
     std::vector<char> inData;
     
-    Host hostState = Host::ALL_INTERFACES;
+    Host hostState = Host::ALL_INTERFACES6;
     running = true;
     while (headerHandler.read(protocol, inData, hostState)) {
         std::vector<char> outData = ProcessContent(inData);

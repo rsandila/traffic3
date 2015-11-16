@@ -47,14 +47,15 @@ public:
 static WindowsInit globalWindowsInit;
 #endif
 const unsigned Host::DEFAULT_PORT = 0;
-Host Host::ALL_INTERFACES(std::string("0.0.0.0"), Host::DEFAULT_PORT);
+Host Host::ALL_INTERFACES4(std::string("0.0.0.0"), Host::DEFAULT_PORT, Host::ProtocolPreference::IPV4);
+Host Host::ALL_INTERFACES6(std::string("::"), Host::DEFAULT_PORT, Host::ProtocolPreference::IPV6);
 
-Host::Host(const std::string & name, unsigned _port) : hostName(name), port(_port), hasAddr(false), hasAddr6(false) {
+Host::Host(const std::string & name, unsigned _port, const ProtocolPreference preference) : hostName(name), port(_port), hasAddr(false), hasAddr6(false), protocolPreference(preference) {
     populateToAddr(hostName, _port);
     populateToAddr6(name, _port);
 }
 
-Host::Host(const Host & other) : hostName(other.hostName), port(other.port), hasAddr(other.hasAddr), hasAddr6(other.hasAddr6) {
+Host::Host(const Host & other) : hostName(other.hostName), port(other.port), hasAddr(other.hasAddr), hasAddr6(other.hasAddr6), protocolPreference(other.protocolPreference) {
     if (hasAddr) {
         memcpy(&addr, &other.addr, sizeof(addr));
     } else {
@@ -68,7 +69,8 @@ Host::Host(const Host & other) : hostName(other.hostName), port(other.port), has
 }
 
 Host::Host(socklen_t len, const struct sockaddr * otherAddr, bool isIPV4) : hostName(""),
-        hasAddr(isIPV4), hasAddr6(!isIPV4) {
+        hasAddr(isIPV4), hasAddr6(!isIPV4),
+        protocolPreference((isIPV4)?ProtocolPreference::IPV4:ProtocolPreference::IPV6) {
     if (isIPV4) {
         if (len < sizeof(addr)) {
             throw new std::length_error("addr not big enough");
@@ -82,7 +84,22 @@ Host::Host(socklen_t len, const struct sockaddr * otherAddr, bool isIPV4) : host
     }
 }
 
-const struct sockaddr * Host::getSockAddress() const {
+const struct sockaddr * Host::getPreferredSockAddress() const {
+    switch (protocolPreference) {
+        case ProtocolPreference::IPV4:
+            return getSockAddress4();
+        case ProtocolPreference::IPV6:
+            return getSockAddress6();
+        case ProtocolPreference::ANY:
+            if (hasAddr6) {
+                return getSockAddress6();
+            } else {
+                return getSockAddress4();
+            }
+    }
+}
+
+const struct sockaddr * Host::getSockAddress4() const {
     if (!hasAddr) {
         return nullptr;
     }
@@ -96,12 +113,47 @@ const struct sockaddr * Host::getSockAddress6() const {
     return (const struct sockaddr *)&addr6;
 }
 
-socklen_t Host::getSockAddressLen() const noexcept {
+socklen_t Host::getPreferedSockAddressLen() const noexcept {
+    switch (protocolPreference) {
+        case ProtocolPreference::IPV4:
+            return getSockAddressLen4();
+        case ProtocolPreference::IPV6:
+            return getSockAddressLen6();
+        case ProtocolPreference::ANY:
+            if (hasAddr6) {
+                return getSockAddressLen6();
+            } else {
+                return getSockAddressLen4();
+            }
+    }
+}
+
+socklen_t Host::getSockAddressLen4() const noexcept {
     return sizeof(addr);
 }
 
 socklen_t Host::getSockAddressLen6() const noexcept {
     return sizeof(addr6);
+}
+
+int Host::getPreferredSocketDomain() const noexcept {
+    switch (protocolPreference) {
+        case ProtocolPreference::IPV4:
+            return AF_INET;
+        case ProtocolPreference::IPV6:
+            return AF_INET6;
+        case ProtocolPreference::ANY:
+            if (hasAddr6) {
+                return AF_INET6;
+            } else {
+                return AF_INET;
+            }
+    }
+    
+}
+
+Host::ProtocolPreference Host::getProtocolPreference() const noexcept {
+    return protocolPreference;
 }
 
 bool Host::populateToAddr(const std::string & name, unsigned _port) {

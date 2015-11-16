@@ -43,18 +43,10 @@ ProtocolUDP4::ProtocolUDP4(ProtocolUDP4 && other) : ProtocolUDP(std::move(other)
 ProtocolUDP4::~ProtocolUDP4() {
 }
 
-bool ProtocolUDP4::listen(const Host & localHost, const int backlog) {
-	return realListen(localHost, PF_INET, localHost.getSockAddress(), localHost.getSockAddressLen(), backlog);
-}
-
-bool ProtocolUDP4::connect(const Host & localHost) {
-	return realConnect(localHost, PF_INET, localHost.getSockAddress(), localHost.getSockAddressLen());
-}
-
 std::unique_ptr<Protocol> ProtocolUDP4::waitForNewConnection() {
     if (numConnections == 0) {
         numConnections++;
-        std::unique_ptr<ProtocolUDP4> returnValue(new ProtocolUDP4(socket, host.getSockAddressLen(), host.getSockAddress()));
+        std::unique_ptr<ProtocolUDP4> returnValue(new ProtocolUDP4(socket, host.getPreferedSockAddressLen(), host.getPreferredSockAddress()));
         return std::move(returnValue);
     }
     while (state != ProtocolState::CLOSED) {

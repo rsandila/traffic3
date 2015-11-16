@@ -74,14 +74,14 @@ bool ProtocolTCP::write(const std::vector<char> & data, const Host & hostState) 
 	return numWritten == data.size();
 }
 
-bool ProtocolTCP::realListen(const Host & localHost, const int af, const struct sockaddr * addr, const int addr_len, const int backlog) {
+bool ProtocolTCP::listen(const Host & localHost, int backlog) {
 	std::unique_lock<std::mutex> lck(lock);
 	if (state != ProtocolState::CLOSED || type != ProtocolType::NONE) {
 		return false;
 	}
 	this->host = localHost;
 	struct protoent *pr = getprotobyname("tcp");
-	socket = ::socket(af, SOCK_STREAM, pr->p_proto);
+	socket = ::socket(localHost.getPreferredSocketDomain(), SOCK_STREAM, pr->p_proto);
 #ifndef _MSC_VER
 	int optval = 1;
 #else
@@ -89,7 +89,7 @@ bool ProtocolTCP::realListen(const Host & localHost, const int af, const struct 
 #endif
 	::setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
 	// setsockopt(socket, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval));
-	if (::bind(socket, addr, addr_len) == 0) {
+	if (::bind(socket, localHost.getPreferredSockAddress(), localHost.getPreferedSockAddressLen()) == 0) {
 		if (::listen(socket, backlog) == 0) {
 			type = ProtocolType::SERVER;
 			state = ProtocolState::OPEN;
@@ -99,15 +99,15 @@ bool ProtocolTCP::realListen(const Host & localHost, const int af, const struct 
 	return false;
 }
 
-bool ProtocolTCP::realConnect(const Host & localHost, const int af, const struct sockaddr * addr, const int addr_len) {
+bool ProtocolTCP::connect(const Host & localHost) {
 	std::unique_lock<std::mutex> lck(lock);
 	if (state != ProtocolState::CLOSED || type != ProtocolType::NONE) {
 		return false;
 	}
 	this->host = localHost;
 	struct protoent *pr = getprotobyname("tcp");
-	socket = ::socket(af, SOCK_STREAM, pr->p_proto);
-	if (::connect(socket, addr, addr_len) == 0) {
+	socket = ::socket(localHost.getPreferredSocketDomain(), SOCK_STREAM, pr->p_proto);
+	if (::connect(socket, localHost.getPreferredSockAddress(), localHost.getPreferedSockAddressLen()) == 0) {
 		type = ProtocolType::CLIENT;
 		state = ProtocolState::OPEN;
 		return true;
@@ -121,7 +121,7 @@ ProtocolTCP::ProtocolTCP(int socket, socklen_t len, const struct sockaddr * addr
 
 ProtocolTCP::ProtocolTCP(ProtocolTCP && other) : Protocol(other.host, other.type, other.socket, other.state) {
 	other.socket = -1;
-	other.host = Host::ALL_INTERFACES;
+	other.host = Host::ALL_INTERFACES6;
 	other.type = ProtocolType::NONE;
 	other.state = ProtocolState::CLOSED;
 }

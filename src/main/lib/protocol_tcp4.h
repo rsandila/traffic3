@@ -25,8 +25,6 @@ class ProtocolTCP4: public ProtocolTCP {
 public:
     ProtocolTCP4();
     virtual ~ProtocolTCP4();
-    virtual bool listen(const Host & host, const int backlog) override;
-    virtual bool connect(const Host & host) override;
     virtual std::unique_ptr<Protocol> waitForNewConnection() override;
 protected:
 private:

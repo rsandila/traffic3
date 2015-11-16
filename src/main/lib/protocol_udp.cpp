@@ -42,18 +42,24 @@ bool ProtocolUDP::read(std::vector<char> & data, bool allowPartialRead, Host & h
 	if (state == ProtocolState::CLOSED) {
 		return false;
 	}
-	struct sockaddr addr;
-	socklen_t addr_len = sizeof(addr);
+    union {
+        struct sockaddr_in addr4;
+        struct sockaddr_in6 addr6;
+    } addr;
+    socklen_t addr_len = (host.getProtocolPreference() == Host::ProtocolPreference::IPV4)?sizeof(addr.addr4):sizeof(addr.addr6);
 	long int numRead;
 	if (type == ProtocolType::CLIENT) {
 		numRead = ::recv(socket, &data[0], data.size(), (allowPartialRead) ? 0 : MSG_WAITALL);
 	}
 	else {
-		numRead = ::recvfrom(socket, &data[0], data.size(), (allowPartialRead) ? 0 : MSG_WAITALL, &addr, &addr_len);
+		numRead = ::recvfrom(socket, &data[0], data.size(), (allowPartialRead) ? 0 : MSG_WAITALL,
+                             (struct sockaddr *)&addr, &addr_len);
 	}
 	LOG(DEBUG) << std::this_thread::get_id() << " read " << numRead << std::endl;
 #ifdef _MSC_VER
 	LOG_IF(numRead == -1, WARNING) << "Error code = " << std::hex << WSAGetLastError() << std::endl;
+#else
+    LOG_IF(numRead == -1, WARNING) << "Error code = " << std::hex << errno << std::endl;
 #endif
 	if (numRead < 0) {
 		return false;
@@ -65,7 +71,8 @@ bool ProtocolUDP::read(std::vector<char> & data, bool allowPartialRead, Host & h
 		hostState = host;
 	}
 	else {
-		hostState = Host(addr_len, &addr);
+        hostState = Host(addr_len, (struct sockaddr *)&addr,
+                         host.getProtocolPreference() == Host::ProtocolPreference::IPV4);
 	}
 	if (allowPartialRead) {
 		return numRead > 0;
@@ -82,13 +89,18 @@ bool ProtocolUDP::write(const std::vector<char> & data, const Host & hostState) 
 	}
 	unsigned long numWritten;
 	if (type == ProtocolType::SERVER_CLIENT) {
-		numWritten = ::sendto(socket, &data[0], data.size(), 0, hostState.getSockAddress(),
-			hostState.getSockAddressLen());
+		numWritten = ::sendto(socket, &data[0], data.size(), 0, hostState.getPreferredSockAddress(),
+			hostState.getPreferedSockAddressLen());
 	}
 	else {
 		numWritten = ::send(socket, &data[0], data.size(), 0);
 	}
 	LOG(DEBUG) << std::this_thread::get_id() << " wrote " << numWritten << std::endl;
+#ifdef _MSC_VER
+    LOG_IF(numWritten == -1, WARNING) << "Error code = " << std::hex << WSAGetLastError() << std::endl;
+#else
+    LOG_IF(numWritten == (unsigned long)-1, WARNING) << "Error code = " << std::hex << errno << std::endl;
+#endif
 	return numWritten == data.size();
 }
 
@@ -97,60 +109,59 @@ ProtocolUDP::ProtocolUDP(int socket, socklen_t len, const struct sockaddr * addr
 
 ProtocolUDP::ProtocolUDP(ProtocolUDP && other) : Protocol(other.host, other.type, other.socket, other.state) {
 	other.socket = -1;
-	other.host = Host::ALL_INTERFACES;
+	other.host = Host::ALL_INTERFACES6;
 	other.type = ProtocolType::NONE;
 	other.state = ProtocolState::CLOSED;
 }
 
-bool ProtocolUDP::realListen(const Host & localHost, const int af, const struct sockaddr * addr, const int addr_len, const int backlog) {
-	UNUSED(backlog);
-	std::unique_lock<std::mutex> lck(lock);
-	if (state != ProtocolState::CLOSED || type != ProtocolType::NONE) {
-		return false;
-	}
-	this->host = localHost;
-	struct protoent *pr = getprotobyname("udp");
-	socket = ::socket(af, SOCK_DGRAM, pr->p_proto);
-	if (socket < 0) {
-		return false;
-	}
-	char optval = 1;
-	setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
-	if (::bind(socket, addr, addr_len) == 0) {
-		type = ProtocolType::SERVER;
-		state = ProtocolState::OPEN;
-		return true;
-	}
-	return false;
+bool ProtocolUDP::listen(const Host & localHost, const int backlog) {
+    UNUSED(backlog);
+    std::unique_lock<std::mutex> lck(lock);
+    if (state != ProtocolState::CLOSED || type != ProtocolType::NONE) {
+        return false;
+    }
+    this->host = localHost;
+    struct protoent *pr = getprotobyname("udp");
+    socket = ::socket(localHost.getPreferredSocketDomain(), SOCK_DGRAM, pr->p_proto);
+    if (socket < 0) {
+        return false;
+    }
+    char optval = 1;
+    setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+    if (::bind(socket, localHost.getPreferredSockAddress(), localHost.getPreferedSockAddressLen()) == 0) {
+        type = ProtocolType::SERVER;
+        state = ProtocolState::OPEN;
+        return true;
+    }
+    return false;
 }
 
-bool ProtocolUDP::realConnect(const Host & localHost, const int af, const struct sockaddr * addr, const int addr_len) {
-	std::unique_lock<std::mutex> lck(lock);
-	if (state != ProtocolState::CLOSED || type != ProtocolType::NONE) {
-		return false;
-	}
-	this->host = localHost;
-	struct protoent *pr = getprotobyname("udp");
-	socket = ::socket(af, SOCK_DGRAM, pr->p_proto);
-	if (socket < 0) {
-		return false;
-	}
+bool ProtocolUDP::connect(const Host & localHost) {
+    std::unique_lock<std::mutex> lck(lock);
+    if (state != ProtocolState::CLOSED || type != ProtocolType::NONE) {
+        return false;
+    }
+    this->host = localHost;
+    struct protoent *pr = getprotobyname("udp");
+    socket = ::socket(localHost.getPreferredSocketDomain(), SOCK_DGRAM, pr->p_proto);
+    if (socket < 0) {
+        return false;
+    }
 #ifdef _MSC_VER
-	char optval = 1;
+    char optval = 1;
 #else
-	int optval = 1;
+    int optval = 1;
 #endif
-	setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
-	if (::connect(socket, addr, addr_len) < 0) {
+    setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+    if (::connect(socket, localHost.getPreferredSockAddress(), localHost.getPreferedSockAddressLen()) < 0) {
 #ifndef _MSC_VER
-		::close(socket);
+        ::close(socket);
 #else
-		::closesocket(socket);
+        ::closesocket(socket);
 #endif
-		return false;
-	}
-	type = ProtocolType::CLIENT;
-	state = ProtocolState::OPEN;
-	return true;
+        return false;
+    }
+    type = ProtocolType::CLIENT;
+    state = ProtocolState::OPEN;
+    return true;
 }
-

@@ -42,14 +42,6 @@ ProtocolTCP4::ProtocolTCP4(ProtocolTCP4 && other) : ProtocolTCP(std::move(other)
 ProtocolTCP4::~ProtocolTCP4() {
 }
 
-bool ProtocolTCP4::listen(const Host & localHost, const int backlog) {
-	return realListen(localHost, PF_INET, localHost.getSockAddress(), localHost.getSockAddressLen(), backlog);
-}
-
-bool ProtocolTCP4::connect(const Host & localHost) {
-	return realConnect(localHost, PF_INET, localHost.getSockAddress(), localHost.getSockAddressLen());
-}
-
 std::unique_ptr<Protocol> ProtocolTCP4::waitForNewConnection() {
     struct sockaddr_in addr;
     socklen_t addrlen=sizeof(addr);

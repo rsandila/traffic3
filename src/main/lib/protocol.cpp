@@ -91,7 +91,7 @@ void Protocol::close() {
 		::closesocket(socket);
 #endif
         socket = 0;
-        host = Host::ALL_INTERFACES;
+        host = Host::ALL_INTERFACES6;
         type = ProtocolType::NONE;
         state = ProtocolState::CLOSED;
     }

@@ -44,18 +44,10 @@ ProtocolUDP6::~ProtocolUDP6() {
     close();
 }
 
-bool ProtocolUDP6::listen(const Host & localHost, const int backlog) {
-	return realListen(localHost, PF_INET6, localHost.getSockAddress6(), localHost.getSockAddressLen6(), backlog);
-}
-
-bool ProtocolUDP6::connect(const Host & localHost) {
-	return realConnect(localHost, PF_INET6, localHost.getSockAddress6(), localHost.getSockAddressLen6());
-}
-
 std::unique_ptr<Protocol> ProtocolUDP6::waitForNewConnection() {
     if (numConnections == 0) {
         numConnections++;
-        std::unique_ptr<ProtocolUDP6> returnValue(new ProtocolUDP6(socket, host.getSockAddressLen6(), host.getSockAddress6()));
+        std::unique_ptr<ProtocolUDP6> returnValue(new ProtocolUDP6(socket, host.getPreferedSockAddressLen(), host.getPreferredSockAddress()));
         return std::move(returnValue);
     }
     while (state != ProtocolState::CLOSED) {

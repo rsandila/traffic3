@@ -42,14 +42,6 @@ ProtocolTCP6::ProtocolTCP6(ProtocolTCP6 && other) : ProtocolTCP(std::move(other)
 ProtocolTCP6::~ProtocolTCP6() {
 }
 
-bool ProtocolTCP6::listen(const Host & localHost, const int backlog) {
-	return realListen(localHost, PF_INET6, localHost.getSockAddress6(), localHost.getSockAddressLen6(), backlog);
-}
-
-bool ProtocolTCP6::connect(const Host & localHost) {
-	return realConnect(localHost, PF_INET6, localHost.getSockAddress6(), localHost.getSockAddressLen6());
-}
-
 std::unique_ptr<Protocol> ProtocolTCP6::waitForNewConnection() {
     struct sockaddr_in6 addr;
     socklen_t addrlen=sizeof(addr);

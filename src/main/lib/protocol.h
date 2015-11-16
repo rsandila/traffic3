@@ -38,7 +38,7 @@ public:
         SERVER_CLIENT,
         NONE
     };
-    Protocol() : host(Host::ALL_INTERFACES), type(ProtocolType::NONE),
+    Protocol() : host(Host::ALL_INTERFACES6), type(ProtocolType::NONE),
         socket(-1), state(ProtocolState::CLOSED) {;}
     Protocol(Host otherHost, ProtocolType otherType, int otherSocket, ProtocolState otherState) :
         host(otherHost), type(otherType), socket(otherSocket), state(otherState) {;}

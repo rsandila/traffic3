@@ -27,8 +27,6 @@ class ProtocolUDP4: public ProtocolUDP {
 public:
     ProtocolUDP4();
     virtual ~ProtocolUDP4();
-    virtual bool listen(const Host & host, const int backlog) override;
-    virtual bool connect(const Host & host) override;
     virtual std::unique_ptr<Protocol> waitForNewConnection() override;
 protected:
     std::atomic<int> numConnections;
