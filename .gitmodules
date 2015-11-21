@@ -6,7 +6,7 @@
 	url = https://github.com/dascandy/hippomocks.git
 [submodule "3rdparty/cmdline"]
 	path = 3rdparty/cmdline
-	url = https://github.com/tanakh/cmdline.git
+	url = https://github.com/ys-nuem/cmdline.git
 [submodule "3rdparty/premake-core"]
 	path = 3rdparty/premake-core
 	url = https://github.com/premake/premake-core.git
