@@ -20,8 +20,6 @@
 
 #define ELPP_THREAD_SAFE
 #define ELPP_FORCE_USE_STD_THREAD
-#ifdef _MSC_VER
-#endif
 #include "easylogging++.h"
 
 

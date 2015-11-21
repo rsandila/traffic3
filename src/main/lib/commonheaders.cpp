@@ -38,6 +38,9 @@ bool CommonHeaders::read(std::unique_ptr<Protocol> & protocol, std::vector<char>
             memcmp(&signature[0], "TRAF", 4) == 0) {
                 // next 4 bytes is length in network order and includes the header
             uint32_t length = ntohl(*(uint32_t *)(&(signature[4])));
+			if (length < 4 + sizeof(uint32_t)) {
+				return false; // invalid header
+			}
             content.resize(length - (4 + sizeof(uint32_t)));
             if (content.size() == 0) {
                 return true;

@@ -201,9 +201,6 @@ bool Host::populateToAddr6(const std::string & name, unsigned _port) {
 }
 
 bool Host::operator==(const Host & other) const {
-    if (!other.hasAddr) {
-        return false; // if not a valid addr then no point in comparing
-    }
     // if it has a name and it differs then exit
     if (other.hostName.size() > 0 && hostName.size() > 0) {
         if (hostName != other.hostName) {

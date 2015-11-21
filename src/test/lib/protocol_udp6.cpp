@@ -41,10 +41,12 @@ TEST_CASE("IPV6: UDP read test", "[ipv6][protocol]") {
     SECTION("Test read with connected socket") {
         MockRepository mocks;
         ProtocolUDP6 protocol;
+#ifndef _MSC_VER
         mocks.ExpectCallFunc(::connect).Return(0);
+#endif
         REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
-        mocks.ExpectCallFunc(::recv).Return(10);
-        mocks.NeverCallFunc(::recvfrom);
+        mocks.ExpectCallFunc(::recvfrom).Return(10);
+        mocks.NeverCallFunc(::recv);
         std::vector<char> data;
         data.resize(1024);
         Host hostState = Host::ALL_INTERFACES6;
@@ -54,10 +56,12 @@ TEST_CASE("IPV6: UDP read test", "[ipv6][protocol]") {
     SECTION("Test read failure mode 1 with connected socket") {
         MockRepository mocks;
         ProtocolUDP6 protocol;
-        mocks.ExpectCallFunc(::connect).Return(0);
-        REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
-        mocks.ExpectCallFunc(::recv).Return(0);
-        mocks.NeverCallFunc(::recvfrom);
+#ifndef _MSC_VER
+		mocks.ExpectCallFunc(::connect).Return(0);
+#endif
+		REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
+        mocks.ExpectCallFunc(::recvfrom).Return(0);
+        mocks.NeverCallFunc(::recv);
         std::vector<char> data;
         data.resize(1024);
         Host hostState = Host::ALL_INTERFACES6;
@@ -67,10 +71,12 @@ TEST_CASE("IPV6: UDP read test", "[ipv6][protocol]") {
     SECTION("Test read failure mode 2 with connected socket") {
         MockRepository mocks;
         ProtocolUDP6 protocol;
-        mocks.ExpectCallFunc(::connect).Return(0);
-        REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
-        mocks.ExpectCallFunc(::recv).Return(-1);
-        mocks.NeverCallFunc(::recvfrom);
+#ifndef _MSC_VER
+		mocks.ExpectCallFunc(::connect).Return(0);
+#endif
+		REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
+        mocks.ExpectCallFunc(::recvfrom).Return(-1);
+        mocks.NeverCallFunc(::recv);
         std::vector<char> data;
         data.resize(1024);
         Host hostState = Host::ALL_INTERFACES6;
@@ -95,11 +101,18 @@ TEST_CASE("IPV6: UDP write test", "[ipv6][protocol]") {
     SECTION("Test write with connected socket") {
         MockRepository mocks;
         ProtocolUDP6 protocol;
-        mocks.ExpectCallFunc(::connect).Return(0);
-        REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
-        mocks.ExpectCallFunc(::send).Return(10);
-        mocks.NeverCallFunc(::sendto);
-        std::vector<char> data;
+#ifndef _MSC_VER
+		mocks.ExpectCallFunc(::connect).Return(0);
+#endif
+		REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
+#ifndef _MSC_VER
+		mocks.ExpectCallFunc(::send).Return(10);
+		mocks.NeverCallFunc(::sendto);
+#else
+		mocks.ExpectCallFunc(::sendto).Return(10);
+        mocks.NeverCallFunc(::send);
+#endif
+		std::vector<char> data;
         data.resize(10);
         Host hostState = Host::ALL_INTERFACES6;
         REQUIRE(protocol.write(data, hostState));
@@ -108,11 +121,18 @@ TEST_CASE("IPV6: UDP write test", "[ipv6][protocol]") {
     SECTION("Test write failure mode 1 with connected socket") {
         MockRepository mocks;
         ProtocolUDP6 protocol;
-        mocks.ExpectCallFunc(::connect).Return(0);
-        REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
-        mocks.ExpectCallFunc(::send).Return(0);
+#ifndef _MSC_VER
+		mocks.ExpectCallFunc(::connect).Return(0);
+#endif
+		REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
+#ifndef _MSC_VER
+		mocks.ExpectCallFunc(::send).Return(0);
         mocks.NeverCallFunc(::sendto);
-        std::vector<char> data;
+#else
+		mocks.ExpectCallFunc(::sendto).Return(0);
+		mocks.NeverCallFunc(::send);
+#endif
+		std::vector<char> data;
         data.resize(1024);
         Host hostState = Host::ALL_INTERFACES6;
         REQUIRE_FALSE(protocol.write(data, hostState));
@@ -121,11 +141,18 @@ TEST_CASE("IPV6: UDP write test", "[ipv6][protocol]") {
     SECTION("Test write failure mode 2 with connected socket") {
         MockRepository mocks;
         ProtocolUDP6 protocol;
-        mocks.ExpectCallFunc(::connect).Return(0);
-        REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
-        mocks.ExpectCallFunc(::send).Return(-1);
+#ifndef _MSC_VER
+		mocks.ExpectCallFunc(::connect).Return(0);
+#endif
+		REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
+#ifndef _MSC_VER
+		mocks.ExpectCallFunc(::send).Return(-1);
         mocks.NeverCallFunc(::sendto);
-        std::vector<char> data;
+#else
+		mocks.ExpectCallFunc(::sendto).Return(-1);
+		mocks.NeverCallFunc(::send);
+#endif
+		std::vector<char> data;
         data.resize(1024);
         Host hostState = Host::ALL_INTERFACES6;
         REQUIRE_FALSE(protocol.write(data, hostState));

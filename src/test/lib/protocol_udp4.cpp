@@ -41,10 +41,12 @@ TEST_CASE("IPV4: UDP read test", "[ipv4][protocol]") {
     SECTION("Test read with connected socket") {
         MockRepository mocks;
         ProtocolUDP4 protocol;
+#ifndef _MSC_VER
         mocks.ExpectCallFunc(::connect).Return(0);
+#endif
         REQUIRE(protocol.connect(Host::ALL_INTERFACES4));
-        mocks.ExpectCallFunc(::recv).Return(10);
-        mocks.NeverCallFunc(::recvfrom);
+        // mocks.ExpectCallFunc(::recv).Return(10);
+        mocks.ExpectCallFunc(::recvfrom).Return(10);
         std::vector<char> data;
         data.resize(1024);
         Host hostState = Host::ALL_INTERFACES4;
@@ -54,10 +56,12 @@ TEST_CASE("IPV4: UDP read test", "[ipv4][protocol]") {
     SECTION("Test read failure mode 1 with connected socket") {
         MockRepository mocks;
         ProtocolUDP4 protocol;
-        mocks.ExpectCallFunc(::connect).Return(0);
+#ifndef _MSC_VER
+		mocks.ExpectCallFunc(::connect).Return(0);
+#endif
         REQUIRE(protocol.connect(Host::ALL_INTERFACES4));
-        mocks.ExpectCallFunc(::recv).Return(0);
-        mocks.NeverCallFunc(::recvfrom);
+        mocks.ExpectCallFunc(::recvfrom).Return(0);
+        // mocks.NeverCallFunc(::recvfrom);
         std::vector<char> data;
         data.resize(1024);
         Host hostState = Host::ALL_INTERFACES4;
@@ -67,10 +71,12 @@ TEST_CASE("IPV4: UDP read test", "[ipv4][protocol]") {
     SECTION("Test read failure mode 2 with connected socket") {
         MockRepository mocks;
         ProtocolUDP4 protocol;
-        mocks.ExpectCallFunc(::connect).Return(0);
+#ifndef _MSC_VER
+		mocks.ExpectCallFunc(::connect).Return(0);
+#endif
         REQUIRE(protocol.connect(Host::ALL_INTERFACES4));
-        mocks.ExpectCallFunc(::recv).Return(-1);
-        mocks.NeverCallFunc(::recvfrom);
+        mocks.ExpectCallFunc(::recvfrom).Return(-1);
+        // mocks.NeverCallFunc(::recvfrom);
         std::vector<char> data;
         data.resize(1024);
         Host hostState = Host::ALL_INTERFACES4;
@@ -95,10 +101,16 @@ TEST_CASE("IPV4: UDP write test", "[ipv4][protocol]") {
     SECTION("Test write with connected socket") {
         MockRepository mocks;
         ProtocolUDP4 protocol;
-        mocks.ExpectCallFunc(::connect).Return(0);
+#ifndef _MSC_VER
+		mocks.ExpectCallFunc(::connect).Return(0);
+#endif
         REQUIRE(protocol.connect(Host::ALL_INTERFACES4));
-        mocks.ExpectCallFunc(::send).Return(10);
+#ifndef _MSC_VER
+		mocks.ExpectCallFunc(::send).Return(10);
         mocks.NeverCallFunc(::sendto);
+#else
+		mocks.ExpectCallFunc(::sendto).Return(10);
+#endif
         std::vector<char> data;
         data.resize(10);
         Host hostState = Host::ALL_INTERFACES4;
@@ -108,10 +120,16 @@ TEST_CASE("IPV4: UDP write test", "[ipv4][protocol]") {
     SECTION("Test write failure mode 1 with connected socket") {
         MockRepository mocks;
         ProtocolUDP4 protocol;
-        mocks.ExpectCallFunc(::connect).Return(0);
+#ifndef _MSC_VER
+		mocks.ExpectCallFunc(::connect).Return(0);
+#endif
         REQUIRE(protocol.connect(Host::ALL_INTERFACES4));
-        mocks.ExpectCallFunc(::send).Return(0);
-        mocks.NeverCallFunc(::sendto);
+#ifndef _MSC_VER
+		mocks.ExpectCallFunc(::send).Return(0);
+		mocks.NeverCallFunc(::sendto);
+#else
+		mocks.ExpectCallFunc(::sendto).Return(0);
+#endif
         std::vector<char> data;
         data.resize(1024);
         Host hostState = Host::ALL_INTERFACES4;
@@ -121,10 +139,16 @@ TEST_CASE("IPV4: UDP write test", "[ipv4][protocol]") {
     SECTION("Test write failure mode 2 with connected socket") {
         MockRepository mocks;
         ProtocolUDP4 protocol;
-        mocks.ExpectCallFunc(::connect).Return(0);
+#ifndef _MSC_VER
+		mocks.ExpectCallFunc(::connect).Return(0);
+#endif
         REQUIRE(protocol.connect(Host::ALL_INTERFACES4));
-        mocks.ExpectCallFunc(::send).Return(-1);
-        mocks.NeverCallFunc(::sendto);
+#ifndef _MSC_VER
+		mocks.ExpectCallFunc(::send).Return(-1);
+		mocks.NeverCallFunc(::sendto);
+#else
+		mocks.ExpectCallFunc(::sendto).Return(-1);
+#endif
         std::vector<char> data;
         data.resize(1024);
         Host hostState = Host::ALL_INTERFACES4;

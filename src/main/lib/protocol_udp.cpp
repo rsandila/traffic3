@@ -46,15 +46,14 @@ bool ProtocolUDP::read(std::vector<char> & data, bool allowPartialRead, Host & h
         struct sockaddr_in addr4;
         struct sockaddr_in6 addr6;
     } addr;
-    socklen_t addr_len = (host.getProtocolPreference() == Host::ProtocolPreference::IPV4)?sizeof(addr.addr4):sizeof(addr.addr6);
-	long int numRead;
-	if (type == ProtocolType::CLIENT) {
-		numRead = ::recv(socket, &data[0], data.size(), (allowPartialRead) ? 0 : MSG_WAITALL);
-	}
-	else {
-		numRead = ::recvfrom(socket, &data[0], data.size(), (allowPartialRead) ? 0 : MSG_WAITALL,
-                             (struct sockaddr *)&addr, &addr_len);
-	}
+	socklen_t addr_len = (host.getProtocolPreference() == Host::ProtocolPreference::IPV4) ? sizeof(addr.addr4) : sizeof(addr.addr6);
+#ifndef _MSC_VER
+	long int numRead = ::recvfrom(socket, &data[0], data.size(), (allowPartialRead) ? 0 : MSG_WAITALL,
+                            (struct sockaddr *)&addr, &addr_len);
+#else
+	long int numRead = ::recvfrom(socket, &data[0], data.size(), 0,
+		(struct sockaddr *)&addr, &addr_len);
+#endif
 	LOG(DEBUG) << std::this_thread::get_id() << " read " << numRead << std::endl;
 #ifdef _MSC_VER
 	LOG_IF(numRead == -1, WARNING) << "Error code = " << std::hex << WSAGetLastError() << std::endl;
@@ -88,6 +87,11 @@ bool ProtocolUDP::write(const std::vector<char> & data, const Host & hostState) 
 		return false;
 	}
 	unsigned long numWritten;
+	Host targetHost = (hostState == Host::ALL_INTERFACES4 || hostState == Host::ALL_INTERFACES6) ? host : hostState;
+#ifdef _MSC_VER
+	numWritten = ::sendto(socket, &data[0], data.size(), 0, targetHost.getPreferredSockAddress(),
+		targetHost.getPreferedSockAddressLen());
+#else
 	if (type == ProtocolType::SERVER_CLIENT) {
 		numWritten = ::sendto(socket, &data[0], data.size(), 0, hostState.getPreferredSockAddress(),
 			hostState.getPreferedSockAddressLen());
@@ -95,6 +99,7 @@ bool ProtocolUDP::write(const std::vector<char> & data, const Host & hostState) 
 	else {
 		numWritten = ::send(socket, &data[0], data.size(), 0);
 	}
+#endif
 	LOG(DEBUG) << std::this_thread::get_id() << " wrote " << numWritten << std::endl;
 #ifdef _MSC_VER
     LOG_IF(numWritten == -1, WARNING) << "Error code = " << std::hex << WSAGetLastError() << std::endl;
@@ -126,7 +131,11 @@ bool ProtocolUDP::listen(const Host & localHost, const int backlog) {
     if (socket < 0) {
         return false;
     }
+#ifdef _MSC_VER
     char optval = 1;
+#else
+	int optval = 1;
+#endif
     setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
     if (::bind(socket, localHost.getPreferredSockAddress(), localHost.getPreferedSockAddressLen()) == 0) {
         type = ProtocolType::SERVER;
@@ -153,15 +162,22 @@ bool ProtocolUDP::connect(const Host & localHost) {
     int optval = 1;
 #endif
     setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
-    if (::connect(socket, localHost.getPreferredSockAddress(), localHost.getPreferedSockAddressLen()) < 0) {
 #ifndef _MSC_VER
+	if (::connect(socket, localHost.getPreferredSockAddress(), localHost.getPreferedSockAddressLen()) < 0) {
         ::close(socket);
-#else
-        ::closesocket(socket);
-#endif
         return false;
     }
-    type = ProtocolType::CLIENT;
+#else
+	Host bindHost = Host::ALL_INTERFACES4;
+	if (localHost.getProtocolPreference() == Host::ProtocolPreference::IPV6) {
+		bindHost = Host::ALL_INTERFACES6;
+	}
+	if (::bind(socket, bindHost.getPreferredSockAddress(), bindHost.getPreferedSockAddressLen()) != 0) {
+		::closesocket(socket);
+		return false;
+	}
+#endif
+	type = ProtocolType::CLIENT;
     state = ProtocolState::OPEN;
     return true;
 }

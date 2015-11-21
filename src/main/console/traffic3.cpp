@@ -17,12 +17,6 @@
  USA.
  */
 
-#ifdef _MSC_VER
-// TODO - find new command-line parser
-int main(int argc, char **argv) {
-	return -1;
-}
-#else
 #include <iostream>
 #include "host.h"
 #include "protocolfactory.h"
@@ -172,4 +166,3 @@ int main(int argc, char ** argv) {
     }
     return 10;
 }
-#endif
