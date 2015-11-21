@@ -44,24 +44,4 @@ This assumes running in a terminal at the root of the source code tree.
 
 # TODO
 
-## Version 3.0
-
-1. ~~Add echo contentmanager~~
-1. ~~Add random (binary) contentmanager~~
-1. ~~Add UDP4~~
-1. ~~Add TCP6~~
-1. ~~Add UDP6~~
-1. Resolve known bugs
-
-## Version 3.1
-
-1. Get it to work in Windows
-
-## Version 3.2
-
-1. Build rpm and deb files
-2. Build windows installer
-
-## Version 3.3
-
-1. Create REST interface
+Moved to [Roadmap](https://github.com/rsandila/traffic3/wiki/Roadmap) page in the wiki.
