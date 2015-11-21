@@ -24,6 +24,12 @@
 #include "host.h"
 #include "common.h"
 
+#ifndef _MSC_VER
+typedef int optval_t;
+#else
+typedef char optval_t;
+#endif
+
 class Protocol {
 public:
     enum class ProtocolState {

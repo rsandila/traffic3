@@ -23,6 +23,7 @@ USA.
 #include <netinet/in.h>
 #include <unistd.h>
 #else
+#define WIN32_LEAN_AND_MEAN
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #endif
@@ -82,11 +83,7 @@ bool ProtocolTCP::listen(const Host & localHost, int backlog) {
 	this->host = localHost;
 	struct protoent *pr = getprotobyname("tcp");
 	socket = ::socket(localHost.getPreferredSocketDomain(), SOCK_STREAM, pr->p_proto);
-#ifndef _MSC_VER
-	int optval = 1;
-#else
-	char optval = 1;
-#endif
+    optval_t optval = 1;
 	::setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
 	// setsockopt(socket, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval));
 	if (::bind(socket, localHost.getPreferredSockAddress(), localHost.getPreferedSockAddressLen()) == 0) {
