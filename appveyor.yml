@@ -1,27 +1,25 @@
 version: 3.1.{build}
-
-platform:
-  - x64
-
-configuration:
-  - Release
-
-matrix:
-  fast_finish: true
-
 os: Visual Studio 2015
-
+configuration: Debug
+platform: Any CPU
 install:
-  - bin\tools\windows\premake5 vs2015
+- cmd: bin\tools\windows\premake5 vs2015
+build_script:
+- cmd: >-
+    git submodule init
 
-build-script:
-  - msbuild traffic3.sln /m /p:Configuration=Release /p:Platform=32bit
-  - msbuild traffic3.sln /m /p:Configuration=Release /p:Platform=64bit
-  - msbuild traffic3.sln /m /p:Configuration=Debug /p:Platform=32bit
-  - msbuild traffic3.sln /m /p:Configuration=Debug /p:Platform=64bit
+    git submodule update
 
+    msbuild traffic3.sln /m /p:Configuration=Debug /p:Platform=64bit /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 test_script:
-  - bin\32bit\Debug\traffic3_test.exe -s
-  - bin\32bit\Release\traffic3_text.exe -s
-  - bin\64bit\Debug\traffic3_test.exe -s
-  - bin\64bit\Release\traffic3_text.exe -s
+- ps: >-
+    # run tests
+
+    bin\64bit\Debug\traffic3_test.exe -s ~[ipv6] -r junit -o traffic3_test.64.debug.xml
+
+    # upload results to AppVeyor
+
+    $wc = New-Object 'System.Net.WebClient'
+
+    $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\traffic3_test.64.debug.xml))
+    
