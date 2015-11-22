@@ -20,10 +20,8 @@ build:
   parallel: true
   project: traffic3.sln
 
-verbosity:
-  detailed
+verbosity: detailed
 
 test_script:
   - test/Debug/traffic3_test.exe -s
   - test/Release/traffic3_text.exe -s
-  
