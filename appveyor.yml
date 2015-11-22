@@ -1,10 +1,10 @@
 version: 3.1.{build}
 
 platform:
-  - x32
+  - x64
 
 configuration:
-  - Debug
+  - Release
 
 matrix:
   fast_finish: true
@@ -14,10 +14,16 @@ os: Visual Studio 2015
 install:
   - bin\tools\windows\premake5 vs2015
 
-build:
-  parallel: true
+build-script:
+  - msbuild traffic3.sln /m /p:Configuration=Release /p:Platform=32bit
+  - msbuild traffic3.sln /m /p:Configuration=Release /p:Platform=64bit
+  - msbuild traffic3.sln /m /p:Configuration=Debug /p:Platform=32bit
+  - msbuild traffic3.sln /m /p:Configuration=Debug /p:Platform=64bit
+
   project: traffic3.sln
 
 test_script:
-  - test/Debug/traffic3_test.exe -s
-  - test/Release/traffic3_text.exe -s
+  - bin\32bit\Debug\traffic3_test.exe -s
+  - bin\32bit\Release\traffic3_text.exe -s
+  - bin\64bit\Debug\traffic3_test.exe -s
+  - bin\64bit\Release\traffic3_text.exe -s

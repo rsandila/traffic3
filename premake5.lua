@@ -1,9 +1,5 @@
 workspace "traffic3"
-	if not os.is("windows") then
-		architecture ( "x86_64" )
-	else
-		architecture ( "x32" )
-	end
+  platforms { "32bit", "64bit" }
 	configurations { "Debug", "Release" }
 	warnings "Extra"
 	if os.is("macosx") then
@@ -18,16 +14,20 @@ workspace "traffic3"
 	end
 	flags { "StaticRuntime", "MultiProcessorCompile" }
 	filter "configurations:Debug"
-        defines { "DEBUG" }
-        flags { "Symbols" }
+    defines { "DEBUG" }
+    flags { "Symbols" }
   filter "configurations:Release"
-        defines { "NDEBUG" }
-        optimize "On"
+    defines { "NDEBUG" }
+    optimize "On"
+	filter "configurations:32bit"
+		architecture ( "x32" )
+	filter "configurations:64bit"
+		architecture ( "x86_64" )
 
 project "common"
 	kind "StaticLib"
 	language "C++"
-	targetdir "bin/%{cfg.buildcfg}"
+	-- targetdir "bin/%{cfg.buildcfg}/%{archdir}"
 	linkoptions "-g"
   files { "src/main/lib/**.h", "src/main/lib/**.cpp" }
 	includedirs { "%{cfg.basedir}/3rdparty/easyloggingpp/src" }
@@ -37,13 +37,13 @@ project "traffic3"
 	links { "common" }
 	language "C++"
   includedirs { "%{cfg.basedir}/src/main/lib", "%{cfg.basedir}/3rdparty/easyloggingpp/src", "%{cfg.basedir}/3rdparty/cmdline" }
-  targetdir "bin/%{cfg.buildcfg}"
+  -- targetdir "bin/%{cfg.buildcfg}/%{archdir}"
 	files { "src/main/console/**.h", "src/main/console/**.cpp" }
 
 project "traffic3_test"
 	kind "ConsoleApp"
   links { "common" }
 	language "C++"
-	targetdir "test/%{cfg.buildcfg}"
+	-- targetdir "test/%{cfg.buildcfg}/%{archdir}"
   includedirs { "%{cfg.basedir}/src/main/lib", "%{cfg.basedir}/3rdparty/Catch/single_include", "%{cfg.basedir}/3rdparty/hippomocks/HippoMocks", "%{cfg.basedir}/3rdparty/easyloggingpp/src" }
 	files { "src/test/**.h", "src/test/**.cpp" }
