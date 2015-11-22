@@ -19,16 +19,12 @@
 #pragma once
 
 #include <mutex>
-#include "protocol.h"
+#include "protocol_tcp.h"
 
-class ProtocolTCP4: public Protocol {
+class ProtocolTCP4: public ProtocolTCP {
 public:
     ProtocolTCP4();
     virtual ~ProtocolTCP4();
-    virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) override;
-    virtual bool write(const std::vector<char> & data, const Host & hostState) override;
-    virtual bool listen(const Host & host, const int backlog) override;
-    virtual bool connect(const Host & host) override;
     virtual std::unique_ptr<Protocol> waitForNewConnection() override;
 protected:
 private:

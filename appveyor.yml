@@ -1,0 +1,25 @@
+version: 3.1.{build}
+os: Visual Studio 2015
+configuration: Debug
+platform: Any CPU
+install:
+- cmd: bin\tools\windows\premake5 vs2015
+build_script:
+- cmd: >-
+    git submodule init
+
+    git submodule update
+
+    msbuild traffic3.sln /m /p:Configuration=Debug /p:Platform=64bit /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+test_script:
+- ps: >-
+    # run tests
+
+    bin\64bit\Debug\traffic3_test.exe -s ~[ipv6] -r junit -o traffic3_test.64.debug.xml
+
+    # upload results to AppVeyor
+
+    $wc = New-Object 'System.Net.WebClient'
+
+    $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\traffic3_test.64.debug.xml))
+    

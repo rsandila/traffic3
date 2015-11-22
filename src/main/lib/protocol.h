@@ -24,6 +24,12 @@
 #include "host.h"
 #include "common.h"
 
+#ifndef _MSC_VER
+typedef int optval_t;
+#else
+typedef char optval_t;
+#endif
+
 class Protocol {
 public:
     enum class ProtocolState {
@@ -38,7 +44,7 @@ public:
         SERVER_CLIENT,
         NONE
     };
-    Protocol() : host(Host::ALL_INTERFACES), type(ProtocolType::NONE),
+    Protocol() : host(Host::ALL_INTERFACES6), type(ProtocolType::NONE),
         socket(-1), state(ProtocolState::CLOSED) {;}
     Protocol(Host otherHost, ProtocolType otherType, int otherSocket, ProtocolState otherState) :
         host(otherHost), type(otherType), socket(otherSocket), state(otherState) {;}
@@ -51,8 +57,8 @@ public:
         return false; };
     virtual ProtocolState getState();
     virtual bool isReady(const ProtocolState & expected, int timeoutInMilliseconds);
-    virtual bool listen(const Host & host, const int backlog) { UNUSED(host); UNUSED(backlog); return false; };
-    virtual bool connect(const Host & host) { UNUSED(host); return false; };
+    virtual bool listen(const Host & localHost, const int backlog) { UNUSED(localHost); UNUSED(backlog); return false; };
+    virtual bool connect(const Host & localHost) { UNUSED(localHost); return false; };
     virtual void close();
     virtual bool isServer() { return getType() == ProtocolType::SERVER; };
     virtual bool isClient() { return getType() == ProtocolType::CLIENT || getType() == ProtocolType::SERVER_CLIENT; };

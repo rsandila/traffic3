@@ -30,7 +30,7 @@
 class ContentManagerFactory {
 public:
     ContentManagerFactory(const ContentManagerType & _type, unsigned _min, unsigned _max, CommonHeaders _headerHandler) :
-            min(_min), max(_max), type(_type), headerHandler(_headerHandler) {
+            minimum(_min), maximum(_max), type(_type), headerHandler(_headerHandler) {
     };
     virtual ~ContentManagerFactory() {;};
     virtual std::unique_ptr<ContentManager> createContentManager(std::unique_ptr<Protocol> protocol, bool isServer) {
@@ -50,13 +50,13 @@ public:
 protected:
     virtual std::unique_ptr<ContentManager> withCustomizations(std::unique_ptr<ContentManager> contentManager) const {
         if (contentManager.get() != nullptr) {
-            contentManager->setMinimumSize(min);
-            contentManager->setMaximumSize(max);
+            contentManager->setMinimumSize(minimum);
+            contentManager->setMaximumSize(maximum);
         }
         return std::move(contentManager);
     }
 private:
-    unsigned min, max;
+    unsigned minimum, maximum;
     ContentManagerType type;
     CommonHeaders headerHandler;
 };

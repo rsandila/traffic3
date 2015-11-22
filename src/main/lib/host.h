@@ -18,22 +18,38 @@
  */
 #pragma once
 
+#ifndef _MSC_VER
 #include <sys/socket.h>
 #include <poll.h>
 #include <netinet/in.h>
+#else
+#define WIN32_LEAN_AND_MEAN
+#include <winsock2.h>
+#include <WS2tcpip.h>
+#endif
 #include <string>
 
 class Host {
 public:
-    Host(const std::string & name, unsigned int port);
+    enum class ProtocolPreference {
+        IPV4,
+        IPV6,
+        ANY,
+    };
+    Host(const std::string & name, unsigned int port, const ProtocolPreference preference);
     Host(const Host & other);
     Host(socklen_t len, const struct sockaddr * addr, bool isIPV4 = true);
-    const struct sockaddr * getSockAddress() const;
+    const struct sockaddr * getPreferredSockAddress() const;
+    const struct sockaddr * getSockAddress4() const;
     const struct sockaddr * getSockAddress6() const;
-    socklen_t getSockAddressLen() const noexcept;
+    socklen_t getPreferedSockAddressLen() const noexcept;
+    socklen_t getSockAddressLen4() const noexcept;
     socklen_t getSockAddressLen6() const noexcept;
-    // TODO
-    static Host ALL_INTERFACES;
+    int getPreferredSocketDomain() const noexcept;
+    ProtocolPreference getProtocolPreference() const noexcept;
+    
+    static Host ALL_INTERFACES4;
+    static Host ALL_INTERFACES6;
     static const unsigned DEFAULT_PORT;
     bool operator==(const Host & other) const;
 protected:
@@ -45,7 +61,8 @@ private:
     struct sockaddr_in addr;
     struct sockaddr_in6 addr6;
     bool hasAddr, hasAddr6;
-
+    ProtocolPreference protocolPreference;
+    
     friend std::ostream & operator<<(std::ostream & outp, const Host & host);
 };
 

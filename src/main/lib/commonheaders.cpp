@@ -16,7 +16,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  USA.
  */
+#ifndef _MSC_VER
 #include <arpa/inet.h>
+#else
+#define WIN32_LEAN_AND_MEAN
+#include <WinSock2.h>
+#endif
 #include <thread>
 #include "commonheaders.h"
 #include "logging.h"
@@ -34,6 +39,9 @@ bool CommonHeaders::read(std::unique_ptr<Protocol> & protocol, std::vector<char>
             memcmp(&signature[0], "TRAF", 4) == 0) {
                 // next 4 bytes is length in network order and includes the header
             uint32_t length = ntohl(*(uint32_t *)(&(signature[4])));
+			if (length < 4 + sizeof(uint32_t)) {
+				return false; // invalid header
+			}
             content.resize(length - (4 + sizeof(uint32_t)));
             if (content.size() == 0) {
                 return true;

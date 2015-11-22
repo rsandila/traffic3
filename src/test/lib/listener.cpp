@@ -26,18 +26,18 @@ TEST_CASE("Listener: Unable to listen", "[server]") {
     SECTION("Bad protocolFactory") {
         ProtocolFactory protocolFactory(ProtocolType::None);
         ContentManagerFactory contentManagerFactory(ContentManagerType::None, 100, 10000, commonHeaders);
-        Listener listener(Host::ALL_INTERFACES, protocolFactory, contentManagerFactory);
+        Listener listener(Host::ALL_INTERFACES4, protocolFactory, contentManagerFactory);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         REQUIRE(listener.inErrorState());
     }
     SECTION("Compare to Host") {
-        Host googleDNS("google-public-dns-a.google.com", 80);
+        Host googleDNS("google-public-dns-a.google.com", 80, Host::ProtocolPreference::IPV4);
         ProtocolFactory protocolFactory(ProtocolType::None);
         ContentManagerFactory contentManagerFactory(ContentManagerType::None, 100, 10000, commonHeaders);
-        Listener listener(Host::ALL_INTERFACES, protocolFactory, contentManagerFactory);
+        Listener listener(Host::ALL_INTERFACES4, protocolFactory, contentManagerFactory);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        REQUIRE(listener == Host::ALL_INTERFACES);
-        REQUIRE(listener.getHost() == Host::ALL_INTERFACES);
+        REQUIRE(listener == Host::ALL_INTERFACES4);
+        REQUIRE(listener.getHost() == Host::ALL_INTERFACES4);
         REQUIRE_FALSE(listener == googleDNS);
     }
 }
@@ -69,7 +69,7 @@ TEST_CASE("Listener test", "[server]") {
         };
         MockProtocolFactory mockProtocolFactory;
         MockContentManagerFactory contentManagerFactory;
-        Listener listener(Host::ALL_INTERFACES, mockProtocolFactory, contentManagerFactory);
+        Listener listener(Host::ALL_INTERFACES4, mockProtocolFactory, contentManagerFactory);
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         REQUIRE_FALSE(listener.inErrorState());
     }
@@ -112,7 +112,7 @@ TEST_CASE("Listener test", "[server]") {
         };
         MockProtocolFactory mockProtocolFactory;
         MockContentManagerFactory contentManagerFactory;
-        Listener listener(Host::ALL_INTERFACES, mockProtocolFactory, contentManagerFactory);
+        Listener listener(Host::ALL_INTERFACES4, mockProtocolFactory, contentManagerFactory);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         REQUIRE_FALSE(listener.inErrorState());        
     }
@@ -168,7 +168,7 @@ TEST_CASE("Listener test", "[server]") {
         {
             MockProtocolFactory mockProtocolFactory;
             MockContentManagerFactory contentManagerFactory;
-            Listener listener(Host::ALL_INTERFACES, mockProtocolFactory, contentManagerFactory);
+            Listener listener(Host::ALL_INTERFACES4, mockProtocolFactory, contentManagerFactory);
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
             REQUIRE_FALSE(listener.inErrorState());
         }

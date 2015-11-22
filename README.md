@@ -13,17 +13,27 @@ Currently builds on my Mac OS X, Ubuntu 14 LTS and CentOS 7 systems.
 
 Will not work on FreeBSD until premake5 is ported to FreeBSD.
 
-Travis CI Status:
-[![Build Status](https://travis-ci.org/rsandila/traffic3.svg?branch=master)](https://travis-ci.org/rsandila/traffic3.svg?branch=master)
+## Build Status
+
+* Travis CI Linux:
+[![Travis CI Linux Build Status](https://travis-ci.org/rsandila/traffic3.svg?branch=master)](https://travis-ci.org/rsandila/traffic3.svg?branch=master)
+
+* AppVeyor CI Windows: [![AppVeyor CI Windows Build Status](https://ci.appveyor.com/api/projects/status/uoecusx4mnetiyly?svg=true)](https://ci.appveyor.com/project/rsandila/traffic3)
+
+*NOTE* AppVeyor seems unable to run any IPV6 related tests so those are skipped
 
 # Requirements
 
 1. Compiler that supports C++11
   1. gcc 4.8 or later
   1. MacOS X: clang 7 or later
-1. Linux (CentOS 7 or Ubuntu 14 LTS) or Mac OS X Capitan
+  1. Visual Studio 2015
+1. Linux (CentOS 7 or Ubuntu 14 LTS), Mac OS X Capitan or Windows 10
 1. git
-1. gmake
+1. Build Tool:
+  1. gmake (Linux and Mac OS X)
+  1. Visual Studio (Windows)
+  1. XCode (Mac OS X)
 
 # How to Build
 
@@ -34,7 +44,7 @@ This assumes running in a terminal at the root of the source code tree.
 1. Change to 3rdparty folder
 1. Run `./build.sh`
 
-## xcode
+## XCode
 
 1. Change to 3rdparty folder
 1. Run `./build.sh`
@@ -42,26 +52,14 @@ This assumes running in a terminal at the root of the source code tree.
 1. Run `./3rdparty/premake-core/bin/release/premake5 xcode4`
 1. Run `open traffic3.xcworkspace`
 
+## Visual Studio 2015
+
+This assume a cmd/powershell window at the root folder of the source code. You can download [Visual Studio Community Edition](https://www.visualstudio.com/en-us/products/visual-studio-express-vs.aspx) from Microsoft. This is sufficient to compile this project.
+
+1. Run `bin\tools\windows\premake5 vs2015`
+  1. If you don't want to run the included binary, download a trusted one from the [premake5 project](https://premake.github.io/download.html#v5).
+1. Run `start traffic3.sln`
+
 # TODO
 
-## Version 3.0
-
-1. ~~Add echo contentmanager~~
-1. ~~Add random (binary) contentmanager~~
-1. ~~Add UDP4~~
-1. ~~Add TCP6~~
-1. ~~Add UDP6~~
-1. Resolve known bugs
-
-## Version 3.1
-
-1. Get it to work in Windows
-
-## Version 3.2
-
-1. Build rpm and deb files
-2. Build windows installer
-
-## Version 3.3
-
-1. Create REST interface
+Moved to [Roadmap](https://github.com/rsandila/traffic3/wiki/Roadmap) page in the wiki.
