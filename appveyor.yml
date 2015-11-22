@@ -1,12 +1,10 @@
 version: 3.1.{build}
 
 platform:
-  - x86
   - x64
 
 configuration:
   - Debug
-  - Release
 
 matrix:
   fast_finish: true
