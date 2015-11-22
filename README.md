@@ -21,9 +21,10 @@ Travis CI Status:
 1. Compiler that supports C++11
   1. gcc 4.8 or later
   1. MacOS X: clang 7 or later
-1. Linux (CentOS 7 or Ubuntu 14 LTS) or Mac OS X Capitan
+  1. Visual Studio 2015
+1. Linux (CentOS 7 or Ubuntu 14 LTS), Mac OS X Capitan or Windows 10
 1. git
-1. gmake
+1. gmake or Visual Studio (Windows)
 
 # How to Build
 
@@ -41,6 +42,14 @@ This assumes running in a terminal at the root of the source code tree.
 1. Change to previous folder (`cd -`)
 1. Run `./3rdparty/premake-core/bin/release/premake5 xcode4`
 1. Run `open traffic3.xcworkspace`
+
+## Visual Studio 2015
+
+This assume a cmd/powershell window at the root folder of the source code. You can download [Visual Studio Community Edition](https://www.visualstudio.com/en-us/products/visual-studio-express-vs.aspx) from Microsoft. This is sufficient to compile this project.
+
+1. Run `bin/tools/premake5 vs2015`
+  1. If you don't want to run the included binary, download a trusted one from the [premake5 project](https://premake.github.io/download.html#v5).
+1. Run `start traffic3.sln`
 
 # TODO
 

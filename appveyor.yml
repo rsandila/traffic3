@@ -1,0 +1,29 @@
+version: 3.1.{build}
+
+platform:
+  - x86
+  - x64
+
+configuration:
+  - Debug
+  - Release
+
+matrix:
+  fast_finish: true
+
+os: Visual Studio 2015
+
+install:
+  - bin\tools\windows\premake5 vs2015
+
+build:
+  parallel: true
+  project: traffic3.sln
+
+verbosity:
+  detailed
+
+test_script:
+  - test/Debug/traffic3_test.exe -s
+  - test/Release/traffic3_text.exe -s
+  
