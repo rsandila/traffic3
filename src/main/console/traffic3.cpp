@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  USA.
  */
-
+#include <fstream>
 #include <iostream>
 #include "host.h"
 #include "protocolfactory.h"
@@ -132,6 +132,8 @@ void print_usage(const std::string argv0) {
     std::cerr << std::endl << "\tUsage: " << argv0 << " server|client ...." << std::endl;
 }
 
+static const char * TRAFFIC_CONF = "traffic3.logging.conf";
+
 int main(int argc, char ** argv) {
     // TODO
     enum class ModeType {
@@ -139,7 +141,14 @@ int main(int argc, char ** argv) {
         ServerMode,
         ClientMode
     };
-    std::map<std::string, ModeType> modeMap { {"server", ModeType::ServerMode}, {"client", ModeType::ClientMode} };
+	{
+		std::ifstream test(TRAFFIC_CONF);
+		if (test.is_open()) {
+			el::Configurations conf(TRAFFIC_CONF);
+			el::Loggers::reconfigureAllLoggers(conf);
+		}
+	}
+	std::map<std::string, ModeType> modeMap { {"server", ModeType::ServerMode}, {"client", ModeType::ClientMode} };
     cmdline::parser options;
     options.add<std::string>("mode", 'o', "Mode [server|client]", true);
     options.add<std::string>("protocol", 'r', "Protocol [tcp4|udp4|tcp6|udp6]", false, "tcp4");
