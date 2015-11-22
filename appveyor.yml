@@ -20,8 +20,6 @@ build-script:
   - msbuild traffic3.sln /m /p:Configuration=Debug /p:Platform=32bit
   - msbuild traffic3.sln /m /p:Configuration=Debug /p:Platform=64bit
 
-  project: traffic3.sln
-
 test_script:
   - bin\32bit\Debug\traffic3_test.exe -s
   - bin\32bit\Release\traffic3_text.exe -s
