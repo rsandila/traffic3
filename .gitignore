@@ -18,3 +18,7 @@ traffic3.sdf
 *.lib
 *.exe
 *.pdb
+bin/32bit/Debug/
+bin/32bit/Release/
+bin/64bit/Debug/
+bin/64bit/Release/

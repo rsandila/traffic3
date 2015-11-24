@@ -82,8 +82,7 @@ bool Protocol::isReady(const ProtocolState & expected, int timeoutInMilliseconds
 }
 
 void Protocol::close() {
-    // std::unique_lock<std::mutex> lck(lock);
-    if (state != ProtocolState::CLOSED) {
+    if (socket > 0) {
 #ifndef _MSC_VER
         ::shutdown(socket, SHUT_RDWR);
         ::close(socket);
