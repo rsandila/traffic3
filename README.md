@@ -1,15 +1,39 @@
-# Overview
+# What is Traffic?
 
-This is a new version of the Network Traffic Generator rewritten using C++11 techniques. For information on the previous version take a look at [traffic](http://robert.rsa3.com/pmwiki/pmwiki.php?n=Projects.Traffic). Currently working on getting feature parity with the older version.
+Traffic is a network traffic generator following a server/client model
+for generating high volumes of traffic on a network. This could be
+used to test the ability of a router/firewall/VPN to handle continuous
+high traffic loads. It is optimally used in an development
+environment. It does not measure throughput or number of connections
+per second or anything like this.
+
+# Use cases
+
+This is a network traffic generator. It is used to check what massive amounts of traffic of certain type will do to an intervening network. It does not try to measure throughput or response times. It has been made with the question in mind: If 100 clients does simultaneous TCP transfers for 2 days, will my router break? Or can I configure my firewall while 50 people are doing large TCP transfers through the device?
+
+# Who should use it?
+
+Responsible software developers in a test environment who needs to
+know how their router/firewall/VPN holds up against continuous high
+traffic loads. You should be careful to use this tool only in
+environments where it will not affect the normal day to day operations
+of your coworkers.
 
 # License
+
 GPLv2 license
+
+# Guarantees
+
+I have tested this software and it works for me. I can not take
+responsibility for what anybody does with this software and whether
+this software is fit or not for any purpose stated or not in any
+documents. It is as-is. If you break it, you get to keep all the
+pieces.
 
 # Status
 
-Serious work in progress.
-
-Currently builds on my Mac OS X, Ubuntu 14 LTS and CentOS 7 systems.
+Currently builds on my Mac OS X, Ubuntu 14 LTS, CentOS 7 and Windows 10 systems.
 
 Will not work on FreeBSD until premake5 is ported to FreeBSD.
 
@@ -63,3 +87,7 @@ This assume a cmd/powershell window at the root folder of the source code. You c
 # TODO
 
 Moved to [Roadmap](https://github.com/rsandila/traffic3/wiki/Roadmap) page in the wiki.
+
+# History
+
+This is a new version of the Network Traffic Generator rewritten using C++11 techniques. For information on the previous version take a look at [traffic](http://robert.rsa3.com/pmwiki/pmwiki.php?n=Projects.Traffic). Currently working on getting feature parity with the older version.
