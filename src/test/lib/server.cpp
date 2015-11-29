@@ -71,13 +71,13 @@ TEST_CASE("Server", "[protocol][server]") {
         };
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
-            MockContentManagerFactory() : ContentManagerFactory(ContentManagerType::None, 100, 10000, CommonHeaders()) {;};
+            MockContentManagerFactory() : ContentManagerFactory(ContentManagerType::None, 100, 10000, commonHeaders) {;};
             virtual std::unique_ptr<ContentManager> createContentManager(std::unique_ptr<Protocol> protocol, bool isServer) override {
                 UNUSED(protocol);
                 UNUSED(isServer);
                 return std::unique_ptr<ContentManager>(new MockContentManager());
             };
-            
+            CommonHeaders commonHeaders;
         };
         MockProtocolFactory mockProtocolFactory;
         MockContentManagerFactory mockContentManagerFactory;

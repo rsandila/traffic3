@@ -29,7 +29,7 @@
 
 class ContentManagerFactory {
 public:
-    ContentManagerFactory(const ContentManagerType & _type, unsigned _min, unsigned _max, CommonHeaders _headerHandler) :
+    ContentManagerFactory(const ContentManagerType & _type, unsigned _min, unsigned _max, CommonHeaders & _headerHandler) :
             minimum(_min), maximum(_max), type(_type), headerHandler(_headerHandler) {
     };
     virtual ~ContentManagerFactory() {;};
@@ -47,6 +47,16 @@ public:
                 return std::unique_ptr<ContentManager>(new ContentManager());
         }
     };
+    ContentManagerFactory(const ContentManagerFactory & other) : minimum(other.minimum), maximum(other.maximum),
+            type(other.type), headerHandler(other.headerHandler) {
+    }
+    ContentManagerFactory & operator=(const ContentManagerFactory & other) {
+        minimum = other.minimum;
+        maximum = other.maximum;
+        type = other.type;
+        headerHandler = other.headerHandler;
+        return *this;
+    }
 protected:
     virtual std::unique_ptr<ContentManager> withCustomizations(std::unique_ptr<ContentManager> contentManager) const {
         if (contentManager.get() != nullptr) {
@@ -58,5 +68,5 @@ protected:
 private:
     unsigned minimum, maximum;
     ContentManagerType type;
-    CommonHeaders headerHandler;
+    CommonHeaders & headerHandler;
 };
