@@ -20,9 +20,9 @@
 #include <memory.h>
 #include <thread>
 #include "catch.hpp"
-#include "protocol.h"
-#include "contentmanager_random_text.h"
-#include "common.h"
+#include "protocol/protocol.h"
+#include "contentmanager/contentmanager_random_text.h"
+#include "lib/common.h"
 
 static std::vector<char> lastWrite;
 static std::atomic<int> order(0);

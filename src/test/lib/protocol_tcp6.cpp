@@ -24,8 +24,8 @@
 #include <thread>
 #include "catch.hpp"
 #include "hippomocks.h"
-#include "protocol_tcp6.h"
-#include "common.h"
+#include "protocol/protocol_tcp6.h"
+#include "lib/common.h"
 
 TEST_CASE("IPV6: TCP read test", "[ipv6][protocol]") {
     SECTION("Test read with closed socket") {

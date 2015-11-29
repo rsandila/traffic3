@@ -24,8 +24,8 @@
 #include <thread>
 #include "catch.hpp"
 #include "hippomocks.h"
-#include "protocol_udp6.h"
-#include "common.h"
+#include "protocol/protocol_udp6.h"
+#include "lib/common.h"
 
 TEST_CASE("IPV6: UDP read test", "[ipv6][protocol]") {
     SECTION("Test read with closed socket") {

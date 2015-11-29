@@ -50,7 +50,7 @@ bool RestHeaders::read(std::unique_ptr<Protocol> & protocol, std::vector<char> &
             if (contentLengthOffset != (uint32_t)-1) {
                 contentLengthOffset += CONTENT_LENGTH.size();
                 uint32_t maxNumber = workBuffer.size() - contentLengthOffset;
-                if (maxNumber > 30) {
+                if (maxNumber > 30) { // why 30... because
                     maxNumber = 30;
                 }
                 std::string toNumber(&workBuffer[contentLengthOffset], maxNumber);

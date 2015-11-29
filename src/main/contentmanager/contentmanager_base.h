@@ -25,8 +25,8 @@
 #include <random>
 #include <atomic>
 #include "contentmanager.h"
-#include "protocol.h"
-#include "commonheaders.h"
+#include "protocol/protocol.h"
+#include "lib/commonheaders.h"
 
 // place holder class, derive new ContentManagers from this class
 class ContentManagerBase : public ContentManager {

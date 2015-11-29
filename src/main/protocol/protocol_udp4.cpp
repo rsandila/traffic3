@@ -29,7 +29,7 @@
 #endif
 #include <thread>
 #include "protocol_udp4.h"
-#include "logging.h"
+#include "lib/logging.h"
 
 ProtocolUDP4::ProtocolUDP4() : ProtocolUDP(), numConnections(0) {
 }

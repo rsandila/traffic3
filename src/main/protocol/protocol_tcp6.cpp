@@ -28,32 +28,31 @@
 #include <WS2tcpip.h>
 #endif
 #include <thread>
-#include "protocol_udp6.h"
-#include "logging.h"
+#include "protocol_tcp6.h"
+#include "lib/logging.h"
 
-ProtocolUDP6::ProtocolUDP6() : ProtocolUDP(), numConnections(0) {
+ProtocolTCP6::ProtocolTCP6() : ProtocolTCP() {
 }
 
-ProtocolUDP6::ProtocolUDP6(int newSocket, socklen_t len, const struct sockaddr * addr) : ProtocolUDP(newSocket, len, addr, false) {
+ProtocolTCP6::ProtocolTCP6(int newSocket, socklen_t len, const struct sockaddr * addr) : ProtocolTCP(newSocket, len, addr, false) {
 }
 
-ProtocolUDP6::ProtocolUDP6(ProtocolUDP6 && other) : ProtocolUDP(std::move(other)),
-        numConnections(other.numConnections.exchange(0)) {
+ProtocolTCP6::ProtocolTCP6(ProtocolTCP6 && other) : ProtocolTCP(std::move(other)) {
 }
 
-ProtocolUDP6::~ProtocolUDP6() {
-    close();
+ProtocolTCP6::~ProtocolTCP6() {
 }
 
-std::unique_ptr<Protocol> ProtocolUDP6::waitForNewConnection() {
-    if (numConnections == 0) {
-        numConnections++;
-        std::unique_ptr<ProtocolUDP6> returnValue(new ProtocolUDP6(socket, host.getPreferedSockAddressLen(), host.getPreferredSockAddress()));
-        return std::move(returnValue);
+std::unique_ptr<Protocol> ProtocolTCP6::waitForNewConnection() {
+    struct sockaddr_in6 addr;
+    socklen_t addrlen=sizeof(addr);
+    std::unique_lock<std::mutex> lck(lock);
+    if (state == ProtocolState::CLOSED || type != ProtocolType::SERVER) {
+        return std::unique_ptr<Protocol>(nullptr);
     }
-    while (state != ProtocolState::CLOSED) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    int newSocket=::accept(socket, (sockaddr *)&addr, &addrlen );
+    if (newSocket < 0) {
+        return std::unique_ptr<Protocol>(nullptr);
     }
-    return std::unique_ptr<Protocol>(nullptr);
+    return std::unique_ptr<Protocol>(new ProtocolTCP6(newSocket, addrlen, (const sockaddr *)&addr));
 }
-

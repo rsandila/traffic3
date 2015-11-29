@@ -21,13 +21,13 @@
 #include <thread>
 #include <random>
 #include "contentmanager_base.h"
-#include "protocol.h"
+#include "protocol/protocol.h"
 
 // place holder class
-class ContentManager_Fixed : public ContentManagerBase {
+class ContentManager_Echo : public ContentManagerBase {
 public:
-    ContentManager_Fixed(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer);
-    virtual ~ContentManager_Fixed();
+    ContentManager_Echo(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer);
+    virtual ~ContentManager_Echo();
     virtual ContentManagerType getType() const noexcept override;
     void setMaximumSize(unsigned long size) noexcept override;
 protected:

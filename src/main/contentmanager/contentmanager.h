@@ -19,7 +19,7 @@
 #pragma once
 
 #include "contentmanagertype.h"
-#include "common.h"
+#include "lib/common.h"
 
 // place holder class, don't derive from this one, derive from ContentManagerBase
 class ContentManager {

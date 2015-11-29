@@ -18,15 +18,15 @@
  */
 #include <fstream>
 #include <iostream>
-#include "host.h"
-#include "protocolfactory.h"
-#include "server.h"
-#include "contentmanagerfactory.h"
-#include "commonheaders.h"
-#include "client.h"
-#include "logging.h"
+#include "lib/host.h"
+#include "protocol/protocolfactory.h"
+#include "lib/server.h"
+#include "contentmanager/contentmanagerfactory.h"
+#include "lib/commonheaders.h"
+#include "lib/client.h"
+#include "lib/logging.h"
 #include "cmdline.h"
-#include "restheaders.h"
+#include "rest/restheaders.h"
 
 INITIALIZE_EASYLOGGINGPP
 

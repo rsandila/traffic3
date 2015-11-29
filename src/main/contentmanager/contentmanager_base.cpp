@@ -21,7 +21,7 @@
 #include <WinSock2.h>
 #endif
 #include <thread>
-#include "logging.h"
+#include "lib/logging.h"
 #include "contentmanager_base.h"
 
 ContentManagerBase::ContentManagerBase(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer) :

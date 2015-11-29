@@ -18,8 +18,8 @@
  */
 #include "catch.hpp"
 #include "hippomocks.h"
-#include "server.h"
-#include "common.h"
+#include "lib/server.h"
+#include "lib/common.h"
 
 TEST_CASE("Server", "[protocol][server]") {
     SECTION("Working") {

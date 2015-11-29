@@ -19,8 +19,8 @@
 #pragma once
 
 #include <vector>
-#include "protocol.h"
-#include "commonheaders.h"
+#include "protocol/protocol.h"
+#include "lib/commonheaders.h"
 
 class RestHeaders : public CommonHeaders {
 public:

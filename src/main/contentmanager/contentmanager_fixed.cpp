@@ -18,8 +18,8 @@
  */
 
 #include "contentmanager_fixed.h"
-#include "common.h"
-#include "logging.h"
+#include "lib/common.h"
+#include "lib/logging.h"
 
 ContentManager_Fixed::ContentManager_Fixed(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer) : ContentManagerBase(std::move(_protocol), _headerHandler, isServer) {
     

@@ -19,8 +19,8 @@
 // Testing contentmanager_fixed
 #include <memory.h>
 #include "catch.hpp"
-#include "contentmanager_fixed.h"
-#include "common.h"
+#include "contentmanager/contentmanager_fixed.h"
+#include "lib/common.h"
 
 static std::vector<char> fixedLastWrite;
 static std::atomic<int> fixedOrder(0);

@@ -20,7 +20,7 @@
 #pragma once
 
 #include <vector>
-#include "protocol.h"
+#include "protocol/protocol.h"
 
 class CommonHeaders {
 public:

@@ -19,8 +19,8 @@
 // Testing contentmanager_echo
 #include <memory.h>
 #include "catch.hpp"
-#include "contentmanager_echo.h"
-#include "common.h"
+#include "contentmanager/contentmanager_echo.h"
+#include "lib/common.h"
 
 static std::vector<char> echoLastWrite;
 static std::atomic<int> echoOrder(0);

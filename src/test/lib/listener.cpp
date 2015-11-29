@@ -18,8 +18,8 @@
  */
 // Tests for Listener class
 #include "catch.hpp"
-#include "listener.h"
-#include "protocolfactory.h"
+#include "lib/listener.h"
+#include "protocol/protocolfactory.h"
 
 TEST_CASE("Listener: Unable to listen", "[server]") {
     CommonHeaders commonHeaders;

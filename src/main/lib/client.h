@@ -20,8 +20,8 @@
 
 #include <map>
 #include <vector>
-#include "protocolfactory.h"
-#include "contentmanagerfactory.h"
+#include "protocol/protocolfactory.h"
+#include "contentmanager/contentmanagerfactory.h"
 #include "host.h"
 
 class Client {

@@ -18,8 +18,8 @@
  */
 #pragma once
 
-#include "contentmanagerfactory.h"
-#include "protocolfactory.h"
+#include "contentmanager/contentmanagerfactory.h"
+#include "protocol/protocolfactory.h"
 
 class Listener {
 public:

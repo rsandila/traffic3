@@ -19,8 +19,8 @@
 // Testing CommonHeaders
 #include <memory.h>
 #include "catch.hpp"
-#include "commonheaders.h"
-#include "common.h"
+#include "lib/commonheaders.h"
+#include "lib/common.h"
 
 TEST_CASE("CommonHeaders", "[headers]") {
     SECTION("Read returns invalid signature") {

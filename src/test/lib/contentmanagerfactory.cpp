@@ -20,7 +20,7 @@
 #include <memory>
 #include <thread>
 #include "catch.hpp"
-#include "contentmanagerfactory.h"
+#include "contentmanager/contentmanagerfactory.h"
 
 TEST_CASE("Testing contentmanagerfactory.h", "[content]") {
     SECTION("Test random text") {

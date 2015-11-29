@@ -28,7 +28,7 @@
 #endif
 #include <memory.h>
 #include "catch.hpp"
-#include "host.h"
+#include "lib/host.h"
 
 TEST_CASE("Validate IPV4 host constructors", "[host][ipv4]") {
     SECTION("IPV4: Test name based constructor") {

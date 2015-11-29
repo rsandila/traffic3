@@ -18,14 +18,14 @@
  */
 #pragma once
 
-#include "host.h"
-#include "protocol.h"
-#include "contentmanager.h"
-#include "contentmanager_random_text.h"
-#include "contentmanager_fixed.h"
-#include "contentmanager_echo.h"
-#include "contentmanager_random_binary.h"
-#include "contentmanagertype.h"
+#include "lib/host.h"
+#include "protocol/protocol.h"
+#include "contentmanager/contentmanager.h"
+#include "contentmanager/contentmanager_random_text.h"
+#include "contentmanager/contentmanager_fixed.h"
+#include "contentmanager/contentmanager_echo.h"
+#include "contentmanager/contentmanager_random_binary.h"
+#include "contentmanager/contentmanagertype.h"
 
 class ContentManagerFactory {
 public:

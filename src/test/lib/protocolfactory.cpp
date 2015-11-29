@@ -18,7 +18,7 @@
  */
 #include "catch.hpp"
 #include "hippomocks.h"
-#include "protocolfactory.h"
+#include "protocol/protocolfactory.h"
 
 TEST_CASE("Protocol Factory", "[protocol]") {
     SECTION("TCP4") {

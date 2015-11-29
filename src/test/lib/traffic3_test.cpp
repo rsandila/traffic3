@@ -17,7 +17,7 @@
  USA.
  */
 #include <fstream>
-#include "logging.h"
+#include "lib/logging.h"
 INITIALIZE_EASYLOGGINGPP
 
 #define CATCH_CONFIG_RUNNER

@@ -21,8 +21,8 @@
 #include <vector>
 #include <memory>
 #include <mutex>
-#include "host.h"
-#include "common.h"
+#include "lib/host.h"
+#include "lib/common.h"
 
 #ifndef _MSC_VER
 typedef int optval_t;

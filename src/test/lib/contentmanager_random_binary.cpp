@@ -20,9 +20,9 @@
 #include <memory.h>
 #include <thread>
 #include "catch.hpp"
-#include "protocol.h"
-#include "contentmanager_random_binary.h"
-#include "common.h"
+#include "protocol/protocol.h"
+#include "contentmanager/contentmanager_random_binary.h"
+#include "lib/common.h"
 
 static std::vector<char> randomBinaryLastWrite;
 static std::atomic<int> randomBinaryOrder(0);

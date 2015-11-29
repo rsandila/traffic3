@@ -21,7 +21,7 @@
 #include <thread>
 #include <random>
 #include "contentmanager_base.h"
-#include "protocol.h"
+#include "protocol/protocol.h"
 
 // place holder class
 class ContentManager_Random_Text : public ContentManagerBase {

@@ -24,8 +24,8 @@
 #include <thread>
 #include "catch.hpp"
 #include "hippomocks.h"
-#include "protocol_udp4.h"
-#include "common.h"
+#include "protocol/protocol_udp4.h"
+#include "lib/common.h"
 
 TEST_CASE("IPV4: UDP read test", "[ipv4][protocol]") {
     SECTION("Test read with closed socket") {

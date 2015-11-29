@@ -22,8 +22,8 @@
 #include <thread>
 #include <mutex>
 #include "listener.h"
-#include "protocolfactory.h"
-#include "contentmanagerfactory.h"
+#include "protocol/protocolfactory.h"
+#include "contentmanager/contentmanagerfactory.h"
 
 class Server {
 public:

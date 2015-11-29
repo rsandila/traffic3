@@ -18,23 +18,23 @@
  */
 #include <thread>
 #include <random>
-#include "contentmanager_random_text.h"
-#include "logging.h"
+#include "contentmanager_random_binary.h"
+#include "lib/logging.h"
 
-ContentManager_Random_Text::ContentManager_Random_Text(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer) :
+ContentManager_Random_Binary::ContentManager_Random_Binary(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer) :
         ContentManagerBase(std::move(_protocol), _headerHandler, isServer),
         generator(std::chrono::system_clock::now().time_since_epoch().count()),
-        chars(32, 127), distribution(nullptr) {
+        chars(0, 255), distribution(nullptr) {
 }
 
-ContentManager_Random_Text::~ContentManager_Random_Text() {
+ContentManager_Random_Binary::~ContentManager_Random_Binary() {
 }
 
-ContentManagerType ContentManager_Random_Text::getType() const noexcept {
+ContentManagerType ContentManager_Random_Binary::getType() const noexcept {
     return ContentManagerType::RandomText;
 }
 
-std::vector<char> ContentManager_Random_Text::ProcessContent(const std::vector<char> & incomingData) noexcept {
+std::vector<char> ContentManager_Random_Binary::ProcessContent(const std::vector<char> & incomingData) noexcept {
     LOG(DEBUG) << "entering with with " << incomingData.size() << std::endl;
     std::vector<char> data;
     data.resize((*distribution)(generator));
@@ -45,11 +45,11 @@ std::vector<char> ContentManager_Random_Text::ProcessContent(const std::vector<c
     return std::move(data);
 }
 
-bool ContentManager_Random_Text::PrepareContent() noexcept {
-    distribution = std::move(std::unique_ptr<std::uniform_int_distribution<int>>(new std::uniform_int_distribution<int>(getMin(), getMax())));
+bool ContentManager_Random_Binary::PrepareContent() noexcept {
+    distribution = std::move(std::unique_ptr<std::uniform_int_distribution<int>>(new std::uniform_int_distribution<int>(getMin(), (int)getMax())));
     return true;
 }
 
-void ContentManager_Random_Text::CleanupContent() noexcept {
+void ContentManager_Random_Binary::CleanupContent() noexcept {
     // do nothing
 }

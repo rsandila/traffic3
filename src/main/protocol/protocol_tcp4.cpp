@@ -29,7 +29,7 @@
 #endif
 #include <thread>
 #include "protocol_tcp4.h"
-#include "logging.h"
+#include "lib/logging.h"
 
 ProtocolTCP4::ProtocolTCP4() : ProtocolTCP() {
 }

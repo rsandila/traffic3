@@ -28,7 +28,7 @@ USA.
 #include <WS2tcpip.h>
 #endif
 #include <thread>
-#include "logging.h"
+#include "lib/logging.h"
 #include "protocol_tcp.h"
 
 ProtocolTCP::ProtocolTCP() : Protocol() {

@@ -22,8 +22,8 @@
 #include <sstream>
 #include <thread>
 #include <vector>
-#include "contentmanagerfactory.h"
-#include "protocolfactory.h"
+#include "contentmanager/contentmanagerfactory.h"
+#include "protocol/protocolfactory.h"
 #include "listener.h"
 #include "logging.h"
 
