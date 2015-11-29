@@ -18,6 +18,7 @@
  */
 
 #include <cstdlib>
+#include <cstring>
 #include "restheaders.h"
 
 RestHeaders::RestHeaders() {
