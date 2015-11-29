@@ -32,7 +32,7 @@ RestHeaders::~RestHeaders() {
 
 // TODO - consider chunked encoding at some stage
 // TODO - consider HTTP/2 at some stage
-bool RestHeaders::read(std::unique_ptr<Protocol> & protocol, std::vector<char> & content, Host & hostState) {
+bool RestHeaders::read(Protocol & protocol, std::vector<char> & content, Host & hostState) {
     std::vector<char> workBuffer, readBuffer;
     uint32_t offset = 0;
     readBuffer.resize(10248);
@@ -40,7 +40,7 @@ bool RestHeaders::read(std::unique_ptr<Protocol> & protocol, std::vector<char> &
     static const std::string END_OF_HEADERS = "\r\n\r\n";
     uint32_t contentLength = (uint32_t)-1;
     
-    while(protocol->read(readBuffer, true, hostState)) {
+    while(protocol.read(readBuffer, true, hostState)) {
         offset = workBuffer.size();
         workBuffer.resize(workBuffer.size() + readBuffer.size());
         memcpy(&workBuffer[offset], &readBuffer[0], readBuffer.size());
@@ -60,7 +60,7 @@ bool RestHeaders::read(std::unique_ptr<Protocol> & protocol, std::vector<char> &
                     break;
                 }
                 readBuffer.resize(contentLength - (workBuffer.size() - endOfHeaders));
-                if (protocol->read(readBuffer, false, hostState)) {
+                if (protocol.read(readBuffer, false, hostState)) {
                     break;
                 } else {
                     return false;
@@ -75,8 +75,8 @@ bool RestHeaders::read(std::unique_ptr<Protocol> & protocol, std::vector<char> &
     return content.size() != 0;
 }
 
-bool RestHeaders::write(std::unique_ptr<Protocol> & protocol, const std::vector<char> & content, const Host & hostState) {
-    return protocol->write(content, hostState);
+bool RestHeaders::write(Protocol & protocol, const std::vector<char> & content, const Host & hostState) {
+    return protocol.write(content, hostState);
 }
 
 unsigned RestHeaders::getVersion() const {

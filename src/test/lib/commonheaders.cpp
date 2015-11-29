@@ -38,7 +38,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
                 return true; };
         };
         CommonHeaders headers;
-        std::unique_ptr<Protocol> mockProtocol(new MockProtocol());
+        MockProtocol mockProtocol;
         std::vector<char> data;
         data.resize(1024);
         Host host = Host::ALL_INTERFACES4;
@@ -58,7 +58,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
                 return true; };
         };
         CommonHeaders headers;
-        std::unique_ptr<Protocol> mockProtocol(new MockProtocol());
+        MockProtocol mockProtocol;
         std::vector<char> data;
         data.resize(1024);
         Host host = Host::ALL_INTERFACES4;
@@ -79,7 +79,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
                 return true; };
         };
         CommonHeaders headers;
-        std::unique_ptr<Protocol> mockProtocol(new MockProtocol());
+        MockProtocol mockProtocol;
         std::vector<char> data;
         data.resize(1024);
         Host host = Host::ALL_INTERFACES4;
@@ -93,7 +93,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
                 return false; };
         };
         CommonHeaders headers;
-        std::unique_ptr<Protocol> mockProtocol(new MockProtocol());
+        MockProtocol mockProtocol;
         std::vector<char> data;
         data.resize(1024);
         Host host = Host::ALL_INTERFACES4;
@@ -123,7 +123,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
             bool firstTime;
         };
         CommonHeaders headers;
-        std::unique_ptr<Protocol> mockProtocol(new MockProtocol());
+        MockProtocol mockProtocol;
         std::vector<char> data;
         data.resize(1024);
         Host host = Host::ALL_INTERFACES4;
@@ -144,7 +144,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
                 return true; };
         };
         CommonHeaders headers;
-        std::unique_ptr<Protocol> mockProtocol(new MockProtocol());
+        MockProtocol mockProtocol;
         std::vector<char> data;
         data.resize(1024);
         Host host = Host::ALL_INTERFACES4;
@@ -178,7 +178,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
             bool firstTime;
         };
         CommonHeaders headers;
-        std::unique_ptr<Protocol> mockProtocol(new MockProtocol());
+        MockProtocol mockProtocol;
         std::vector<char> data;
         data.resize(1024);
         Host host = Host::ALL_INTERFACES4;

@@ -128,11 +128,11 @@ void ContentManagerBase::ClientWorker() noexcept {
     running = true;
     do {
         std::vector<char> outData = ProcessContent(inData);
-        if (!headerHandler.write(protocol, outData, hostState)) {
+        if (!headerHandler.write(*protocol, outData, hostState)) {
             LOG(WARNING) << std::this_thread::get_id() << " write failed " << errno << std::endl;
             break;
         }
-    } while (headerHandler.read(protocol, inData, hostState));
+    } while (headerHandler.read(*protocol, inData, hostState));
     LOG(WARNING) << std::this_thread::get_id() << " read failed " << errno << std::endl;
     CleanupContent();
 }
@@ -152,9 +152,9 @@ void ContentManagerBase::ServerWorker() noexcept {
     
     Host hostState = Host::ALL_INTERFACES6;
     running = true;
-    while (headerHandler.read(protocol, inData, hostState)) {
+    while (headerHandler.read(*protocol, inData, hostState)) {
         std::vector<char> outData = ProcessContent(inData);
-        if (!headerHandler.write(protocol, outData, hostState)) {
+        if (!headerHandler.write(*protocol, outData, hostState)) {
             LOG(WARNING) << std::this_thread::get_id() << " write failed " << errno << std::endl;
             break;
         }
