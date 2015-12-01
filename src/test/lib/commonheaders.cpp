@@ -187,4 +187,130 @@ TEST_CASE("CommonHeaders", "[headers]") {
         REQUIRE(data[0] == 'A');
         REQUIRE(data[1] == 'B');
     }
+    SECTION("Write success") {
+        class MockProtocol : public Protocol {
+        public:
+            MockProtocol() : count(0) {
+            }
+            virtual bool write(const std::vector<char> & data, const Host & hostState) {
+                const uint32_t length = htonl(12);
+                uint32_t actualLength;
+                switch (++count) {
+                    case 1:
+                        REQUIRE(data.size() == 8);
+                        REQUIRE(data[0] == 'T');
+                        REQUIRE(data[1] == 'R');
+                        REQUIRE(data[2] == 'A');
+                        REQUIRE(data[3] == 'F');
+                        actualLength = *(uint32_t *)(&data[4]);
+                        REQUIRE(length == actualLength);
+                        return true;
+                    case 2:
+                        REQUIRE(data.size() == 4);
+                        REQUIRE(data[0] == 'A');
+                        REQUIRE(data[1] == 'B');
+                        REQUIRE(data[2] == 'C');
+                        REQUIRE(data[3] == 'D');
+                        return true;
+                        
+                }
+                FAIL("Should never get here");
+                UNUSED(hostState);
+                return false;
+            };
+            int count;
+        };
+        MockProtocol protocol;
+        CommonHeaders headers;
+        Host host = Host::ALL_INTERFACES4;
+        std::vector<char> data;
+        data.resize(4);
+        data[0] = 'A';
+        data[1] = 'B';
+        data[2] = 'C';
+        data[3] = 'D';
+        REQUIRE(headers.write(protocol, data, host));
+    }
+    SECTION("Write success once") {
+        class MockProtocol : public Protocol {
+        public:
+            MockProtocol() : count(0) {
+            }
+            virtual bool write(const std::vector<char> & data, const Host & hostState) {
+                const uint32_t length = htonl(12);
+                uint32_t actualLength;
+                switch (++count) {
+                    case 1:
+                        REQUIRE(data.size() == 8);
+                        REQUIRE(data[0] == 'T');
+                        REQUIRE(data[1] == 'R');
+                        REQUIRE(data[2] == 'A');
+                        REQUIRE(data[3] == 'F');
+                        actualLength = *(uint32_t *)(&data[4]);
+                        REQUIRE(length == actualLength);
+                        return true;
+                    case 2:
+                        REQUIRE(data.size() == 4);
+                        REQUIRE(data[0] == 'A');
+                        REQUIRE(data[1] == 'B');
+                        REQUIRE(data[2] == 'C');
+                        REQUIRE(data[3] == 'D');
+                        return false;
+                        
+                }
+                UNUSED(hostState);
+                FAIL("Should never get here");
+                return false;
+            };
+            int count;
+        };
+        MockProtocol protocol;
+        CommonHeaders headers;
+        Host host = Host::ALL_INTERFACES4;
+        std::vector<char> data;
+        data.resize(4);
+        data[0] = 'A';
+        data[1] = 'B';
+        data[2] = 'C';
+        data[3] = 'D';
+        REQUIRE_FALSE(headers.write(protocol, data, host));
+    }
+    SECTION("Write never succeeds") {
+        class MockProtocol : public Protocol {
+        public:
+            MockProtocol() : count(0) {
+            }
+            virtual bool write(const std::vector<char> & data, const Host & hostState) {
+                const uint32_t length = htonl(12);
+                uint32_t actualLength;
+                switch (++count) {
+                    case 1:
+                        REQUIRE(data.size() == 8);
+                        REQUIRE(data[0] == 'T');
+                        REQUIRE(data[1] == 'R');
+                        REQUIRE(data[2] == 'A');
+                        REQUIRE(data[3] == 'F');
+                        actualLength = *(uint32_t *)(&data[4]);
+                        REQUIRE(length == actualLength);
+                        return false;
+                    case 2:
+                        FAIL("Should never be called");
+                        return false;                        
+                }
+                UNUSED(hostState);
+                return false;
+            };
+            int count;
+        };
+        MockProtocol protocol;
+        CommonHeaders headers;
+        Host host = Host::ALL_INTERFACES4;
+        std::vector<char> data;
+        data.resize(4);
+        data[0] = 'A';
+        data[1] = 'B';
+        data[2] = 'C';
+        data[3] = 'D';
+        REQUIRE_FALSE(headers.write(protocol, data, host));
+    }
 }

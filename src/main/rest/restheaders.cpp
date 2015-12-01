@@ -19,6 +19,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <cmath>
 #include "restheaders.h"
 
 RestHeaders::RestHeaders() {
@@ -34,18 +35,26 @@ RestHeaders::~RestHeaders() {
 // TODO - consider HTTP/2 at some stage
 bool RestHeaders::read(Protocol & protocol, std::vector<char> & content, Host & hostState) {
     std::vector<char> workBuffer, readBuffer;
+    workBuffer.resize(0);
     uint32_t offset = 0;
     readBuffer.resize(10248);
     static const std::string CONTENT_LENGTH = "Content-Length:";
     static const std::string END_OF_HEADERS = "\r\n\r\n";
     uint32_t contentLength = (uint32_t)-1;
+    uint32_t endOfHeaders = (uint32_t)-1;
     
     while(protocol.read(readBuffer, true, hostState)) {
+        if (readBuffer.size() == 0) {
+            break;
+        }
         offset = workBuffer.size();
         workBuffer.resize(workBuffer.size() + readBuffer.size());
         memcpy(&workBuffer[offset], &readBuffer[0], readBuffer.size());
-        uint32_t endOfHeaders = findStringInVector(workBuffer, 0, workBuffer.size(), END_OF_HEADERS);
+        if (endOfHeaders == (uint32_t)-1) {
+            endOfHeaders = findStringInVector(workBuffer, 0, workBuffer.size(), END_OF_HEADERS);
+        }
         if (endOfHeaders != (uint32_t)-1) {
+            endOfHeaders += END_OF_HEADERS.length();
             uint32_t contentLengthOffset = findStringInVector(workBuffer, 0, endOfHeaders, CONTENT_LENGTH);
             if (contentLengthOffset != (uint32_t)-1) {
                 contentLengthOffset += CONTENT_LENGTH.size();
@@ -54,13 +63,28 @@ bool RestHeaders::read(Protocol & protocol, std::vector<char> & content, Host & 
                     maxNumber = 30;
                 }
                 std::string toNumber(&workBuffer[contentLengthOffset], maxNumber);
-                contentLength = atol(toNumber.c_str());
+                try {
+                    int32_t signedContentLength = std::stol(toNumber);
+                    contentLength = signedContentLength;
+                    if (std::fabs(contentLength) != std::abs(signedContentLength)) {
+                        return false;
+                    }
+                } catch (std::invalid_argument e) {
+                    // invalid format
+                    return false;
+                }
                 if (workBuffer.size() - endOfHeaders >= contentLength) {
-                    // TODO - this may not be true... what if toNumber is badly formatted?
                     break;
                 }
-                readBuffer.resize(contentLength - (workBuffer.size() - endOfHeaders));
+                uint32_t expectedReadSize = contentLength - (workBuffer.size() - endOfHeaders);
+                readBuffer.resize(expectedReadSize);
                 if (protocol.read(readBuffer, false, hostState)) {
+                    if (readBuffer.size() < expectedReadSize) {
+                        return false;
+                    }
+                    uint32_t originalSize = workBuffer.size();
+                    workBuffer.resize(workBuffer.size() + expectedReadSize);
+                    memcpy(&workBuffer[originalSize], &readBuffer[0], expectedReadSize);
                     break;
                 } else {
                     return false;
@@ -72,7 +96,7 @@ bool RestHeaders::read(Protocol & protocol, std::vector<char> & content, Host & 
         }
     }
     content = std::move(workBuffer);
-    return content.size() != 0;
+    return (content.size() != 0) && (endOfHeaders != (uint32_t)-1);
 }
 
 bool RestHeaders::write(Protocol & protocol, const std::vector<char> & content, const Host & hostState) {

@@ -60,4 +60,4 @@ project "traffic3_test"
 	language "C++"
   includedirs { "%{cfg.basedir}/src/main", "%{cfg.basedir}/3rdparty/Catch/single_include",
     "%{cfg.basedir}/3rdparty/hippomocks/HippoMocks", "%{cfg.basedir}/3rdparty/easyloggingpp/src" }
-	files { "src/test/lib/**.h", "src/test/lib/**.cpp" }
+	files { "src/test/lib/**.h", "src/test/lib/**.cpp", "src/test/rest/**.cpp", "src/test/rest/**.h" }
