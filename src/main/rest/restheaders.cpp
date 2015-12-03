@@ -33,7 +33,7 @@ RestHeaders::~RestHeaders() {
 
 // TODO - consider chunked encoding at some stage
 // TODO - consider HTTP/2 at some stage
-bool RestHeaders::read(Protocol & protocol, std::vector<char> & content, Host & hostState) {
+bool RestHeaders::read(std::unique_ptr<Protocol> & protocol, std::vector<char> & content, Host & hostState) {
     std::vector<char> workBuffer, readBuffer;
     workBuffer.resize(0);
     uint32_t offset = 0;
@@ -43,7 +43,7 @@ bool RestHeaders::read(Protocol & protocol, std::vector<char> & content, Host & 
     uint32_t contentLength = (uint32_t)-1;
     uint32_t endOfHeaders = (uint32_t)-1;
     
-    while(protocol.read(readBuffer, true, hostState)) {
+    while(protocol->read(readBuffer, true, hostState)) {
         if (readBuffer.size() == 0) {
             break;
         }
@@ -78,7 +78,7 @@ bool RestHeaders::read(Protocol & protocol, std::vector<char> & content, Host & 
                 }
                 uint32_t expectedReadSize = contentLength - (workBuffer.size() - endOfHeaders);
                 readBuffer.resize(expectedReadSize);
-                if (protocol.read(readBuffer, false, hostState)) {
+                if (protocol->read(readBuffer, false, hostState)) {
                     if (readBuffer.size() < expectedReadSize) {
                         return false;
                     }
@@ -99,8 +99,8 @@ bool RestHeaders::read(Protocol & protocol, std::vector<char> & content, Host & 
     return (content.size() != 0) && (endOfHeaders != (uint32_t)-1);
 }
 
-bool RestHeaders::write(Protocol & protocol, const std::vector<char> & content, const Host & hostState) {
-    return protocol.write(content, hostState);
+bool RestHeaders::write(std::unique_ptr<Protocol> & protocol, const std::vector<char> & content, const Host & hostState) {
+    return protocol->write(content, hostState);
 }
 
 unsigned RestHeaders::getVersion() const {
@@ -122,5 +122,5 @@ uint32_t RestHeaders::findStringInVector(const std::vector<char> & buffer, uint3
             }
         }
     }
-    return -1;
+    return (uint32_t)-1;
 }

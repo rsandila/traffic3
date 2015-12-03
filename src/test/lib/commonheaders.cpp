@@ -38,7 +38,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
                 return true; };
         };
         CommonHeaders headers;
-        MockProtocol mockProtocol;
+		std::unique_ptr<Protocol> mockProtocol(new MockProtocol());
         std::vector<char> data;
         data.resize(1024);
         Host host = Host::ALL_INTERFACES4;
@@ -58,7 +58,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
                 return true; };
         };
         CommonHeaders headers;
-        MockProtocol mockProtocol;
+		std::unique_ptr<Protocol> mockProtocol(new MockProtocol());
         std::vector<char> data;
         data.resize(1024);
         Host host = Host::ALL_INTERFACES4;
@@ -79,8 +79,8 @@ TEST_CASE("CommonHeaders", "[headers]") {
                 return true; };
         };
         CommonHeaders headers;
-        MockProtocol mockProtocol;
-        std::vector<char> data;
+		std::unique_ptr<Protocol> mockProtocol(new MockProtocol());
+		std::vector<char> data;
         data.resize(1024);
         Host host = Host::ALL_INTERFACES4;
         REQUIRE_FALSE(headers.read(mockProtocol, data, host));
@@ -93,8 +93,8 @@ TEST_CASE("CommonHeaders", "[headers]") {
                 return false; };
         };
         CommonHeaders headers;
-        MockProtocol mockProtocol;
-        std::vector<char> data;
+		std::unique_ptr<Protocol> mockProtocol(new MockProtocol());
+		std::vector<char> data;
         data.resize(1024);
         Host host = Host::ALL_INTERFACES4;
         REQUIRE_FALSE(headers.read(mockProtocol, data, host));
@@ -123,8 +123,8 @@ TEST_CASE("CommonHeaders", "[headers]") {
             bool firstTime;
         };
         CommonHeaders headers;
-        MockProtocol mockProtocol;
-        std::vector<char> data;
+		std::unique_ptr<Protocol> mockProtocol(new MockProtocol());
+		std::vector<char> data;
         data.resize(1024);
         Host host = Host::ALL_INTERFACES4;
         REQUIRE_FALSE(headers.read(mockProtocol, data, host));
@@ -144,8 +144,8 @@ TEST_CASE("CommonHeaders", "[headers]") {
                 return true; };
         };
         CommonHeaders headers;
-        MockProtocol mockProtocol;
-        std::vector<char> data;
+		std::unique_ptr<Protocol> mockProtocol(new MockProtocol());
+		std::vector<char> data;
         data.resize(1024);
         Host host = Host::ALL_INTERFACES4;
         REQUIRE(headers.read(mockProtocol, data, host));
@@ -178,8 +178,8 @@ TEST_CASE("CommonHeaders", "[headers]") {
             bool firstTime;
         };
         CommonHeaders headers;
-        MockProtocol mockProtocol;
-        std::vector<char> data;
+		std::unique_ptr<Protocol> mockProtocol(new MockProtocol());
+		std::vector<char> data;
         data.resize(1024);
         Host host = Host::ALL_INTERFACES4;
         REQUIRE(headers.read(mockProtocol, data, host));
@@ -220,8 +220,8 @@ TEST_CASE("CommonHeaders", "[headers]") {
             };
             int count;
         };
-        MockProtocol protocol;
-        CommonHeaders headers;
+		std::unique_ptr<Protocol> mockProtocol(new MockProtocol());
+		CommonHeaders headers;
         Host host = Host::ALL_INTERFACES4;
         std::vector<char> data;
         data.resize(4);
@@ -229,7 +229,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
         data[1] = 'B';
         data[2] = 'C';
         data[3] = 'D';
-        REQUIRE(headers.write(protocol, data, host));
+        REQUIRE(headers.write(mockProtocol, data, host));
     }
     SECTION("Write success once") {
         class MockProtocol : public Protocol {
@@ -264,8 +264,8 @@ TEST_CASE("CommonHeaders", "[headers]") {
             };
             int count;
         };
-        MockProtocol protocol;
-        CommonHeaders headers;
+		std::unique_ptr<Protocol> mockProtocol(new MockProtocol());
+		CommonHeaders headers;
         Host host = Host::ALL_INTERFACES4;
         std::vector<char> data;
         data.resize(4);
@@ -273,7 +273,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
         data[1] = 'B';
         data[2] = 'C';
         data[3] = 'D';
-        REQUIRE_FALSE(headers.write(protocol, data, host));
+        REQUIRE_FALSE(headers.write(mockProtocol, data, host));
     }
     SECTION("Write never succeeds") {
         class MockProtocol : public Protocol {
@@ -302,8 +302,8 @@ TEST_CASE("CommonHeaders", "[headers]") {
             };
             int count;
         };
-        MockProtocol protocol;
-        CommonHeaders headers;
+		std::unique_ptr<Protocol> mockProtocol(new MockProtocol());
+		CommonHeaders headers;
         Host host = Host::ALL_INTERFACES4;
         std::vector<char> data;
         data.resize(4);
@@ -311,6 +311,6 @@ TEST_CASE("CommonHeaders", "[headers]") {
         data[1] = 'B';
         data[2] = 'C';
         data[3] = 'D';
-        REQUIRE_FALSE(headers.write(protocol, data, host));
+        REQUIRE_FALSE(headers.write(mockProtocol, data, host));
     }
 }

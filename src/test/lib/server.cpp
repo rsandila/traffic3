@@ -27,7 +27,7 @@ TEST_CASE("Server", "[protocol][server]") {
         public:
             MockProtocol() : returnedOne(false) {
             }
-            virtual bool listen(const Host & host, const int backlog) override { UNUSED(host); UNUSED(backlog); return true; };
+            virtual bool listen(const Host & ignoredHost, const int backlog) override { UNUSED(ignoredHost); UNUSED(backlog); return true; };
             virtual std::unique_ptr<Protocol> waitForNewConnection() override {
                 if (!returnedOne) {
                     returnedOne = true;

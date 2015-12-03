@@ -32,9 +32,9 @@ CommonHeaders::CommonHeaders() {
 CommonHeaders::~CommonHeaders() {
 }
 
-bool CommonHeaders::read(Protocol & protocol, std::vector<char> & content, Host & hostState) {
+bool CommonHeaders::read(std::unique_ptr<Protocol> & protocol, std::vector<char> & content, Host & hostState) {
     std::vector<char> signature(4 + sizeof(uint32_t));
-    if (protocol.read(signature, false, hostState)) {
+    if (protocol->read(signature, false, hostState)) {
         if (signature.size() == (4 + sizeof(uint32_t)) &&
             memcmp(&signature[0], "TRAF", 4) == 0) {
                 // next 4 bytes is length in network order and includes the header
@@ -47,7 +47,7 @@ bool CommonHeaders::read(Protocol & protocol, std::vector<char> & content, Host 
                 return true;
             }
             LOG(DEBUG) << std::this_thread::get_id() << " reading " << length << " " << content.size() << " bytes" << std::endl;
-            return protocol.read(content, false, hostState);
+            return protocol->read(content, false, hostState);
         } else {
             LOG(WARNING) << std::this_thread::get_id() << " Invalid signature received " << signature.size() << " " << &signature[0] << std::endl;
         }
@@ -55,13 +55,13 @@ bool CommonHeaders::read(Protocol & protocol, std::vector<char> & content, Host 
     return false;
 }
 
-bool CommonHeaders::write(Protocol & protocol, const std::vector<char> & content, const Host & hostState) {
+bool CommonHeaders::write(std::unique_ptr<Protocol> & protocol, const std::vector<char> & content, const Host & hostState) {
     std::vector<char> signature(4 + sizeof(uint32_t));
     memcpy(&signature[0], "TRAF", 4);
     uint32_t length = htonl(8 + content.size());
     memcpy(&signature[4], &length, sizeof(uint32_t));
-    if (protocol.write(signature, hostState)) {
-        return protocol.write(content, hostState);
+    if (protocol->write(signature, hostState)) {
+        return protocol->write(content, hostState);
     }
     return false;
 }

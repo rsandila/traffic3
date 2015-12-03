@@ -1,8 +1,10 @@
 *.exe
+*.filters
 *.ilk
 *.lib
 *.log
 *.make
+*.opendb
 *.opensdf
 *.pdb
 *.sln

@@ -47,7 +47,7 @@ TEST_CASE("Listener test", "[server]") {
     SECTION("Listen success, waitForNewConnection fails") {
         class MockProtocol : public Protocol {
         public:
-            virtual bool listen(const Host & host, const int backlog) override { UNUSED(host); UNUSED(backlog); return true; };
+            virtual bool listen(const Host & ignoredHost, const int backlog) override { UNUSED(ignoredHost); UNUSED(backlog); return true; };
         };
         class MockProtocolFactory: public ProtocolFactory {
         public:
@@ -78,7 +78,7 @@ TEST_CASE("Listener test", "[server]") {
         class MockProtocol : public Protocol {
         public:
             MockProtocol() : shouldReturnConnection(true) {;};
-            virtual bool listen(const Host & host, const int backlog) override { UNUSED(host); UNUSED(backlog); return true; };
+            virtual bool listen(const Host & ignoredHost, const int backlog) override { UNUSED(ignoredHost); UNUSED(backlog); return true; };
             virtual std::unique_ptr<Protocol> waitForNewConnection() override {
                 if (shouldReturnConnection) {
                     shouldReturnConnection = false;
@@ -126,7 +126,7 @@ TEST_CASE("Listener test", "[server]") {
         public:
             MockProtocol() : returnedOne(false) {
             }
-            virtual bool listen(const Host & host, const int backlog) override { UNUSED(host); UNUSED(backlog); return true; };
+            virtual bool listen(const Host & ignoredHost, const int backlog) override { UNUSED(ignoredHost); UNUSED(backlog); return true; };
             virtual std::unique_ptr<Protocol> waitForNewConnection() override {
                 if (!returnedOne) {
                     returnedOne = true;

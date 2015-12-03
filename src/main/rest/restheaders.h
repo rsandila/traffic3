@@ -26,8 +26,8 @@ class RestHeaders : public CommonHeaders {
 public:
     RestHeaders();
     virtual ~RestHeaders();
-    virtual bool read(Protocol & protocol, std::vector<char> & content, Host & hostState) override;
-    virtual bool write(Protocol & protocol, const std::vector<char> & content, const Host & hostState) override;
+    virtual bool read(std::unique_ptr<Protocol> & protocol, std::vector<char> & content, Host & hostState) override;
+    virtual bool write(std::unique_ptr<Protocol> & protocol, const std::vector<char> & content, const Host & hostState) override;
     virtual unsigned getVersion() const override;
 protected:
     uint32_t findStringInVector(const std::vector<char> & buffer, uint32_t offset, uint32_t max_offset, const std::string & toFind) const noexcept;

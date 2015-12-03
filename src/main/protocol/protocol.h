@@ -71,4 +71,6 @@ protected:
     int socket;
     ProtocolState state;
 private:
+	Protocol & operator=(const Protocol & other) = delete;
+	Protocol(const Protocol & other) = delete;
 };
