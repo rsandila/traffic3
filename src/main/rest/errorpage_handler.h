@@ -16,24 +16,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  USA.
  */
+
 #pragma once
 
-#include <thread>
-#include <random>
-#include "contentmanager_base.h"
-#include "protocol/protocol.h"
+#include <vector>
+#include "errortypes.h"
 
-// place holder class
-class ContentManager_Echo : public ContentManagerBase {
+class ErrorPageHandler {
 public:
-    ContentManager_Echo(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer);
-    virtual ~ContentManager_Echo();
-    virtual ContentManagerType getType() const noexcept override;
-    void setMaximumSize(unsigned long size) noexcept override;
-protected:
-    virtual std::vector<char> ProcessContent(const std::vector<char> & incomingData, const Host & host) noexcept override;
-    virtual bool PrepareContent() noexcept override;
-    virtual void CleanupContent() noexcept override;
+    /*
+        If it returns an empty vector then the next one will be called
+     */
+    virtual std::vector<char> handleError(ErrorTypes type, const std::vector<char> & incomingData) const noexcept;
 private:
-    std::vector<char> fixed;
 };

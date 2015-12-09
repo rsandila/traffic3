@@ -19,21 +19,31 @@
 #pragma once
 
 #include <thread>
+#include <vector>
 #include <random>
-#include "contentmanager_base.h"
+#include "contentmanager/contentmanager_base.h"
 #include "protocol/protocol.h"
+#include "errortypes.h"
+#include "errorpage_handler.h"
+#include "rest_request_handler.h"
 
-// place holder class
-class ContentManager_Echo : public ContentManagerBase {
+class ContentManager_Headers : public ContentManagerBase {
 public:
-    ContentManager_Echo(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer);
-    virtual ~ContentManager_Echo();
+    ContentManager_Headers(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer);
+    virtual ~ContentManager_Headers();
     virtual ContentManagerType getType() const noexcept override;
-    void setMaximumSize(unsigned long size) noexcept override;
+    
+    virtual bool addErrorPageHandler(std::unique_ptr<ErrorPageHandler> && errorHandler);
+    virtual bool addRestRequestHandler(std::unique_ptr<RestRequestHandler> && restHandler);
 protected:
     virtual std::vector<char> ProcessContent(const std::vector<char> & incomingData, const Host & host) noexcept override;
     virtual bool PrepareContent() noexcept override;
     virtual void CleanupContent() noexcept override;
+    virtual std::vector<char> returnErrorPage(ErrorTypes type, const std::vector<char> & incomingData); // TODO make this smarter
 private:
-    std::vector<char> fixed;
+    std::string getLineFromVector(const std::vector<char> & data, unsigned int & startOffset) noexcept;
+    void trimString(std::string & line) const noexcept;
+    
+    std::vector<std::unique_ptr<ErrorPageHandler>> errorHandlers;
+    std::vector<std::unique_ptr<RestRequestHandler>> restHandlers;
 };

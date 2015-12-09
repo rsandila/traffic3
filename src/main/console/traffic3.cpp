@@ -92,7 +92,7 @@ int beClient(const cmdline::parser & options) {
 int beRest(const cmdline::parser & options) {
     ProtocolFactory protocolFactory(protocolMap[options.get<std::string>("protocol")]);
     RestHeaders headers;
-    ContentManagerFactory contentManagerFactory(contentManagerMap[options.get<std::string>("type")], options.get<unsigned>("min"), options.get<unsigned>("max"), headers);
+    ContentManagerFactory contentManagerFactory(ContentManagerType::RestHeaders, 0, 0, headers);
     Server server(protocolFactory, contentManagerFactory);
     Host port10000(options.get<std::string>("interface"), options.get<unsigned>("port"),
                    protocolPreferenceMap[options.get<std::string>("protocol")]);

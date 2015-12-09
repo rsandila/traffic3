@@ -43,7 +43,7 @@ public:
 protected:
     void ServerWorker() noexcept;
     void ClientWorker() noexcept;
-    virtual std::vector<char> ProcessContent(const std::vector<char> & incomingData) noexcept = 0;
+    virtual std::vector<char> ProcessContent(const std::vector<char> & incomingData, const Host & host) noexcept = 0;
     virtual bool PrepareContent() noexcept = 0;
     virtual void CleanupContent() noexcept = 0;
     unsigned long getMin() const noexcept {

@@ -30,7 +30,7 @@ public:
     virtual ~ContentManager_Random_Text();
     virtual ContentManagerType getType() const noexcept override;
 protected:
-    virtual std::vector<char> ProcessContent(const std::vector<char> & incomingData) noexcept override;
+    virtual std::vector<char> ProcessContent(const std::vector<char> & incomingData, const Host & host) noexcept override;
     virtual bool PrepareContent() noexcept override;
     virtual void CleanupContent() noexcept override;
 private:

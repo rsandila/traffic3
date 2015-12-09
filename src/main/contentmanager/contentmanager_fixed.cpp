@@ -33,8 +33,9 @@ ContentManagerType ContentManager_Fixed::getType() const noexcept {
     return ContentManagerType::Fixed;
 }
 
-std::vector<char> ContentManager_Fixed::ProcessContent(const std::vector<char> & incomingData) noexcept {
+std::vector<char> ContentManager_Fixed::ProcessContent(const std::vector<char> & incomingData, const Host & host) noexcept {
     UNUSED(incomingData);
+    UNUSED(host);
     LOG(DEBUG) << "entering with " << incomingData.size() << std::endl;
     LOG(DEBUG) << "existing with " << fixed.size() << std::endl;
     return fixed;

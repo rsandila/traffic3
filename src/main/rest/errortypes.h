@@ -16,24 +16,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  USA.
  */
+
 #pragma once
 
-#include <thread>
-#include <random>
-#include "contentmanager_base.h"
-#include "protocol/protocol.h"
-
-// place holder class
-class ContentManager_Echo : public ContentManagerBase {
-public:
-    ContentManager_Echo(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer);
-    virtual ~ContentManager_Echo();
-    virtual ContentManagerType getType() const noexcept override;
-    void setMaximumSize(unsigned long size) noexcept override;
-protected:
-    virtual std::vector<char> ProcessContent(const std::vector<char> & incomingData, const Host & host) noexcept override;
-    virtual bool PrepareContent() noexcept override;
-    virtual void CleanupContent() noexcept override;
-private:
-    std::vector<char> fixed;
+enum class ErrorTypes {
+    EmptyRequest,
+    BadlyFormedRequest,
+    UnknownRequestType,
+    BadlyFormatedHeader,
+    NotFound
 };

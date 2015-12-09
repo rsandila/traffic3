@@ -34,7 +34,9 @@ ContentManagerType ContentManager_Random_Text::getType() const noexcept {
     return ContentManagerType::RandomText;
 }
 
-std::vector<char> ContentManager_Random_Text::ProcessContent(const std::vector<char> & incomingData) noexcept {
+std::vector<char> ContentManager_Random_Text::ProcessContent(const std::vector<char> & incomingData, const Host & host)
+        noexcept {
+    UNUSED(host);
     LOG(DEBUG) << "entering with with " << incomingData.size() << std::endl;
     std::vector<char> data;
     data.resize((*distribution)(generator));

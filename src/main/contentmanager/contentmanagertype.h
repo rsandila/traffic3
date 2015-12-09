@@ -23,5 +23,6 @@ enum class ContentManagerType {
     RandomBinary,
     Fixed,
     Echo,
+    RestHeaders,
     None
 };

@@ -26,6 +26,7 @@
 #include "contentmanager/contentmanager_echo.h"
 #include "contentmanager/contentmanager_random_binary.h"
 #include "contentmanager/contentmanagertype.h"
+#include "rest/contentmanager_headers.h"
 
 class ContentManagerFactory {
 public:
@@ -43,6 +44,8 @@ public:
                 return withCustomizations(std::unique_ptr<ContentManager>(new ContentManager_Fixed(std::move(protocol), headerHandler, isServer)));
             case ContentManagerType::Echo:
                 return withCustomizations(std::unique_ptr<ContentManager>(new ContentManager_Echo(std::move(protocol), headerHandler, isServer)));
+            case ContentManagerType::RestHeaders:
+                return withCustomizations(std::unique_ptr<ContentManager>(new ContentManager_Headers(std::move(protocol), headerHandler, isServer)));
             default:
                 return std::unique_ptr<ContentManager>(new ContentManager());
         }

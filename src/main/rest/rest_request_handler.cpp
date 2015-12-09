@@ -17,34 +17,14 @@
  USA.
  */
 
-#include "contentmanager_echo.h"
 #include "lib/common.h"
-#include "lib/logging.h"
+#include "rest_request_handler.h"
 
-ContentManager_Echo::ContentManager_Echo(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer) : ContentManagerBase(std::move(_protocol), _headerHandler, isServer) {
-    
-}
-
-ContentManager_Echo::~ContentManager_Echo() {
-    
-}
-
-ContentManagerType ContentManager_Echo::getType() const noexcept {
-    return ContentManagerType::Echo;
-}
-
-std::vector<char> ContentManager_Echo::ProcessContent(const std::vector<char> & incomingData, const Host & host) noexcept {
+std::vector<char> RestRequestHandler::handleRequest(const Host & host, const RestRequest & request,
+                    const std::map<std::string, std::string> & headers, const std::vector<char> & body) {
     UNUSED(host);
-    return incomingData;
-}
-
-bool ContentManager_Echo::PrepareContent() noexcept {
-    return true;
-}
-
-void ContentManager_Echo::CleanupContent() noexcept {
-}
-
-void ContentManager_Echo::setMaximumSize(unsigned long size) noexcept {
-    setMax(size);
+    UNUSED(request);
+    UNUSED(headers);
+    UNUSED(body);
+    return std::vector<char>();
 }
