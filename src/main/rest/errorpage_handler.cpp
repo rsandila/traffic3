@@ -17,6 +17,7 @@
  USA.
  */
 #include <sstream>
+#include <cstring>
 #include "lib/common.h"
 #include "errorpage_handler.h"
 

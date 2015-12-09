@@ -26,14 +26,14 @@
 #include "contentmanager_headers.h"
 
 static const std::map<std::string, RestRequestType> REST_REQUEST_TYPE_NAMES {
-    {"GET", RestRequestType::GET},
-    {"PUT", RestRequestType::PUT},
-    {"POST", RestRequestType::POST},
-    {"HEAD", RestRequestType::HEAD},
-    {"DELETE", RestRequestType::DELETE},
-    {"TRACE", RestRequestType::TRACE},
-    {"OPTIONS", RestRequestType::OPTIONS},
-    {"CONNECT", RestRequestType::CONNECT}
+    {"GET", RestRequestType::RRT_GET},
+    {"PUT", RestRequestType::RRT_PUT},
+    {"POST", RestRequestType::RRT_POST},
+    {"HEAD", RestRequestType::RRT_HEAD},
+    {"DELETE", RestRequestType::RRT_DELETE},
+    {"TRACE", RestRequestType::RRT_TRACE},
+    {"OPTIONS", RestRequestType::RRT_OPTIONS},
+    {"CONNECT", RestRequestType::RRT_CONNECT}
 };
 
 ContentManager_Headers::ContentManager_Headers(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler,

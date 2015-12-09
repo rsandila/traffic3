@@ -20,12 +20,12 @@
 #pragma once
 
 enum class RestRequestType {
-    GET,
-    PUT,
-    POST,
-    HEAD,
-    DELETE,
-    TRACE,
-    OPTIONS,
-    CONNECT
+    RRT_GET,
+    RRT_PUT,
+    RRT_POST,
+    RRT_HEAD,
+    RRT_DELETE,
+    RRT_TRACE,
+    RRT_OPTIONS,
+    RRT_CONNECT
 };
