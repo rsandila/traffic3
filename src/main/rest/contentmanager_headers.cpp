@@ -57,7 +57,7 @@ std::vector<char> ContentManager_Headers::ProcessContent(const std::vector<char>
     trimString(requestLine);
     std::stringstream ss(requestLine);
     std::string item;
-    std::vector<std::string> fields(3);
+    std::vector<std::string> fields;
     while (std::getline(ss, item, ' ')) {
         fields.push_back(item);
     }

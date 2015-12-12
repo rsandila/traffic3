@@ -37,16 +37,19 @@ std::vector<char> StaticRestRequestHandler::handleRequest(const Host & host, con
     std::smatch sm;
     if (std::regex_match(request.getUri(), sm, uriRegex) || sm.size() != 2) {
         std::ostringstream ostr;
-        ostr << basePath << "//" << sm[1];
+        ostr << basePath << "/" << sm[1];
         std::string path = ostr.str();
-        if (path.find("..") != std::string::npos) {
+        if (path.find("..") == std::string::npos) {
             std::ifstream inp(path);
             if (inp) {
                 inp.seekg (0, inp.end);
                 uint32_t length = inp.tellg();
                 inp.seekg (0, inp.beg);
-                std::vector<char> returnValue(length);
-                inp.read(&returnValue[0], returnValue.size());
+                std::stringstream ostr;
+                ostr << "HTTP/1.0 200 OK\r\nContent-Length: " << length << "\r\n\r\n";
+                std::vector<char> returnValue(length + ostr.str().length());
+                memcpy(&returnValue[0], ostr.str().c_str(), ostr.str().length());
+                inp.read(&returnValue[ostr.str().length()], length);
                 if (inp) {
                     return returnValue;
                 }
