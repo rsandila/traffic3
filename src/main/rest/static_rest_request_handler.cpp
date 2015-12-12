@@ -19,6 +19,7 @@
 
 #include <sstream>
 #include <fstream>
+#include <cstring>
 #include "lib/common.h"
 #include "static_rest_request_handler.h"
 
