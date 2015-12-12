@@ -26,12 +26,14 @@
 #include "contentmanager/contentmanager_echo.h"
 #include "contentmanager/contentmanager_random_binary.h"
 #include "contentmanager/contentmanagertype.h"
+#include "contentmanager/contentmanager_customizer.h"
 #include "rest/contentmanager_headers.h"
 
 class ContentManagerFactory {
 public:
-    ContentManagerFactory(const ContentManagerType & _type, unsigned _min, unsigned _max, CommonHeaders & _headerHandler) :
-            minimum(_min), maximum(_max), type(_type), headerHandler(_headerHandler) {
+    ContentManagerFactory(const ContentManagerType & _type, CommonHeaders & _headerHandler,
+                          std::unique_ptr<ContentManagerCustomizer> & customizer)
+        : type(_type), headerHandler(_headerHandler), customizerHandler(std::move(customizer)) {
     };
     virtual ~ContentManagerFactory() {;};
     virtual std::unique_ptr<ContentManager> createContentManager(std::unique_ptr<Protocol> protocol, bool isServer) {
@@ -50,26 +52,15 @@ public:
                 return std::unique_ptr<ContentManager>(new ContentManager());
         }
     };
-    ContentManagerFactory(const ContentManagerFactory & other) : minimum(other.minimum), maximum(other.maximum),
-            type(other.type), headerHandler(other.headerHandler) {
-    }
-    ContentManagerFactory & operator=(const ContentManagerFactory & other) {
-        minimum = other.minimum;
-        maximum = other.maximum;
-        type = other.type;
-        headerHandler = other.headerHandler;
-        return *this;
-    }
 protected:
     virtual std::unique_ptr<ContentManager> withCustomizations(std::unique_ptr<ContentManager> contentManager) const {
-        if (contentManager.get() != nullptr) {
-            contentManager->setMinimumSize(minimum);
-            contentManager->setMaximumSize(maximum);
+        if (contentManager.get() != nullptr && customizerHandler.get() != nullptr) {
+            return std::move(customizerHandler->customize(std::move(contentManager)));
         }
         return std::move(contentManager);
     }
 private:
-    unsigned minimum, maximum;
     ContentManagerType type;
     CommonHeaders & headerHandler;
+    std::unique_ptr<ContentManagerCustomizer> customizerHandler;
 };

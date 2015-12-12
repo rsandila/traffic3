@@ -21,21 +21,25 @@
 #include <thread>
 #include "catch.hpp"
 #include "contentmanager/contentmanagerfactory.h"
+#include "contentmanager/contentmanager_customizer.h"
 
 TEST_CASE("Testing contentmanagerfactory.h", "[content]") {
     SECTION("Test random text") {
         CommonHeaders commonHeaders;
-        ContentManagerFactory test(ContentManagerType::RandomText, 100, 100000, commonHeaders);
+        std::unique_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
+        std::shared_ptr<ContentManagerFactory> test(new ContentManagerFactory(ContentManagerType::RandomText,
+                                                                              commonHeaders, contentManagerCustomizer));
         std::unique_ptr<Protocol> dummy(new Protocol());
         
-        std::unique_ptr<ContentManager> text(test.createContentManager(std::move(dummy), true));
+        std::unique_ptr<ContentManager> text(test->createContentManager(std::move(dummy), true));
         text->Start();
         REQUIRE(text->getType() == ContentManagerType::RandomText);
         text->Stop();
     }
     SECTION("Test fixed") {
         CommonHeaders commonHeaders;
-        ContentManagerFactory test(ContentManagerType::Fixed, 100, 100000, commonHeaders);
+        std::unique_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
+        ContentManagerFactory test(ContentManagerType::Fixed, commonHeaders, contentManagerCustomizer);
         std::unique_ptr<Protocol> dummy(new Protocol());
         
         std::unique_ptr<ContentManager> text(test.createContentManager(std::move(dummy), true));
@@ -45,7 +49,8 @@ TEST_CASE("Testing contentmanagerfactory.h", "[content]") {
     }
     SECTION("Test echo") {
         CommonHeaders commonHeaders;
-        ContentManagerFactory test(ContentManagerType::Echo, 100, 100000, commonHeaders);
+        std::unique_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
+        ContentManagerFactory test(ContentManagerType::Echo, commonHeaders, contentManagerCustomizer);
         std::unique_ptr<Protocol> dummy(new Protocol());
         
         std::unique_ptr<ContentManager> text(test.createContentManager(std::move(dummy), true));

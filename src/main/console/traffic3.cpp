@@ -27,6 +27,9 @@
 #include "lib/logging.h"
 #include "cmdline.h"
 #include "rest/restheaders.h"
+#include "contentmanager/contentmanager_customizer.h"
+#include "rest/rest_contentmanager_customizer.h"
+#include "rest/static_rest_request_handler.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -61,7 +64,10 @@ static std::map<std::string, ContentManagerType> contentManagerMap {
 int beServer(const cmdline::parser & options) {
     CommonHeaders headers;
     ProtocolFactory protocolFactory(protocolMap[options.get<std::string>("protocol")]);
-    ContentManagerFactory contentManagerFactory(contentManagerMap[options.get<std::string>("type")], options.get<unsigned>("min"), options.get<unsigned>("max"), headers);
+    std::unique_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(
+                                                    options.get<unsigned>("min"), options.get<unsigned>("max")));
+    std::shared_ptr<ContentManagerFactory> contentManagerFactory = std::shared_ptr<ContentManagerFactory>(new ContentManagerFactory(contentManagerMap[options.get<std::string>("type")], headers,
+                                                contentManagerCustomizer));
     Server server(protocolFactory, contentManagerFactory);
     Host port10000(options.get<std::string>("interface"), options.get<unsigned>("port"),
                    protocolPreferenceMap[options.get<std::string>("protocol")]);
@@ -76,7 +82,9 @@ int beServer(const cmdline::parser & options) {
 int beClient(const cmdline::parser & options) {
     ProtocolFactory protocolFactory(protocolMap[options.get<std::string>("protocol")]);
     CommonHeaders headers;
-    ContentManagerFactory contentManagerFactory(contentManagerMap[options.get<std::string>("type")], options.get<unsigned>("min"), options.get<unsigned>("max"), headers);
+    std::unique_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(
+                                                        options.get<unsigned>("min"), options.get<unsigned>("max")));
+    ContentManagerFactory contentManagerFactory(contentManagerMap[options.get<std::string>("type")], headers, contentManagerCustomizer);
     Host port10000(options.get<std::string>("host"), options.get<unsigned>("port"),
                    protocolPreferenceMap[options.get<std::string>("protocol")]);
     Client client;
@@ -92,7 +100,13 @@ int beClient(const cmdline::parser & options) {
 int beRest(const cmdline::parser & options) {
     ProtocolFactory protocolFactory(protocolMap[options.get<std::string>("protocol")]);
     RestHeaders headers;
-    ContentManagerFactory contentManagerFactory(ContentManagerType::RestHeaders, 0, 0, headers);
+    std::vector<std::shared_ptr<RestRequestHandler>> restRequestHandlers;
+    std::vector<std::shared_ptr<ErrorPageHandler>> errorPageHandlers;
+    errorPageHandlers.push_back(std::shared_ptr<ErrorPageHandler>(new ErrorPageHandler()));
+    restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new StaticRestRequestHandler("static", "/")));
+    std::unique_ptr<ContentManagerCustomizer> contentManagerCustomizer(new RestContentManagerCustomizer(restRequestHandlers, errorPageHandlers));
+    // TODO - set up handlers
+    std::shared_ptr<ContentManagerFactory> contentManagerFactory = std::shared_ptr<ContentManagerFactory>(new ContentManagerFactory(ContentManagerType::RestHeaders, headers, contentManagerCustomizer));
     Server server(protocolFactory, contentManagerFactory);
     Host port10000(options.get<std::string>("interface"), options.get<unsigned>("port"),
                    protocolPreferenceMap[options.get<std::string>("protocol")]);

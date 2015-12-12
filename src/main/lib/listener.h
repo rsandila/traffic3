@@ -23,7 +23,7 @@
 
 class Listener {
 public:
-    Listener(const Host & _host, ProtocolFactory & protocolFactory, ContentManagerFactory & contentManagerFactory);
+    Listener(const Host & _host, ProtocolFactory & protocolFactory, std::shared_ptr<ContentManagerFactory> & contentManagerFactory);
     Listener(Listener && other);
     virtual ~Listener();
     Listener & operator=(Listener&& other);
@@ -36,7 +36,7 @@ protected:
 private:
     Host host;
     std::unique_ptr<Protocol> protocol;
-    ContentManagerFactory & _contentManagerFactory;
+    std::shared_ptr<ContentManagerFactory> _contentManagerFactory;
     std::vector<std::unique_ptr<ContentManager>> contentManagers;
     bool errorState;
     std::thread thread;

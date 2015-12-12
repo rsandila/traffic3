@@ -19,7 +19,7 @@
 #include "server.h"
 #include "listener.h"
 
-Server::Server(ProtocolFactory & _protocolFactory, ContentManagerFactory & contentManagerFactory) :
+Server::Server(ProtocolFactory & _protocolFactory, std::shared_ptr<ContentManagerFactory> & contentManagerFactory) :
         protocolFactory(_protocolFactory), contentFactory(contentManagerFactory) {
 }
 

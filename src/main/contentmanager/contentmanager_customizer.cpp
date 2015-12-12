@@ -16,27 +16,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  USA.
  */
-#pragma once
 
-#include <vector>
-#include <thread>
-#include <mutex>
-#include "listener.h"
-#include "protocol/protocolfactory.h"
-#include "contentmanager/contentmanagerfactory.h"
+#include "contentmanager_customizer.h"
 
-class Server {
-public:
-    Server(ProtocolFactory & protocolFactory, std::shared_ptr<ContentManagerFactory> & contentManagerFactory);
-    virtual ~Server();
-    bool addPort(Host & host);
-    bool stopPort(Host & host);
-    const std::vector<Host> getPorts() const noexcept;
-    // TODO - collect statistics
-protected:
-private:
-    std::vector<std::unique_ptr<Listener>> listeners;
-    ProtocolFactory & protocolFactory;
-    std::shared_ptr<ContentManagerFactory> contentFactory;
-    mutable std::mutex lock;
-};
+
+ContentManagerCustomizer::ContentManagerCustomizer(unsigned minimum, unsigned maximum)
+        : _minimum(minimum), _maximum(maximum) {
+}
+
+std::unique_ptr<ContentManager> ContentManagerCustomizer::customize(std::unique_ptr<ContentManager> contentManager) {
+    contentManager->setMinimumSize(_minimum);
+    contentManager->setMaximumSize(_maximum);
+    return std::move(contentManager);
+}

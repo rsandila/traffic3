@@ -71,7 +71,7 @@ TEST_CASE("Server", "[protocol][server]") {
         };
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
-            MockContentManagerFactory() : ContentManagerFactory(ContentManagerType::None, 100, 10000, commonHeaders) {;};
+            MockContentManagerFactory(std::unique_ptr<ContentManagerCustomizer> & contentManagerCustomizer) : ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer) {;};
             virtual std::unique_ptr<ContentManager> createContentManager(std::unique_ptr<Protocol> protocol, bool isServer) override {
                 UNUSED(protocol);
                 UNUSED(isServer);
@@ -80,7 +80,8 @@ TEST_CASE("Server", "[protocol][server]") {
             CommonHeaders commonHeaders;
         };
         MockProtocolFactory mockProtocolFactory;
-        MockContentManagerFactory mockContentManagerFactory;
+        std::unique_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
+        std::shared_ptr<ContentManagerFactory>  mockContentManagerFactory(new  MockContentManagerFactory(contentManagerCustomizer));
         MockRepository mocks;
         {
             Server testServer(mockProtocolFactory, mockContentManagerFactory);

@@ -18,25 +18,19 @@
  */
 #pragma once
 
-#include <vector>
-#include <thread>
-#include <mutex>
-#include "listener.h"
-#include "protocol/protocolfactory.h"
-#include "contentmanager/contentmanagerfactory.h"
+#include <memory>
+#include "rest/rest_request_handler.h"
+#include "rest/errorpage_handler.h"
+#include "contentmanager/contentmanager.h"
+#include "contentmanager/contentmanager_customizer.h"
 
-class Server {
+class RestContentManagerCustomizer : public ContentManagerCustomizer{
 public:
-    Server(ProtocolFactory & protocolFactory, std::shared_ptr<ContentManagerFactory> & contentManagerFactory);
-    virtual ~Server();
-    bool addPort(Host & host);
-    bool stopPort(Host & host);
-    const std::vector<Host> getPorts() const noexcept;
-    // TODO - collect statistics
+    RestContentManagerCustomizer(std::vector<std::shared_ptr<RestRequestHandler>> & restRequestHandlers,
+                                 std::vector<std::shared_ptr<ErrorPageHandler>> & errorPageHandlers);
+    virtual std::unique_ptr<ContentManager> customize(std::unique_ptr<ContentManager> contentManager);
 protected:
 private:
-    std::vector<std::unique_ptr<Listener>> listeners;
-    ProtocolFactory & protocolFactory;
-    std::shared_ptr<ContentManagerFactory> contentFactory;
-    mutable std::mutex lock;
+    std::vector<std::shared_ptr<RestRequestHandler>> & restRequestHandlerList;
+    std::vector<std::shared_ptr<ErrorPageHandler>> & errorPageHandlerList;
 };

@@ -33,8 +33,8 @@ public:
     virtual ~ContentManager_Headers();
     virtual ContentManagerType getType() const noexcept override;
     
-    virtual bool addErrorPageHandler(std::unique_ptr<ErrorPageHandler> && errorHandler);
-    virtual bool addRestRequestHandler(std::unique_ptr<RestRequestHandler> && restHandler);
+    virtual bool addErrorPageHandlers(std::vector<std::shared_ptr<ErrorPageHandler>> & errorHandler);
+    virtual bool addRestRequestHandlers(std::vector<std::shared_ptr<RestRequestHandler>> & restHandler);
 protected:
     virtual std::vector<char> ProcessContent(const std::vector<char> & incomingData, const Host & host) noexcept override;
     virtual bool PrepareContent() noexcept override;
@@ -44,6 +44,6 @@ private:
     std::string getLineFromVector(const std::vector<char> & data, unsigned int & startOffset) noexcept;
     void trimString(std::string & line) const noexcept;
     
-    std::vector<std::unique_ptr<ErrorPageHandler>> errorHandlers;
-    std::vector<std::unique_ptr<RestRequestHandler>> restHandlers;
+    std::vector<std::shared_ptr<ErrorPageHandler>> errorHandlers;
+    std::vector<std::shared_ptr<RestRequestHandler>> restHandlers;
 };

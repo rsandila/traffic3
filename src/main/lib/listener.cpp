@@ -27,7 +27,8 @@
 #include "listener.h"
 #include "logging.h"
 
-Listener::Listener(const Host & _host, ProtocolFactory & protocolFactory, ContentManagerFactory & contentManagerFactory) :
+Listener::Listener(const Host & _host, ProtocolFactory & protocolFactory,
+                   std::shared_ptr<ContentManagerFactory> & contentManagerFactory) :
         host(_host), protocol(protocolFactory.createProtocol()), _contentManagerFactory(contentManagerFactory),
     errorState(false), thread(std::thread(std::bind(&Listener::listen, this))) {
 }
@@ -82,7 +83,7 @@ void Listener::listen() {
         do {
             std::unique_ptr<Protocol> newProtocol = protocol->waitForNewConnection();
             if (newProtocol.get() != nullptr && newProtocol->getState() == Protocol::ProtocolState::OPEN) {
-                std::unique_ptr<ContentManager> tempContentManager =_contentManagerFactory.createContentManager(std::move(newProtocol), true);
+                std::unique_ptr<ContentManager> tempContentManager =_contentManagerFactory->createContentManager(std::move(newProtocol), true);
                 if (tempContentManager.get() != nullptr) {
                     tempContentManager->Start();
                     contentManagers.push_back(std::move(tempContentManager));

@@ -107,23 +107,13 @@ bool ContentManager_Headers::PrepareContent() noexcept {
 void ContentManager_Headers::CleanupContent() noexcept {
 }
 
-bool ContentManager_Headers::addErrorPageHandler(std::unique_ptr<ErrorPageHandler> && errorHandler) {
-    for (auto & item: errorHandlers) {
-        if (item.get() == errorHandler.get()) {
-            return false;
-        }
-    }
-    errorHandlers.push_back(std::move(errorHandler));
+bool ContentManager_Headers::addErrorPageHandlers(std::vector<std::shared_ptr<ErrorPageHandler>> & errorHandler) {
+    errorHandlers.insert(errorHandlers.begin(), errorHandler.begin(), errorHandler.end());
     return true;
 }
 
-bool ContentManager_Headers::addRestRequestHandler(std::unique_ptr<RestRequestHandler> && restHandler) {
-    for (auto & item: restHandlers) {
-        if (item.get() == restHandler.get()) {
-            return false;
-        }
-    }
-    restHandlers.push_back(std::move(restHandler));
+bool ContentManager_Headers::addRestRequestHandlers(std::vector<std::shared_ptr<RestRequestHandler>> & restHandler) {
+    restHandlers.insert(restHandlers.begin(), restHandler.begin(), restHandler.end());
     return true;
 }
 
