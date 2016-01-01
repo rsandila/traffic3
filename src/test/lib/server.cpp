@@ -102,7 +102,7 @@ TEST_CASE("Server", "[protocol][server]") {
             REQUIRE(testServer.getPorts().size() == 2);
             REQUIRE(testServer.stopPort(1));
             REQUIRE(testServer.getPorts().size() == 1);
-            REQUIRE(testServer.getPorts()[0] == testHost2);
+            REQUIRE(testServer.getPorts()[0] == 2);
         }
         REQUIRE(contentManagerCounterStart == 3);
         REQUIRE(contentManagerCounterStop == 3);

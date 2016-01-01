@@ -48,6 +48,12 @@ public:
     virtual ContentManagerType getType() const noexcept {
         return ContentManagerType::None;
     }
+    virtual long long getBytesRead() const noexcept {
+        return 0LL;
+    }
+    virtual long long getBytesWritten() const noexcept {
+        return 0LL;
+    }
 private:
     ContentManager(const ContentManager &) = delete;
     ContentManager & operator=(const ContentManager &) = delete;

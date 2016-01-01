@@ -18,12 +18,13 @@
  */
 
 #include "rest/rest_status.h"
+#include "rest/rest_state.h"
 
-RestStatus::RestStatus(const std::string & uriPattern) {
+RestStatus::RestStatus(const std::string & uriPattern, RestState & _state) : state(_state) {
     // TODO
 }
 
 std::vector<char> RestStatus::handleRequest(const Host & host, const RestRequest & request, const std::map<std::string, std::string> & headers, const std::vector<char> & body) {
-    // TODO
+    // TODO - get info from state and report it as a html/json response
     return std::vector<char>();
 }

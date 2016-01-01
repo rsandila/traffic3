@@ -30,13 +30,13 @@ std::vector<char> RestClient::handleRequest(const Host & host, const RestRequest
     if (request.getUri().find("/client") == 0) {
         switch (request.getType()) {
             case RestRequestType::RRT_GET:
-                // TODO - get status
+                // get status
                 return handleGetStatus(request, headers, body);
             case RestRequestType::RRT_PUT:
-                // TODO - create client
+                // create client
                 return handleCreateClient(request, headers, body);
             case RestRequestType::RRT_DELETE:
-                // TODO - stop client
+                // stop client
                 return handleStopClient(request, headers, body);
             default:
                 break;

@@ -48,6 +48,7 @@ bool ProtocolTCP::read(std::vector<char> & data, bool allowPartialRead, Host & h
 		long int numRead = ::recv(socket, &data[0], data.size(), 0);
 		if (numRead > 0) {
 			data.resize(numRead);
+            totalRead += numRead;
 		}
 		return numRead > 0;
 	}
@@ -58,6 +59,7 @@ bool ProtocolTCP::read(std::vector<char> & data, bool allowPartialRead, Host & h
 			numRead = ::recv(socket, &data[offset], data.size() - offset, MSG_WAITALL);
 			if (numRead > 0) {
 				offset += numRead;
+                totalRead += numRead;
 			}
 			LOG(DEBUG) << std::this_thread::get_id() << " read " << numRead << std::endl;
 		} while (numRead > 0 && offset < data.size());
@@ -72,6 +74,9 @@ bool ProtocolTCP::write(const std::vector<char> & data, const Host & hostState) 
 		return false;
 	}
 	unsigned long numWritten = ::send(socket, &data[0], data.size(), 0);
+    if (numWritten > 0) {
+        totalWritten += numWritten;
+    }
 	return numWritten == data.size();
 }
 

@@ -23,12 +23,15 @@
 #include "rest/rest_request_handler.h"
 #include "lib/host.h"
 #include "rest/rest_request.h"
+#include "rest/rest_state.h"
 
 #pragma once
 
 class RestStatus : public RestRequestHandler {
 public:
-    RestStatus(const std::string & uriPattern);
+    RestStatus(const std::string & uriPattern, RestState & _state);
     virtual std::vector<char> handleRequest(const Host & host, const RestRequest & request, const std::map<std::string, std::string> & headers, const std::vector<char> & body);
 protected:
+private:
+    RestState & state;
 };

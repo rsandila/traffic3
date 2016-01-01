@@ -40,6 +40,8 @@ public:
     virtual void setMinimumSize(unsigned long size) noexcept override;
     virtual void setMaximumSize(unsigned long size) noexcept override;
     virtual ContentManagerType getType() const noexcept override = 0;
+    virtual long long getBytesRead() const noexcept override;
+    virtual long long getBytesWritten() const noexcept override;
 protected:
     void ServerWorker() noexcept;
     void ClientWorker() noexcept;

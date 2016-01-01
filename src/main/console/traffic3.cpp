@@ -110,7 +110,7 @@ int beRest(const cmdline::parser & options) {
     errorPageHandlers.push_back(std::shared_ptr<ErrorPageHandler>(new ErrorPageHandler()));
     // TODO - set up handlers
     restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new RestClient("/client", state)));
-    restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new RestStatus("/status")));
+    restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new RestStatus("/status", state)));
     restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new StaticRestRequestHandler(options.get<std::string>("rest_content"), "/(.*)")));
     std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new RestContentManagerCustomizer(restRequestHandlers, errorPageHandlers));
     std::shared_ptr<ContentManagerFactory> contentManagerFactory = std::shared_ptr<ContentManagerFactory>(new ContentManagerFactory(ContentManagerType::RestHeaders, headers, contentManagerCustomizer));

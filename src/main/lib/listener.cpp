@@ -101,3 +101,22 @@ void Listener::listen() {
     
 }
 
+unsigned Listener::getPortId() const noexcept {
+    return _portId;
+}
+
+long long Listener::getBytesRead() const noexcept {
+    if (protocol.get()) {
+        return protocol->getBytesRead();
+    } else {
+        return 0LL;
+    }
+}
+
+long long Listener::getBytesWritten() const noexcept {
+    if (protocol.get()) {
+        return protocol->getBytesWritten();
+    } else {
+        return 0LL;
+    }
+}

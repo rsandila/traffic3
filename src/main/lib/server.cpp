@@ -54,11 +54,11 @@ bool Server::stopPort(unsigned portId) {
     return false;
 }
 
-const std::vector<Host> Server::getPorts() const noexcept {
+const std::vector<unsigned> Server::getPorts() const noexcept {
     std::unique_lock<std::mutex> lck(lock);
-    std::vector<Host> retVal;
+    std::vector<unsigned> retVal;
     for (auto it = listeners.cbegin(); it != listeners.cend(); ++it) {
-        retVal.push_back((*it)->getHost());
+        retVal.push_back((*it)->getPortId());
     }
     return std::move(retVal);
 }
@@ -67,3 +67,20 @@ int Server::getNumServers() noexcept {
     std::unique_lock<std::mutex> lck(lock);
     return listeners.size();
 }
+
+long long Server::getNumBytesRead() const noexcept {
+    long long total = 0LL;
+    for (const auto & port: listeners) {
+        total += port->getBytesRead();
+    }
+    return total;
+}
+
+long long Server::getNumBytesWritten() const noexcept {
+    long long total = 0LL;
+    for (const auto & port: listeners) {
+        total += port->getBytesWritten();
+    }
+    return total;
+}
+

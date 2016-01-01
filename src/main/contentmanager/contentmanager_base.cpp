@@ -162,3 +162,19 @@ void ContentManagerBase::ServerWorker() noexcept {
     LOG(WARNING) << std::this_thread::get_id() << " read failed " << errno << std::endl;
     CleanupContent();
 }
+            
+long long ContentManagerBase::getBytesRead() const noexcept {
+    if (protocol.get()) {
+        return protocol->getBytesRead();
+    } else {
+        return 0LL;
+    }
+}
+
+long long ContentManagerBase::getBytesWritten() const noexcept {
+    if (protocol.get()) {
+        return protocol->getBytesWritten();
+    } else {
+        return 0LL;
+    }
+}

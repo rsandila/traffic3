@@ -31,6 +31,12 @@ public:
     
     int startServer(unsigned portId, Host & host, ProtocolFactory & protocolFactory, std::shared_ptr<ContentManagerFactory> & contentManagerFactory);
     bool stopServer(unsigned portId);
+    
+    long long getClientNumWritten() const noexcept;
+    long long getClientNumRead() const noexcept;
+    long long getServerNumWritten() const noexcept;
+    long long getServerNumRead() const noexcept;
+    
 protected:
 private:
     Client client;

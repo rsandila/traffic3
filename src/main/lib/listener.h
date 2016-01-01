@@ -31,6 +31,9 @@ public:
     const Host & getHost() const;
     bool inErrorState() const noexcept;
     bool Stop();
+    unsigned getPortId() const noexcept;
+    long long getBytesRead() const noexcept;
+    long long getBytesWritten() const noexcept;
 protected:
     void listen();
 private:

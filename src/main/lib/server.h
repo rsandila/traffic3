@@ -30,9 +30,10 @@ public:
     virtual ~Server();
     bool addPort(unsigned portId, Host & host, ProtocolFactory & protocolFactory, std::shared_ptr<ContentManagerFactory> & contentManagerFactory);
     bool stopPort(unsigned portId);
-    const std::vector<Host> getPorts() const noexcept;
+    const std::vector<unsigned> getPorts() const noexcept;
     int getNumServers() noexcept;
-    // TODO - collect statistics
+    long long getNumBytesRead() const noexcept;
+    long long getNumBytesWritten() const noexcept;
 protected:
 private:
     std::vector<std::unique_ptr<Listener>> listeners;

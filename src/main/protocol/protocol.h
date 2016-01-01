@@ -45,7 +45,7 @@ public:
         NONE
     };
     Protocol() : host(Host::ALL_INTERFACES6), type(ProtocolType::NONE),
-        socket(-1), state(ProtocolState::CLOSED) {;}
+        socket(-1), state(ProtocolState::CLOSED), totalWritten(0LL), totalRead(0LL) {;}
     Protocol(Host otherHost, ProtocolType otherType, int otherSocket, ProtocolState otherState) :
         host(otherHost), type(otherType), socket(otherSocket), state(otherState) {;}
     Protocol(int newSocket, socklen_t len, const struct sockaddr * addr, bool isIPV4) : host(len, addr, isIPV4),
@@ -64,12 +64,16 @@ public:
     virtual bool isClient() { return getType() == ProtocolType::CLIENT || getType() == ProtocolType::SERVER_CLIENT; };
     virtual ProtocolType getType();
     virtual std::unique_ptr<Protocol> waitForNewConnection() { return std::unique_ptr<Protocol>(new Protocol()); };
+    virtual long long getBytesRead() const noexcept { return totalRead; };
+    virtual long long getBytesWritten() const noexcept { return totalWritten; };
 protected:
     Host host;
     ProtocolType type;
     std::mutex lock;
     int socket;
     ProtocolState state;
+    long long totalWritten;
+    long long totalRead;
 private:
 	Protocol & operator=(const Protocol & other) = delete;
 	Protocol(const Protocol & other) = delete;

@@ -43,3 +43,19 @@ int RestState::startServer(unsigned portId, Host & host, ProtocolFactory & proto
 bool RestState::stopServer(unsigned portId) {
     return server.stopPort(portId);
 }
+
+long long RestState::getClientNumWritten() const noexcept {
+    return client.getNumBytesWritten();
+}
+
+long long RestState::getClientNumRead() const noexcept {
+    return client.getNumBytesRead();
+}
+
+long long RestState::getServerNumWritten() const noexcept {
+    return server.getNumBytesWritten();
+}
+
+long long RestState::getServerNumRead() const noexcept {
+    return server.getNumBytesRead();
+}

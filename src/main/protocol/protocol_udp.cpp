@@ -55,18 +55,17 @@ bool ProtocolUDP::read(std::vector<char> & data, bool allowPartialRead, Host & h
 	}
 	if (numRead > 0) {
 		data.resize(numRead);
+        totalRead += numRead;
 	}
 	if (type == ProtocolType::CLIENT) {
 		hostState = host;
-	}
-	else {
+	} else {
         hostState = Host(addr_len, (struct sockaddr *)&addr,
                          host.getProtocolPreference() == Host::ProtocolPreference::IPV4);
 	}
 	if (allowPartialRead) {
 		return numRead > 0;
-	}
-	else {
+	} else {
 		return (unsigned long)numRead == data.size();
 	}
 }
@@ -81,10 +80,14 @@ bool ProtocolUDP::write(const std::vector<char> & data, const Host & hostState) 
 	numWritten = ::sendto(socket, &data[0], data.size(), 0, targetHost.getPreferredSockAddress(),
 		targetHost.getPreferedSockAddressLen());
 	LOG(DEBUG) << std::this_thread::get_id() << " wrote " << numWritten << std::endl;
+    if (numWritten > 0) {
+        totalWritten += numWritten;
+    }
 	return numWritten == data.size();
 }
 
-ProtocolUDP::ProtocolUDP(int socket, socklen_t len, const struct sockaddr * addr, bool isIPV4) : Protocol(socket, len, addr, isIPV4) {
+ProtocolUDP::ProtocolUDP(int socket, socklen_t len, const struct sockaddr * addr, bool isIPV4) :
+        Protocol(socket, len, addr, isIPV4) {
 }
 
 ProtocolUDP::ProtocolUDP(ProtocolUDP && other) : Protocol(other.host, other.type, other.socket, other.state) {

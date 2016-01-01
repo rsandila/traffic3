@@ -61,3 +61,23 @@ int Client::getNumClients() noexcept {
     std::unique_lock<std::mutex> lck(lock);
     return workers.size();
 }
+
+long long Client::getNumBytesRead() const noexcept {
+    long long total = 0;
+    for (const auto & client: workers) {
+        for (const auto & one: client.second) {
+            total += one->getBytesRead();
+        }
+    }
+    return total;
+}
+
+long long Client::getNumBytesWritten() const noexcept {
+    long long total = 0;
+    for (const auto & client: workers) {
+        for (const auto & one: client.second) {
+            total += one->getBytesWritten();
+        }
+    }
+    return total;
+}
