@@ -16,27 +16,21 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  USA.
  */
+
+#include <string>
+#include <vector>
+#include <map>
+#include <regex>
+#include "rest/rest_request_handler.h"
+#include "lib/host.h"
+#include "rest/rest_request.h"
+
 #pragma once
 
-#include <vector>
-#include <thread>
-#include <mutex>
-#include "listener.h"
-#include "protocol/protocolfactory.h"
-#include "contentmanager/contentmanagerfactory.h"
-
-class Server {
+class RestServer : public RestRequestHandler {
 public:
-    virtual ~Server();
-    bool addPort(unsigned portId, Host & host, ProtocolFactory & protocolFactory, std::shared_ptr<ContentManagerFactory> & contentManagerFactory);
-    bool stopPort(unsigned portId);
-    const std::vector<Host> getPorts() const noexcept;
-    int getNumServers() noexcept;
-    // TODO - collect statistics
+    RestServer();
+    virtual std::vector<char> handleRequest(const Host & host, const RestRequest & request, const std::map<std::string, std::string> & headers, const std::vector<char> & body);
 protected:
-private:
-    std::vector<std::unique_ptr<Listener>> listeners;
-    // ProtocolFactory protocolFactory;
-    // std::shared_ptr<ContentManagerFactory> contentFactory;
-    mutable std::mutex lock;
+    std::regex uriRegex;
 };

@@ -27,13 +27,14 @@
 #include "listener.h"
 #include "logging.h"
 
-Listener::Listener(const Host & _host, ProtocolFactory & protocolFactory,
-                   std::shared_ptr<ContentManagerFactory> & contentManagerFactory) :
+Listener::Listener(unsigned portId, const Host & _host, ProtocolFactory & protocolFactory,
+                   std::shared_ptr<ContentManagerFactory> & contentManagerFactory) : _portId(portId),
         host(_host), protocol(protocolFactory.createProtocol()), _contentManagerFactory(contentManagerFactory),
     errorState(false), thread(std::thread(std::bind(&Listener::listen, this))) {
 }
 
-Listener::Listener(Listener && other) : host(other.host), protocol(std::move(other.protocol)), _contentManagerFactory(other._contentManagerFactory),
+Listener::Listener(Listener && other) : _portId(other._portId), host(other.host),
+        protocol(std::move(other.protocol)), _contentManagerFactory(other._contentManagerFactory),
         contentManagers(std::move(other.contentManagers)), errorState(other.errorState), thread(std::move(other.thread)) {
 }
 
@@ -47,8 +48,8 @@ Listener & Listener::operator=(Listener&& other) {
     return *this;
 }
 
-bool Listener::operator==(const Host & other) const {
-    return host == other;
+bool Listener::operator==(const unsigned portId) const {
+    return _portId == portId;
 }
 
 const Host & Listener::getHost() const {

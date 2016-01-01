@@ -30,6 +30,9 @@
 #include "contentmanager/contentmanager_customizer.h"
 #include "rest/rest_contentmanager_customizer.h"
 #include "rest/static_rest_request_handler.h"
+#include "rest/rest_status.h"
+#include "rest/rest_state.h"
+#include "rest/rest_client.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -64,14 +67,14 @@ static std::map<std::string, ContentManagerType> contentManagerMap {
 int beServer(const cmdline::parser & options) {
     CommonHeaders headers;
     ProtocolFactory protocolFactory(protocolMap[options.get<std::string>("protocol")]);
-    std::unique_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(
+    std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(
                                                     options.get<unsigned>("min"), options.get<unsigned>("max")));
     std::shared_ptr<ContentManagerFactory> contentManagerFactory = std::shared_ptr<ContentManagerFactory>(new ContentManagerFactory(contentManagerMap[options.get<std::string>("type")], headers,
                                                 contentManagerCustomizer));
-    Server server(protocolFactory, contentManagerFactory);
+    Server server;
     Host port10000(options.get<std::string>("interface"), options.get<unsigned>("port"),
                    protocolPreferenceMap[options.get<std::string>("protocol")]);
-    if (!server.addPort(port10000)) {
+    if (!server.addPort(1, port10000, protocolFactory, contentManagerFactory)) {
         std::cerr << "Unable to listen on port " << options.get<unsigned>("port") << " " << options.get<std::string>("protocol") << " on interface " << options.get<std::string>("interface") << std::endl;
         return 1;
     }
@@ -82,7 +85,7 @@ int beServer(const cmdline::parser & options) {
 int beClient(const cmdline::parser & options) {
     ProtocolFactory protocolFactory(protocolMap[options.get<std::string>("protocol")]);
     CommonHeaders headers;
-    std::unique_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(
+    std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(
                                                         options.get<unsigned>("min"), options.get<unsigned>("max")));
     ContentManagerFactory contentManagerFactory(contentManagerMap[options.get<std::string>("type")], headers, contentManagerCustomizer);
     Host port10000(options.get<std::string>("host"), options.get<unsigned>("port"),
@@ -100,17 +103,21 @@ int beClient(const cmdline::parser & options) {
 int beRest(const cmdline::parser & options) {
     ProtocolFactory protocolFactory(protocolMap[options.get<std::string>("protocol")]);
     RestHeaders headers;
+    RestState state;
+    
     std::vector<std::shared_ptr<RestRequestHandler>> restRequestHandlers;
     std::vector<std::shared_ptr<ErrorPageHandler>> errorPageHandlers;
     errorPageHandlers.push_back(std::shared_ptr<ErrorPageHandler>(new ErrorPageHandler()));
-    restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new StaticRestRequestHandler("/tmp/static", "/(.*)")));
-    std::unique_ptr<ContentManagerCustomizer> contentManagerCustomizer(new RestContentManagerCustomizer(restRequestHandlers, errorPageHandlers));
     // TODO - set up handlers
+    restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new RestClient("/client", state)));
+    restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new RestStatus("/status")));
+    restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new StaticRestRequestHandler(options.get<std::string>("rest_content"), "/(.*)")));
+    std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new RestContentManagerCustomizer(restRequestHandlers, errorPageHandlers));
     std::shared_ptr<ContentManagerFactory> contentManagerFactory = std::shared_ptr<ContentManagerFactory>(new ContentManagerFactory(ContentManagerType::RestHeaders, headers, contentManagerCustomizer));
-    Server server(protocolFactory, contentManagerFactory);
+    Server server;
     Host port10000(options.get<std::string>("interface"), options.get<unsigned>("port"),
                    protocolPreferenceMap[options.get<std::string>("protocol")]);
-    if (!server.addPort(port10000)) {
+    if (!server.addPort(1, port10000, protocolFactory, contentManagerFactory)) {
         std::cerr << "Unable to listen on port " << options.get<unsigned>("port") << " " << options.get<std::string>("protocol") << " on interface " << options.get<std::string>("interface") << std::endl;
         return 1;
     }
@@ -143,6 +150,7 @@ int main(int argc, char ** argv) {
     options.add<std::string>("host", 'h', "Host to connect to", false, "127.0.0.1");
     options.add<unsigned>("count", 'c', "Number of clients to use", false, 1);
     options.add<std::string>("interface", 'i', "Interface IP to listen on", false, "0.0.0.0");
+    options.add<std::string>("rest_content", 'r', "Folder containing static files to server", false, "/tmp/static");
     options.parse_check(argc, argv);
 
     START_EASYLOGGINGPP(argc, argv);

@@ -18,25 +18,21 @@
  */
 #pragma once
 
-#include <vector>
-#include <thread>
-#include <mutex>
-#include "listener.h"
-#include "protocol/protocolfactory.h"
-#include "contentmanager/contentmanagerfactory.h"
+#include "lib/client.h"
+#include "lib/server.h"
 
-class Server {
+class RestState {
 public:
-    virtual ~Server();
-    bool addPort(unsigned portId, Host & host, ProtocolFactory & protocolFactory, std::shared_ptr<ContentManagerFactory> & contentManagerFactory);
-    bool stopPort(unsigned portId);
-    const std::vector<Host> getPorts() const noexcept;
+    int getNumClients() noexcept;
     int getNumServers() noexcept;
-    // TODO - collect statistics
+    
+    int startClient(unsigned clientId, unsigned num_clients, ProtocolFactory & _protocolFactory, ContentManagerFactory & _contentManagerFactory, Host & _server);
+    bool stopClient(unsigned clientId);
+    
+    int startServer(unsigned portId, Host & host, ProtocolFactory & protocolFactory, std::shared_ptr<ContentManagerFactory> & contentManagerFactory);
+    bool stopServer(unsigned portId);
 protected:
 private:
-    std::vector<std::unique_ptr<Listener>> listeners;
-    // ProtocolFactory protocolFactory;
-    // std::shared_ptr<ContentManagerFactory> contentFactory;
-    mutable std::mutex lock;
+    Client client;
+    Server server;
 };

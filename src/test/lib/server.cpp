@@ -71,7 +71,7 @@ TEST_CASE("Server", "[protocol][server]") {
         };
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
-            MockContentManagerFactory(std::unique_ptr<ContentManagerCustomizer> & contentManagerCustomizer) : ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer) {;};
+            MockContentManagerFactory(std::shared_ptr<ContentManagerCustomizer> & contentManagerCustomizer) : ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer) {;};
             virtual std::unique_ptr<ContentManager> createContentManager(std::unique_ptr<Protocol> protocol, bool isServer) override {
                 UNUSED(protocol);
                 UNUSED(isServer);
@@ -80,27 +80,27 @@ TEST_CASE("Server", "[protocol][server]") {
             CommonHeaders commonHeaders;
         };
         MockProtocolFactory mockProtocolFactory;
-        std::unique_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
+        std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
         std::shared_ptr<ContentManagerFactory>  mockContentManagerFactory(new  MockContentManagerFactory(contentManagerCustomizer));
         MockRepository mocks;
         {
-            Server testServer(mockProtocolFactory, mockContentManagerFactory);
+            Server testServer;
             REQUIRE(testServer.getPorts().empty());
             Host testHost("0.0.0.0", 80, Host::ProtocolPreference::IPV4);
-            REQUIRE(testServer.addPort(testHost));
-            REQUIRE_FALSE(testServer.addPort(testHost));
+            REQUIRE(testServer.addPort(1, testHost, mockProtocolFactory, mockContentManagerFactory));
+            REQUIRE_FALSE(testServer.addPort(1, testHost, mockProtocolFactory, mockContentManagerFactory));
             REQUIRE(testServer.getPorts().size() == 1);
             // test stopPorts
-            REQUIRE(testServer.stopPort(testHost));
+            REQUIRE(testServer.stopPort(1));
             REQUIRE(testServer.getPorts().empty());
             // test adding a port after stopping it
-            REQUIRE(testServer.addPort(testHost));
+            REQUIRE(testServer.addPort(1, testHost, mockProtocolFactory, mockContentManagerFactory));
             REQUIRE(testServer.getPorts().size() == 1);
             // test adding a second port
             Host testHost2("0.0.0.0", 81, Host::ProtocolPreference::IPV4);
-            REQUIRE(testServer.addPort(testHost2));
+            REQUIRE(testServer.addPort(2, testHost2, mockProtocolFactory, mockContentManagerFactory));
             REQUIRE(testServer.getPorts().size() == 2);
-            REQUIRE(testServer.stopPort(testHost));
+            REQUIRE(testServer.stopPort(1));
             REQUIRE(testServer.getPorts().size() == 1);
             REQUIRE(testServer.getPorts()[0] == testHost2);
         }

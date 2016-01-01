@@ -26,7 +26,7 @@
 TEST_CASE("Testing contentmanagerfactory.h", "[content]") {
     SECTION("Test random text") {
         CommonHeaders commonHeaders;
-        std::unique_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
+        std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
         std::shared_ptr<ContentManagerFactory> test(new ContentManagerFactory(ContentManagerType::RandomText,
                                                                               commonHeaders, contentManagerCustomizer));
         std::unique_ptr<Protocol> dummy(new Protocol());
@@ -38,7 +38,7 @@ TEST_CASE("Testing contentmanagerfactory.h", "[content]") {
     }
     SECTION("Test fixed") {
         CommonHeaders commonHeaders;
-        std::unique_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
+        std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
         ContentManagerFactory test(ContentManagerType::Fixed, commonHeaders, contentManagerCustomizer);
         std::unique_ptr<Protocol> dummy(new Protocol());
         
@@ -49,7 +49,7 @@ TEST_CASE("Testing contentmanagerfactory.h", "[content]") {
     }
     SECTION("Test echo") {
         CommonHeaders commonHeaders;
-        std::unique_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
+        std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
         ContentManagerFactory test(ContentManagerType::Echo, commonHeaders, contentManagerCustomizer);
         std::unique_ptr<Protocol> dummy(new Protocol());
         

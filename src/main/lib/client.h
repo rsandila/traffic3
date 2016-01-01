@@ -26,10 +26,10 @@
 
 class Client {
 public:
-    Client();
     virtual ~Client();
-    bool startClients(unsigned clientId, unsigned num_clients, ProtocolFactory & _protocolFactory, ContentManagerFactory & _contentManagerFactory, Host _server);
+    bool startClients(unsigned clientId, unsigned num_clients, ProtocolFactory _protocolFactory, ContentManagerFactory _contentManagerFactory, Host _server);
     bool stopClients(unsigned clientId);
+    int getNumClients() noexcept;
     // TODO - collect statistics
 protected:
 private:

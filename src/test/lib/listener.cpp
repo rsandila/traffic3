@@ -26,9 +26,9 @@ TEST_CASE("Listener: Unable to listen", "[server]") {
     SECTION("Bad protocolFactory") {
         ProtocolFactory protocolFactory(ProtocolType::None);
         
-        std::unique_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
+        std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
         std::shared_ptr<ContentManagerFactory> contentManagerFactory(new ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer));
-        Listener listener(Host::ALL_INTERFACES4, protocolFactory, contentManagerFactory);
+        Listener listener(1, Host::ALL_INTERFACES4, protocolFactory, contentManagerFactory);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         REQUIRE(listener.inErrorState());
     }
@@ -36,13 +36,13 @@ TEST_CASE("Listener: Unable to listen", "[server]") {
         Host googleDNS("google-public-dns-a.google.com", 80, Host::ProtocolPreference::IPV4);
         ProtocolFactory protocolFactory(ProtocolType::None);
 
-        std::unique_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
+        std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
         std::shared_ptr<ContentManagerFactory> contentManagerFactory(new ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer));
-        Listener listener(Host::ALL_INTERFACES4, protocolFactory, contentManagerFactory);
+        Listener listener(1, Host::ALL_INTERFACES4, protocolFactory, contentManagerFactory);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        REQUIRE(listener == Host::ALL_INTERFACES4);
+        REQUIRE(listener == 1);
         REQUIRE(listener.getHost() == Host::ALL_INTERFACES4);
-        REQUIRE_FALSE(listener == googleDNS);
+        REQUIRE_FALSE(listener == 2);
     }
 }
 
@@ -63,7 +63,7 @@ TEST_CASE("Listener test", "[server]") {
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
             CommonHeaders header;
-            MockContentManagerFactory(std::unique_ptr<ContentManagerCustomizer> & contentManagerCustomizer) : ContentManagerFactory(ContentManagerType::None, header, contentManagerCustomizer) {
+            MockContentManagerFactory(std::shared_ptr<ContentManagerCustomizer> & contentManagerCustomizer) : ContentManagerFactory(ContentManagerType::None, header, contentManagerCustomizer) {
             };
             virtual std::unique_ptr<ContentManager> createContentManager(std::unique_ptr<Protocol> protocol, bool isServer) override {
                 UNUSED(protocol);
@@ -73,9 +73,9 @@ TEST_CASE("Listener test", "[server]") {
             }
         };
         MockProtocolFactory mockProtocolFactory;
-        std::unique_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
+        std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
         std::shared_ptr<ContentManagerFactory>  contentManagerFactory(new  MockContentManagerFactory(contentManagerCustomizer));
-        Listener listener(Host::ALL_INTERFACES4, mockProtocolFactory, contentManagerFactory);
+        Listener listener(1, Host::ALL_INTERFACES4, mockProtocolFactory, contentManagerFactory);
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         REQUIRE_FALSE(listener.inErrorState());
     }
@@ -109,7 +109,7 @@ TEST_CASE("Listener test", "[server]") {
         };
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
-            MockContentManagerFactory(std::unique_ptr<ContentManagerCustomizer> & contentManagerCustomizer) : ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer) {
+            MockContentManagerFactory(std::shared_ptr<ContentManagerCustomizer> & contentManagerCustomizer) : ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer) {
             };
             virtual std::unique_ptr<ContentManager> createContentManager(std::unique_ptr<Protocol> protocol, bool isServer) override {
                 UNUSED(protocol); UNUSED(isServer);
@@ -118,9 +118,9 @@ TEST_CASE("Listener test", "[server]") {
             CommonHeaders commonHeaders;
         };
         MockProtocolFactory mockProtocolFactory;
-        std::unique_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
+        std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
         std::shared_ptr<ContentManagerFactory>  contentManagerFactory(new  MockContentManagerFactory(contentManagerCustomizer));
-        Listener listener(Host::ALL_INTERFACES4, mockProtocolFactory, contentManagerFactory);
+        Listener listener(1, Host::ALL_INTERFACES4, mockProtocolFactory, contentManagerFactory);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         REQUIRE_FALSE(listener.inErrorState());        
     }
@@ -166,7 +166,7 @@ TEST_CASE("Listener test", "[server]") {
         };
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
-            MockContentManagerFactory(std::unique_ptr<ContentManagerCustomizer> & contentManagerCustomizer) : ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer) {
+            MockContentManagerFactory(std::shared_ptr<ContentManagerCustomizer> & contentManagerCustomizer) : ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer) {
             };
             virtual std::unique_ptr<ContentManager> createContentManager(std::unique_ptr<Protocol> protocol, bool isServer) override {
                 UNUSED(protocol); UNUSED(isServer);
@@ -176,9 +176,9 @@ TEST_CASE("Listener test", "[server]") {
         };
         {
             MockProtocolFactory mockProtocolFactory;
-            std::unique_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
+            std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
             std::shared_ptr<ContentManagerFactory>  contentManagerFactory(new  MockContentManagerFactory(contentManagerCustomizer));
-            Listener listener(Host::ALL_INTERFACES4, mockProtocolFactory, contentManagerFactory);
+            Listener listener(1, Host::ALL_INTERFACES4, mockProtocolFactory, contentManagerFactory);
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
             REQUIRE_FALSE(listener.inErrorState());
         }

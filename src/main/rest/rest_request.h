@@ -19,26 +19,22 @@
 
 #pragma once
 
+#include <map>
 #include <string>
 #include "rest_request_type.h"
 
 class RestRequest {
 public:
-    RestRequest(const RestRequestType & type, const std::string & uri, const std::string & version) :
-        _type(type), _uri(uri), _version(version) {
-    }
-    RestRequestType getType() const noexcept {
-        return _type;
-    }
-    const std::string & getUri() const noexcept {
-        return _uri;
-    }
-    const std::string & getVersion() const noexcept {
-        return _version;
-    }
+    RestRequest(const RestRequestType & type, const std::string & uri, const std::string & version);
+    RestRequestType getType() const noexcept;
+    const std::string & getUri() const noexcept;
+    const std::string & getVersion() const noexcept;
+    const std::string getParam(const std::string & name) const noexcept;
 protected:
+    const std::string parseParamsFromUri(const std::string & uri) noexcept;
 private:
     const RestRequestType _type;
     const std::string _uri;
     const std::string _version;
+    std::map<std::string, std::string> params;
 };

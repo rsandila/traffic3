@@ -32,7 +32,7 @@
 class ContentManagerFactory {
 public:
     ContentManagerFactory(const ContentManagerType & _type, CommonHeaders & _headerHandler,
-                          std::unique_ptr<ContentManagerCustomizer> & customizer)
+                          std::shared_ptr<ContentManagerCustomizer> & customizer)
         : type(_type), headerHandler(_headerHandler), customizerHandler(std::move(customizer)) {
     };
     virtual ~ContentManagerFactory() {;};
@@ -62,5 +62,5 @@ protected:
 private:
     ContentManagerType type;
     CommonHeaders & headerHandler;
-    std::unique_ptr<ContentManagerCustomizer> customizerHandler;
+    std::shared_ptr<ContentManagerCustomizer> customizerHandler;
 };

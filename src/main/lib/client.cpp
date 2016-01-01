@@ -18,10 +18,6 @@
  */
 #include "client.h"
 
-Client::Client() {
-    
-}
-
 Client::~Client() {
     for (auto it = workers.begin(); it != workers.end(); it++) {
         for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
@@ -30,8 +26,7 @@ Client::~Client() {
     }
 }
 
-bool Client::startClients(unsigned clientId, unsigned num_clients, ProtocolFactory & _protocolFactory, ContentManagerFactory & _contentManagerFactory,
-                          Host _server) {
+bool Client::startClients(unsigned clientId, unsigned num_clients, ProtocolFactory _protocolFactory, ContentManagerFactory  _contentManagerFactory, Host _server) {
     std::unique_lock<std::mutex> lck(lock);
     if (workers.find(clientId) != workers.end()) {
         return false;
@@ -60,4 +55,9 @@ bool Client::stopClients(unsigned clientId) {
     }
     workers.erase(client);
     return true;
+}
+
+int Client::getNumClients() noexcept {
+    std::unique_lock<std::mutex> lck(lock);
+    return workers.size();
 }

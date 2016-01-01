@@ -19,25 +19,21 @@
 #include "server.h"
 #include "listener.h"
 
-Server::Server(ProtocolFactory & _protocolFactory, std::shared_ptr<ContentManagerFactory> & contentManagerFactory) :
-        protocolFactory(_protocolFactory), contentFactory(contentManagerFactory) {
-}
-
 Server::~Server() {
     for (auto it = listeners.begin(); it != listeners.end(); ++it) {
         (*it)->Stop();
     }
 }
 
-bool Server::addPort(Host & host) {
+bool Server::addPort(unsigned portId, Host & host, ProtocolFactory & protocolFactory, std::shared_ptr<ContentManagerFactory> & contentManagerFactory) {
     std::unique_lock<std::mutex> lck(lock);
     // don't add a second port that is the same
     for (auto it = listeners.cbegin(); it != listeners.cend(); ++it) {
-        if (*(*it) == host) {
+        if (*(*it) == portId) {
             return false;
         }
     }
-    std::unique_ptr<Listener> newListener(new Listener(host, protocolFactory, contentFactory));
+    std::unique_ptr<Listener> newListener(new Listener(portId, host, protocolFactory, contentManagerFactory));
     if (!newListener->inErrorState()) {
         listeners.push_back(std::move(newListener));
         return true;
@@ -46,10 +42,10 @@ bool Server::addPort(Host & host) {
 }
 
 
-bool Server::stopPort(Host & host) {
+bool Server::stopPort(unsigned portId) {
     std::unique_lock<std::mutex> lck(lock);
     for (auto it = listeners.begin(); it != listeners.end(); ++it) {
-        if (*(*it) == host) {
+        if (*(*it) == portId) {
             bool retVal = (*it)->Stop();
             listeners.erase(it);
             return retVal;
@@ -65,4 +61,9 @@ const std::vector<Host> Server::getPorts() const noexcept {
         retVal.push_back((*it)->getHost());
     }
     return std::move(retVal);
+}
+
+int Server::getNumServers() noexcept {
+    std::unique_lock<std::mutex> lck(lock);
+    return listeners.size();
 }

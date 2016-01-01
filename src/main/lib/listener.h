@@ -23,17 +23,18 @@
 
 class Listener {
 public:
-    Listener(const Host & _host, ProtocolFactory & protocolFactory, std::shared_ptr<ContentManagerFactory> & contentManagerFactory);
+    Listener(unsigned portId, const Host & _host, ProtocolFactory & protocolFactory, std::shared_ptr<ContentManagerFactory> & contentManagerFactory);
     Listener(Listener && other);
     virtual ~Listener();
     Listener & operator=(Listener&& other);
-    bool operator==(const Host & other) const;
+    bool operator==(const unsigned portId) const;
     const Host & getHost() const;
     bool inErrorState() const noexcept;
     bool Stop();
 protected:
     void listen();
 private:
+    unsigned _portId;
     Host host;
     std::unique_ptr<Protocol> protocol;
     std::shared_ptr<ContentManagerFactory> _contentManagerFactory;
