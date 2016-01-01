@@ -4,9 +4,6 @@
 [submodule "3rdparty/hippomocks"]
 	path = 3rdparty/hippomocks
 	url = https://github.com/dascandy/hippomocks.git
-[submodule "3rdparty/cmdline"]
-	path = 3rdparty/cmdline
-	url = https://github.com/ys-nuem/cmdline.git
 [submodule "3rdparty/premake-core"]
 	path = 3rdparty/premake-core
 	url = https://github.com/premake/premake-core.git
