@@ -26,7 +26,7 @@ int RestState::getNumServers() noexcept {
     return server.getNumServers();
 }
 
-int RestState::startClient(unsigned clientId, unsigned num_clients, ProtocolFactory & _protocolFactory,
+bool RestState::startClient(unsigned clientId, unsigned num_clients, ProtocolFactory & _protocolFactory,
                            ContentManagerFactory & _contentManagerFactory, Host & _server) {
     return client.startClients(clientId, num_clients, _protocolFactory, _contentManagerFactory, _server);
 }
@@ -35,7 +35,7 @@ bool RestState::stopClient(unsigned clientId) {
     return client.stopClients(clientId);
 }
 
-int RestState::startServer(unsigned portId, Host & host, ProtocolFactory & protocolFactory,
+bool RestState::startServer(unsigned portId, Host & host, ProtocolFactory & protocolFactory,
                            std::shared_ptr<ContentManagerFactory> & contentManagerFactory) {
     return server.addPort(portId, host, protocolFactory, contentManagerFactory);
 }

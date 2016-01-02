@@ -37,9 +37,13 @@ const std::string & RestRequest::getVersion() const noexcept {
 }
 
 const std::string RestRequest::getParam(const std::string & name) const noexcept {
+    return getParamWithDefault(name, "");
+}
+
+const std::string RestRequest::getParamWithDefault(const std::string & name, const std::string & defaultValue) const noexcept {
     auto retval = params.find(name);
     if (retval == params.end()) {
-        return "";
+        return defaultValue;
     }
     return retval->first;
 }

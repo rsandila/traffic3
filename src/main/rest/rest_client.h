@@ -37,5 +37,6 @@ protected:
     virtual std::vector<char> handleCreateClient(const RestRequest & request, const std::map<std::string, std::string> & headers, const std::vector<char> & body) const noexcept;
     virtual std::vector<char> handleStopClient(const RestRequest & request, const std::map<std::string, std::string> & headers, const std::vector<char> & body) const noexcept;
 private:
+    std::string uriBase;
     RestState & state;
 };

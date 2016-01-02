@@ -222,4 +222,19 @@ std::ostream & operator<<(std::ostream & outp, const Host & host) {
     outp << host.hostName;
     outp << ":" << host.port;
     return outp;
+}
+
+Host::ProtocolPreference convertFromProtocolTypeToPreference(const ProtocolType type) {
+    switch (type) {
+        case ProtocolType::UDP4:
+            // fall through on purpose
+        case ProtocolType::TCP4:
+            return Host::ProtocolPreference::IPV4;
+        case ProtocolType::TCP6:
+            // fall through on purpose
+        case ProtocolType::UDP6:
+            return Host::ProtocolPreference::IPV6;
+        case ProtocolType::None:
+            return Host::ProtocolPreference::ANY;
     }
+}

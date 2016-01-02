@@ -18,16 +18,17 @@
  */
 
 #include "lib/common.h"
+#include "lib/commonheaders.h"
 #include "rest_client.h"
 
-RestClient::RestClient(const std::string & uriPattern, RestState & _state) : state(_state) {
+RestClient::RestClient(const std::string & uriPattern, RestState & _state) : uriBase(uriPattern), state(_state) {
 }
 
 std::vector<char> RestClient::handleRequest(const Host & host, const RestRequest & request, const std::map<std::string,
                                             std::string> & headers, const std::vector<char> & body) {
     UNUSED(host);
     std::vector<char> returnValue;
-    if (request.getUri().find("/client") == 0) {
+    if (request.getUri().find(uriBase) == 0) {
         switch (request.getType()) {
             case RestRequestType::RRT_GET:
                 // get status
@@ -61,7 +62,32 @@ std::vector<char> RestClient::handleCreateClient(const RestRequest & request,
     UNUSED(headers);
     UNUSED(body);
     std::vector<char> returnValue;
-    // TODO
+    
+    unsigned id = std::stoul(request.getParamWithDefault("id", "0"));
+    std::string protocol = request.getParamWithDefault("protocol", "tcp4");
+    std::string cm_type = request.getParamWithDefault("contentmanager", "fixed");
+    unsigned count = std::stoul(request.getParamWithDefault("count", "1"));
+    std::string hostName = request.getParam("host");
+    unsigned port = std::stoul(request.getParam("port"));
+    unsigned minimum = std::stoul(request.getParamWithDefault("min", "10"));
+    unsigned maximum = std::stoul(request.getParamWithDefault("max", "10000"));
+    
+    // preference should map from protocol string to ProtocolPreference
+    ProtocolType protocolType = convertStringToProtocolType(protocol);
+    const Host::ProtocolPreference preference = convertFromProtocolTypeToPreference(protocolType);
+    Host host(hostName, port, preference);
+    ProtocolFactory protocolFactory(protocolType);// TODO map protocol string to ProtocolType
+    CommonHeaders commonHeaders;
+    std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(minimum, maximum));
+    // convert cm_type string to contentManagerType
+    ContentManagerType contentManagerType = convertStringToContentManagerType(cm_type);
+    ContentManagerFactory contentManagerFactory(contentManagerType, commonHeaders, contentManagerCustomizer);
+    
+    if (state.startClient(id, count, protocolFactory, contentManagerFactory, host)) {
+        // TODO - return success
+    } else {
+        // TODO - return failure
+    }
     return returnValue;
 }
 
@@ -72,5 +98,11 @@ std::vector<char> RestClient::handleStopClient(const RestRequest & request,
     UNUSED(body);
     std::vector<char> returnValue;
     // TODO
+    unsigned id = std::stoul(request.getParam("id"));
+    if (state.stopClient(id)) {
+        // TODO return success
+    } else {
+        // TODO return error
+    }
     return returnValue;
 }

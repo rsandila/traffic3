@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Robert Sandilands
+ * Copyright (C) 2016 Robert Sandilands
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,16 +16,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  USA.
  */
-#pragma once
 
-#include <string>
+#include <map>
+#include "protocoltype.h"
 
-enum class ProtocolType {
-    TCP4,
-    TCP6,
-    UDP4,
-    UDP6,
-    None
-};
+static std::map<std::string, ProtocolType> protocolMap {
+    {"tcp4", ProtocolType::TCP4},
+    {"tcp6", ProtocolType::TCP6},
+    {"udp4", ProtocolType::UDP4},
+    {"udp6", ProtocolType::UDP6} };
 
-ProtocolType convertStringToProtocolType(const std::string & name);
+ProtocolType convertStringToProtocolType(const std::string & name) {
+    std::string lname = name;
+    std::for_each(name.begin(), name.end(), [](char a){ return std::tolower(a);});
+    if (protocolMap.find(lname) == protocolMap.end()) {
+        // TODO - should be an error and throw some exception
+        return ProtocolType::None;
+    }
+    return protocolMap[lname];
+}

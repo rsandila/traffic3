@@ -18,6 +18,8 @@
  */
 #pragma once
 
+#include <string>
+
 enum class ContentManagerType {
     RandomText,
     RandomBinary,
@@ -26,3 +28,5 @@ enum class ContentManagerType {
     RestHeaders,
     None
 };
+
+ContentManagerType convertStringToContentManagerType(const std::string & name);

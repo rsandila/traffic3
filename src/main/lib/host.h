@@ -28,6 +28,7 @@
 #include <WS2tcpip.h>
 #endif
 #include <string>
+#include "protocol/protocoltype.h"
 
 class Host {
 public:
@@ -66,3 +67,4 @@ private:
     friend std::ostream & operator<<(std::ostream & outp, const Host & host);
 };
 
+Host::ProtocolPreference convertFromProtocolTypeToPreference(const ProtocolType type);

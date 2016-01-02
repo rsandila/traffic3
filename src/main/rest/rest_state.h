@@ -26,10 +26,10 @@ public:
     int getNumClients() noexcept;
     int getNumServers() noexcept;
     
-    int startClient(unsigned clientId, unsigned num_clients, ProtocolFactory & _protocolFactory, ContentManagerFactory & _contentManagerFactory, Host & _server);
+    bool startClient(unsigned clientId, unsigned num_clients, ProtocolFactory & _protocolFactory, ContentManagerFactory & _contentManagerFactory, Host & _server);
     bool stopClient(unsigned clientId);
     
-    int startServer(unsigned portId, Host & host, ProtocolFactory & protocolFactory, std::shared_ptr<ContentManagerFactory> & contentManagerFactory);
+    bool startServer(unsigned portId, Host & host, ProtocolFactory & protocolFactory, std::shared_ptr<ContentManagerFactory> & contentManagerFactory);
     bool stopServer(unsigned portId);
     
     long long getClientNumWritten() const noexcept;

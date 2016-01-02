@@ -47,33 +47,25 @@ static std::map<std::string, ModeType> modeMap {
     {"server", ModeType::ServerMode},
     {"client", ModeType::ClientMode},
     {"rest", ModeType::RestMode} };
-static std::map<std::string, Host::ProtocolPreference> protocolPreferenceMap {
+// TODO - convert the ProtocolType instead of std::string 
+/*static std::map<std::string, Host::ProtocolPreference> protocolPreferenceMap {
     {"tcp4", Host::ProtocolPreference::IPV4},
     {"tcp6", Host::ProtocolPreference::IPV6},
     {"udp4", Host::ProtocolPreference::IPV4},
     {"udp6", Host::ProtocolPreference::IPV6} };
-static std::map<std::string, ProtocolType> protocolMap {
-    {"tcp4", ProtocolType::TCP4},
-    {"tcp6", ProtocolType::TCP6},
-    {"udp4", ProtocolType::UDP4},
-    {"udp6", ProtocolType::UDP6} };
-static std::map<std::string, ContentManagerType> contentManagerMap {
-    {"randomtext", ContentManagerType::RandomText},
-    {"randombinary", ContentManagerType::RandomBinary},
-    {"fixed", ContentManagerType::Fixed},
-    {"echo", ContentManagerType::Echo}
-};
+*/
+
 
 int beServer(const cmdline::parser & options) {
     CommonHeaders headers;
-    ProtocolFactory protocolFactory(protocolMap[options.get<std::string>("protocol")]);
+    ProtocolFactory protocolFactory(convertStringToProtocolType(options.get<std::string>("protocol")));
     std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(
                                                     options.get<unsigned>("min"), options.get<unsigned>("max")));
-    std::shared_ptr<ContentManagerFactory> contentManagerFactory = std::shared_ptr<ContentManagerFactory>(new ContentManagerFactory(contentManagerMap[options.get<std::string>("type")], headers,
+    std::shared_ptr<ContentManagerFactory> contentManagerFactory = std::shared_ptr<ContentManagerFactory>(new ContentManagerFactory(convertStringToContentManagerType(options.get<std::string>("type")), headers,
                                                 contentManagerCustomizer));
     Server server;
     Host port10000(options.get<std::string>("interface"), options.get<unsigned>("port"),
-                   protocolPreferenceMap[options.get<std::string>("protocol")]);
+                   convertFromProtocolTypeToPreference(convertStringToProtocolType(options.get<std::string>("protocol"))));
     if (!server.addPort(1, port10000, protocolFactory, contentManagerFactory)) {
         std::cerr << "Unable to listen on port " << options.get<unsigned>("port") << " " << options.get<std::string>("protocol") << " on interface " << options.get<std::string>("interface") << std::endl;
         return 1;
@@ -83,13 +75,13 @@ int beServer(const cmdline::parser & options) {
 }
 
 int beClient(const cmdline::parser & options) {
-    ProtocolFactory protocolFactory(protocolMap[options.get<std::string>("protocol")]);
+    ProtocolFactory protocolFactory(convertStringToProtocolType(options.get<std::string>("protocol")));
     CommonHeaders headers;
     std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(
                                                         options.get<unsigned>("min"), options.get<unsigned>("max")));
-    ContentManagerFactory contentManagerFactory(contentManagerMap[options.get<std::string>("type")], headers, contentManagerCustomizer);
+    ContentManagerFactory contentManagerFactory(convertStringToContentManagerType(options.get<std::string>("type")), headers, contentManagerCustomizer);
     Host port10000(options.get<std::string>("host"), options.get<unsigned>("port"),
-                   protocolPreferenceMap[options.get<std::string>("protocol")]);
+                   convertFromProtocolTypeToPreference(convertStringToProtocolType(options.get<std::string>("protocol"))));
     Client client;
     if (client.startClients(1, options.get<unsigned>("count"), protocolFactory, contentManagerFactory, port10000)) {
         getchar();
@@ -101,7 +93,7 @@ int beClient(const cmdline::parser & options) {
 }
 
 int beRest(const cmdline::parser & options) {
-    ProtocolFactory protocolFactory(protocolMap[options.get<std::string>("protocol")]);
+    ProtocolFactory protocolFactory(convertStringToProtocolType(options.get<std::string>("protocol")));
     RestHeaders headers;
     RestState state;
     
@@ -116,7 +108,7 @@ int beRest(const cmdline::parser & options) {
     std::shared_ptr<ContentManagerFactory> contentManagerFactory = std::shared_ptr<ContentManagerFactory>(new ContentManagerFactory(ContentManagerType::RestHeaders, headers, contentManagerCustomizer));
     Server server;
     Host port10000(options.get<std::string>("interface"), options.get<unsigned>("port"),
-                   protocolPreferenceMap[options.get<std::string>("protocol")]);
+                   convertFromProtocolTypeToPreference(convertStringToProtocolType(options.get<std::string>("protocol"))));
     if (!server.addPort(1, port10000, protocolFactory, contentManagerFactory)) {
         std::cerr << "Unable to listen on port " << options.get<unsigned>("port") << " " << options.get<std::string>("protocol") << " on interface " << options.get<std::string>("interface") << std::endl;
         return 1;

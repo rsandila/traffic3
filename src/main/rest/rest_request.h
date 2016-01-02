@@ -30,6 +30,7 @@ public:
     const std::string & getUri() const noexcept;
     const std::string & getVersion() const noexcept;
     const std::string getParam(const std::string & name) const noexcept;
+    const std::string getParamWithDefault(const std::string & name, const std::string & defaultValue) const noexcept;
 protected:
     const std::string parseParamsFromUri(const std::string & uri) noexcept;
 private:
