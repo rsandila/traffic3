@@ -18,6 +18,7 @@
  */
 
 #include <algorithm>
+#include <cctype>
 #include <map>
 #include "protocoltype.h"
 

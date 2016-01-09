@@ -17,6 +17,7 @@
  USA.
  */
 #include <algorithm>
+#include <cctype>
 #include <map>
 #include "contentmanagertype.h"
 
