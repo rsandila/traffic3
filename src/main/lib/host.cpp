@@ -235,6 +235,8 @@ Host::ProtocolPreference convertFromProtocolTypeToPreference(const ProtocolType 
         case ProtocolType::UDP6:
             return Host::ProtocolPreference::IPV6;
         case ProtocolType::None:
+	   // fall through on purpose
+	default:
             return Host::ProtocolPreference::ANY;
     }
 }

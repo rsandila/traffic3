@@ -17,6 +17,7 @@
  USA.
  */
 
+#include <algorithm>
 #include <map>
 #include "protocoltype.h"
 

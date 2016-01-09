@@ -17,6 +17,7 @@
  USA.
  */
 
+#include <cstring>
 #include <sstream>
 #include "html_return.h"
 
