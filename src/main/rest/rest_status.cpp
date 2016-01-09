@@ -17,14 +17,36 @@
  USA.
  */
 
+#include <string>
+#include <cstring>
+#include "lib/common.h"
 #include "rest/rest_status.h"
 #include "rest/rest_state.h"
+#include "json.hpp"
+#include "rest/html_return.h"
 
-RestStatus::RestStatus(const std::string & uriPattern, RestState & _state) : state(_state) {
-    // TODO
+RestStatus::RestStatus(const std::string & _uriPattern, RestState & _state) : uriPattern(_uriPattern), state(_state) {
 }
 
 std::vector<char> RestStatus::handleRequest(const Host & host, const RestRequest & request, const std::map<std::string, std::string> & headers, const std::vector<char> & body) {
-    // TODO - get info from state and report it as a html/json response
-    return std::vector<char>();
+    UNUSED(host);
+    UNUSED(request);
+    UNUSED(headers);
+    UNUSED(body);
+    
+    if (request.getUri() != uriPattern) {
+        // not me, return empty
+        return std::vector<char>();
+    }
+    
+    nlohmann::json returnValue;
+    
+    returnValue["numClients"] = state.getNumClients();
+    returnValue["numServers"] = state.getNumServers();
+    returnValue["serverNumRead"] = state.getServerNumRead();
+    returnValue["serverNumWriten"] = state.getServerNumWritten();
+    returnValue["clientNumRead"] = state.getClientNumRead();
+    returnValue["clentNumWritten"] = state.getClientNumWritten();
+    std::string returnBody = returnValue.dump(4);
+    return std::move(returnJsonPage(200, "OK", returnValue.dump(0)));
 }

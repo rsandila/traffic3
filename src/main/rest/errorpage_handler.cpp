@@ -20,6 +20,7 @@
 #include <cstring>
 #include "lib/common.h"
 #include "errorpage_handler.h"
+#include "html_return.h"
 
 std::vector<char> ErrorPageHandler::handleError(ErrorTypes type, const std::vector<char> & incomingData) const noexcept {
     UNUSED(type);
@@ -50,13 +51,5 @@ std::vector<char> ErrorPageHandler::handleError(ErrorTypes type, const std::vect
             break;
             
     }
-    ostr << "HTTP/1.0 " << code << " " << message << "\r\nConnection: close\r\nContent-Length:";
-    std::stringstream body;
-    body << "<!DOCTYPE HTML PUBLIC ""-//IETF//DTD HTML 2.0//EN"">\r\n<html><head><title>";
-    body << code << " " << message << "</title></head><body><h1>" << message << "</h1>";
-    body << "</body></html>\r\n";
-    ostr << body.str().length() << "\r\n\r\n" << body.str();
-    std::vector<char> returnValue(ostr.str().length());
-    memcpy(&returnValue[0], ostr.str().c_str(), returnValue.size());
-    return std::move(returnValue);
+    return std::move(returnHtmlPage(code, message, message, message));
 }

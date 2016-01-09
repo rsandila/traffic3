@@ -142,7 +142,7 @@ int main(int argc, char ** argv) {
     options.add<std::string>("host", 'h', "Host to connect to", false, "127.0.0.1");
     options.add<unsigned>("count", 'c', "Number of clients to use", false, 1);
     options.add<std::string>("interface", 'i', "Interface IP to listen on", false, "0.0.0.0");
-    options.add<std::string>("rest_content", 'r', "Folder containing static files to server", false, "/tmp/static");
+    options.add<std::string>("rest_content", 'e', "Folder containing static files to server", false, "/tmp/static");
     options.parse_check(argc, argv);
 
     START_EASYLOGGINGPP(argc, argv);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Robert Sandilands
+ * Copyright (C) 2016 Robert Sandilands
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,11 @@
  USA.
  */
 
-#include <string>
-#include <vector>
-#include <map>
-#include "rest/rest_request_handler.h"
-#include "lib/host.h"
-#include "rest/rest_request.h"
-#include "rest/rest_state.h"
-
 #pragma once
 
-class RestStatus : public RestRequestHandler {
-public:
-    RestStatus(const std::string & _uriPattern, RestState & _state);
-    virtual std::vector<char> handleRequest(const Host & host, const RestRequest & request, const std::map<std::string, std::string> & headers, const std::vector<char> & body);
-protected:
-private:
-    std::string uriPattern;
-    RestState & state;
-};
+#include <string>
+#include <vector>
+
+std::vector<char> returnHtmlPage(unsigned code, const std::string message, const std::string title,
+                                 const std::string & body);
+std::vector<char> returnJsonPage(unsigned code, const std::string message, const std::string & dump);

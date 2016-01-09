@@ -44,6 +44,7 @@ project "contentmanager"
 project "rest"
   kind "StaticLib"
   language "C++"
+  includedirs { "%{cfg.basedir}/3rdparty/json/src" }
   files { "src/main/rest/**.h", "src/main/rest/**.cpp" }
 
 project "traffic3"
