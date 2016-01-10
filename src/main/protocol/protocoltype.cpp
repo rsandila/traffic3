@@ -37,3 +37,12 @@ ProtocolType convertStringToProtocolType(const std::string & name) {
     }
     return protocolMap[lname];
 }
+
+const std::string protocolTypeToString(const ProtocolType type) {
+    for (const auto & it: protocolMap) {
+        if (it.second == type) {
+            return it.first;
+        }
+    }
+    return "tcp4"; // should probably throw some exception
+}

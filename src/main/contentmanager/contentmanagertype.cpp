@@ -37,3 +37,12 @@ ContentManagerType convertStringToContentManagerType(const std::string & name) {
     }
     return contentManagerMap[lname];
 }
+
+const std::string convertContentManagerTypeToString(const ContentManagerType type) {
+    for (const auto & it: contentManagerMap) {
+        if (it.second == type) {
+            return it.first;
+        }
+    }
+    return "none";
+}

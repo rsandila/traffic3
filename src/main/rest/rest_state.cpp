@@ -59,3 +59,11 @@ long long RestState::getServerNumWritten() const noexcept {
 long long RestState::getServerNumRead() const noexcept {
     return server.getNumBytesRead();
 }
+
+nlohmann::json RestState::getServerJson() const noexcept {
+    return std::move(server.toJson());
+}
+
+nlohmann::json RestState::getClientJson() const noexcept {
+    return std::move(client.toJson());
+}

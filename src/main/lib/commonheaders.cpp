@@ -55,7 +55,8 @@ bool CommonHeaders::read(std::unique_ptr<Protocol> & protocol, std::vector<char>
     return false;
 }
 
-bool CommonHeaders::write(std::unique_ptr<Protocol> & protocol, const std::vector<char> & content, const Host & hostState) {
+bool CommonHeaders::write(std::unique_ptr<Protocol> & protocol, const std::vector<char> & content,
+                          const Host & hostState) {
     std::vector<char> signature(4 + sizeof(uint32_t));
     memcpy(&signature[0], "TRAF", 4);
     uint32_t length = htonl(8 + content.size());
@@ -68,4 +69,13 @@ bool CommonHeaders::write(std::unique_ptr<Protocol> & protocol, const std::vecto
 
 unsigned CommonHeaders::getVersion() const {
     return 2;
+}
+
+nlohmann::json CommonHeaders::toJson() const noexcept {
+    nlohmann::json returnValue;
+    
+    returnValue["version"] = getVersion();
+    returnValue["type"] = std::string("commonHeaders");
+    
+    return std::move(returnValue);
 }

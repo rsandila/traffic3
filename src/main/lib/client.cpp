@@ -81,3 +81,17 @@ long long Client::getNumBytesWritten() const noexcept {
     }
     return total;
 }
+
+nlohmann::json Client::toJson() const noexcept {
+    nlohmann::json returnValue;
+    
+    for (const auto & it: workers) {
+        std::vector<nlohmann::json> returnArray;
+        
+        for (const auto & it2: it.second) {
+            returnArray.push_back(it2->toJson());
+        }
+        returnValue[it.first] = returnArray;
+    }
+    return std::move(returnValue);
+}

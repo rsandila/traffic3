@@ -191,7 +191,7 @@ TEST_CASE("IPV6: TCP listen", "[ipv6][protocol]") {
         mocks.ExpectCallFunc(::bind).Return(0);
         mocks.ExpectCallFunc(::listen).Return(0);
         REQUIRE(protocol.listen(Host::ALL_INTERFACES6, 10));
-        REQUIRE(protocol.getType() == Protocol::ProtocolType::SERVER);
+        REQUIRE(protocol.getType() == Protocol::ProtocolInstanceType::SERVER);
         REQUIRE(protocol.getState() == Protocol::ProtocolState::OPEN);
     }
     SECTION("Bind fails") {
@@ -199,7 +199,7 @@ TEST_CASE("IPV6: TCP listen", "[ipv6][protocol]") {
         ProtocolTCP6 protocol;
         mocks.ExpectCallFunc(::bind).Return(-1);
         REQUIRE_FALSE(protocol.listen(Host::ALL_INTERFACES6, 10));
-        REQUIRE(protocol.getType() == Protocol::ProtocolType::NONE);
+        REQUIRE(protocol.getType() == Protocol::ProtocolInstanceType::NONE);
         REQUIRE(protocol.getState() == Protocol::ProtocolState::CLOSED);
     }
     SECTION("Bind success, ::listen fails") {
@@ -208,7 +208,7 @@ TEST_CASE("IPV6: TCP listen", "[ipv6][protocol]") {
         mocks.ExpectCallFunc(::bind).Return(0);
         mocks.ExpectCallFunc(::listen).Return(-1);
         REQUIRE_FALSE(protocol.listen(Host::ALL_INTERFACES6, 10));
-        REQUIRE(protocol.getType() == Protocol::ProtocolType::NONE);
+        REQUIRE(protocol.getType() == Protocol::ProtocolInstanceType::NONE);
         REQUIRE(protocol.getState() == Protocol::ProtocolState::CLOSED);
     }
 
@@ -230,7 +230,7 @@ TEST_CASE("IPV6: TCP connect", "[ipv6][protocol]") {
         ProtocolTCP6 protocol;
         mocks.ExpectCallFunc(::connect).Return(0);
         REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
-        REQUIRE(protocol.getType() == Protocol::ProtocolType::CLIENT);
+        REQUIRE(protocol.getType() == Protocol::ProtocolInstanceType::CLIENT);
         REQUIRE(protocol.getState() == Protocol::ProtocolState::OPEN);
     }
     SECTION("Connect fails") {
@@ -238,7 +238,7 @@ TEST_CASE("IPV6: TCP connect", "[ipv6][protocol]") {
         ProtocolTCP6 protocol;
         mocks.ExpectCallFunc(::connect).Return(-1);
         REQUIRE_FALSE(protocol.connect(Host::ALL_INTERFACES6));
-        REQUIRE(protocol.getType() == Protocol::ProtocolType::NONE);
+        REQUIRE(protocol.getType() == Protocol::ProtocolInstanceType::NONE);
         REQUIRE(protocol.getState() == Protocol::ProtocolState::CLOSED);
     }
 }
@@ -251,7 +251,7 @@ TEST_CASE("IPV6: waitForNewConnection", "[ipv6][protocol]") {
         mocks.ExpectCallFunc(::connect).Return(0);
         mocks.NeverCallFunc(::accept);
         REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
-        REQUIRE(protocol.getType() == Protocol::ProtocolType::CLIENT);
+        REQUIRE(protocol.getType() == Protocol::ProtocolInstanceType::CLIENT);
         REQUIRE(protocol.getState() == Protocol::ProtocolState::OPEN);
         std::unique_ptr<Protocol> newProtocol = protocol.waitForNewConnection();
         REQUIRE(newProtocol.get() == nullptr);
@@ -277,12 +277,12 @@ TEST_CASE("IPV6: waitForNewConnection", "[ipv6][protocol]") {
 		mocks.ExpectCallFunc(::closesocket).Return(0);
 #endif
         REQUIRE(protocol.listen(Host::ALL_INTERFACES6, 10));
-        REQUIRE(protocol.getType() == Protocol::ProtocolType::SERVER);
+        REQUIRE(protocol.getType() == Protocol::ProtocolInstanceType::SERVER);
         REQUIRE(protocol.getState() == Protocol::ProtocolState::OPEN);
         std::unique_ptr<Protocol> newProtocol = protocol.waitForNewConnection();
         REQUIRE(newProtocol.get() != nullptr);
         REQUIRE(newProtocol->getState() == Protocol::ProtocolState::OPEN);
-        REQUIRE(newProtocol->getType() == Protocol::ProtocolType::SERVER_CLIENT);
+        REQUIRE(newProtocol->getType() == Protocol::ProtocolInstanceType::SERVER_CLIENT);
     }
     SECTION("wait if accept fails") {
         MockRepository mocks;
@@ -291,7 +291,7 @@ TEST_CASE("IPV6: waitForNewConnection", "[ipv6][protocol]") {
         mocks.ExpectCallFunc(::listen).Return(0);
         mocks.ExpectCallFunc(::accept).Return(-1);
         REQUIRE(protocol.listen(Host::ALL_INTERFACES6, 10));
-        REQUIRE(protocol.getType() == Protocol::ProtocolType::SERVER);
+        REQUIRE(protocol.getType() == Protocol::ProtocolInstanceType::SERVER);
         REQUIRE(protocol.getState() == Protocol::ProtocolState::OPEN);
         std::unique_ptr<Protocol> newProtocol = protocol.waitForNewConnection();
         REQUIRE(newProtocol.get() == nullptr);
@@ -308,10 +308,10 @@ TEST_CASE("IPV6: close", "[ipv6][protocol]") {
         // mocks.ExpectCallFunc(::shutdown); // this causes a crash for some reason
         // mocks.ExpectCallFunc(::close);
         REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
-        REQUIRE(protocol.getType() == Protocol::ProtocolType::CLIENT);
+        REQUIRE(protocol.getType() == Protocol::ProtocolInstanceType::CLIENT);
         REQUIRE(protocol.getState() == Protocol::ProtocolState::OPEN);
         protocol.close();
-        REQUIRE(protocol.getType() == Protocol::ProtocolType::NONE);
+        REQUIRE(protocol.getType() == Protocol::ProtocolInstanceType::NONE);
         REQUIRE(protocol.getState() == Protocol::ProtocolState::CLOSED);
     }
 }

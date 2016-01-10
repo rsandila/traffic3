@@ -25,6 +25,8 @@ class ContentManagerCustomizer {
 public:
     ContentManagerCustomizer(unsigned minimum, unsigned maximum);
     virtual std::unique_ptr<ContentManager> customize(std::unique_ptr<ContentManager> contentManager);
+    
+    virtual nlohmann::json toJson() const noexcept;
 protected:
 private:
     unsigned _minimum;

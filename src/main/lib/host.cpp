@@ -218,6 +218,45 @@ bool Host::operator==(const Host & other) const {
     return retval;
 }
 
+nlohmann::json Host::toJson() const noexcept {    
+    nlohmann::json returnValue;
+    
+    returnValue["hostName"] = hostName;
+    returnValue["port"] = port;
+    returnValue["hasIPv4"] = hasAddr;
+    returnValue["hasIPv6"] = hasAddr6;
+    switch (protocolPreference) {
+        case ProtocolPreference::IPV4:
+            returnValue["protocolPreference"] = std::string("IPv4");
+            break;
+        case ProtocolPreference::IPV6:
+            returnValue["protocolPreference"] = std::string("IPv6");
+            break;
+        case ProtocolPreference::ANY:
+            returnValue["protocolPreference"] = std::string("ANY");
+            break;
+    }
+    
+    char hbuf[NI_MAXHOST], sbuf[NI_MAXSERV];
+    hbuf[0] = 0;
+    sbuf[0] = 0;
+    if (hasAddr && getnameinfo((const sockaddr *)&addr, addr.sin_len, hbuf, sizeof(hbuf), sbuf,
+                        sizeof(sbuf), 0) == 0) {
+        returnValue["ipv4Name"] = std::string(hbuf);
+        returnValue["ipv4Service"] = std::string(sbuf);
+    }
+    hbuf[0] = 0;
+    sbuf[0] = 0;
+    if (hasAddr6 && getnameinfo((const sockaddr *)&addr6, addr6.sin6_len, hbuf, sizeof(hbuf), sbuf,
+                               sizeof(sbuf), 0) == 0) {
+        returnValue["ipv6Name"] = std::string(hbuf);
+        returnValue["ipv6Service"] = std::string(sbuf);
+    }
+    
+    return std::move(returnValue);
+}
+
+
 std::ostream & operator<<(std::ostream & outp, const Host & host) {
     outp << host.hostName;
     outp << ":" << host.port;

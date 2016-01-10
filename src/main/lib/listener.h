@@ -20,6 +20,7 @@
 
 #include "contentmanager/contentmanagerfactory.h"
 #include "protocol/protocolfactory.h"
+#include "json.hpp"
 
 class Listener {
 public:
@@ -34,6 +35,7 @@ public:
     unsigned getPortId() const noexcept;
     long long getBytesRead() const noexcept;
     long long getBytesWritten() const noexcept;
+    nlohmann::json toJson() const noexcept;
 protected:
     void listen();
 private:

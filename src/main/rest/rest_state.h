@@ -20,6 +20,7 @@
 
 #include "lib/client.h"
 #include "lib/server.h"
+#include "json.hpp"
 
 class RestState {
 public:
@@ -36,7 +37,8 @@ public:
     long long getClientNumRead() const noexcept;
     long long getServerNumWritten() const noexcept;
     long long getServerNumRead() const noexcept;
-    
+    nlohmann::json getServerJson() const noexcept;
+    nlohmann::json getClientJson() const noexcept;
 protected:
 private:
     Client client;

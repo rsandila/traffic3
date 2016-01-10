@@ -24,6 +24,7 @@
 #include "listener.h"
 #include "protocol/protocolfactory.h"
 #include "contentmanager/contentmanagerfactory.h"
+#include "json.hpp"
 
 class Server {
 public:
@@ -34,6 +35,7 @@ public:
     int getNumServers() noexcept;
     long long getNumBytesRead() const noexcept;
     long long getNumBytesWritten() const noexcept;
+    nlohmann::json toJson() const noexcept;
 protected:
 private:
     std::vector<std::unique_ptr<Listener>> listeners;

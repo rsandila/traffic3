@@ -120,3 +120,22 @@ long long Listener::getBytesWritten() const noexcept {
         return 0LL;
     }
 }
+
+nlohmann::json Listener::toJson() const noexcept {
+    nlohmann::json returnValue;
+    
+    returnValue["id"] = _portId;
+    returnValue["host"] = host.toJson();
+    returnValue["protocol"] = protocol->toJson();
+    returnValue["contentManagerFactory"] = _contentManagerFactory->toJson();
+    returnValue["numContentManagers"] = contentManagers.size();
+    
+    std::vector<nlohmann::json> contentManagersJson(contentManagers.size());
+    for (const auto & contentManager: contentManagers) {
+        contentManagersJson.push_back(contentManager->toJson());
+    }
+    returnValue["contentManagers"] = contentManagersJson;
+    returnValue["errorState"] = errorState;
+    
+    return std::move(returnValue);
+}

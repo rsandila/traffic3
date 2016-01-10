@@ -82,7 +82,7 @@ bool ProtocolTCP::write(const std::vector<char> & data, const Host & hostState) 
 
 bool ProtocolTCP::listen(const Host & localHost, int backlog) {
 	std::unique_lock<std::mutex> lck(lock);
-	if (state != ProtocolState::CLOSED || type != ProtocolType::NONE) {
+	if (state != ProtocolState::CLOSED || type != ProtocolInstanceType::NONE) {
 		return false;
 	}
 	this->host = localHost;
@@ -93,7 +93,7 @@ bool ProtocolTCP::listen(const Host & localHost, int backlog) {
 	// setsockopt(socket, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval));
 	if (::bind(socket, localHost.getPreferredSockAddress(), localHost.getPreferedSockAddressLen()) == 0) {
 		if (::listen(socket, backlog) == 0) {
-			type = ProtocolType::SERVER;
+			type = ProtocolInstanceType::SERVER;
 			state = ProtocolState::OPEN;
 			return true;
 		}
@@ -103,14 +103,14 @@ bool ProtocolTCP::listen(const Host & localHost, int backlog) {
 
 bool ProtocolTCP::connect(const Host & localHost) {
 	std::unique_lock<std::mutex> lck(lock);
-	if (state != ProtocolState::CLOSED || type != ProtocolType::NONE) {
+	if (state != ProtocolState::CLOSED || type != ProtocolInstanceType::NONE) {
 		return false;
 	}
 	this->host = localHost;
 	struct protoent *pr = getprotobyname("tcp");
 	socket = ::socket(localHost.getPreferredSocketDomain(), SOCK_STREAM, pr->p_proto);
 	if (::connect(socket, localHost.getPreferredSockAddress(), localHost.getPreferedSockAddressLen()) == 0) {
-		type = ProtocolType::CLIENT;
+		type = ProtocolInstanceType::CLIENT;
 		state = ProtocolState::OPEN;
 		return true;
 	}
@@ -124,7 +124,7 @@ ProtocolTCP::ProtocolTCP(int socket, socklen_t len, const struct sockaddr * addr
 ProtocolTCP::ProtocolTCP(ProtocolTCP && other) : Protocol(other.host, other.type, other.socket, other.state) {
 	other.socket = -1;
 	other.host = Host::ALL_INTERFACES6;
-	other.type = ProtocolType::NONE;
+	other.type = ProtocolInstanceType::NONE;
 	other.state = ProtocolState::CLOSED;
 }
 

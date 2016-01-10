@@ -23,6 +23,7 @@
 #include <mutex>
 #include "lib/host.h"
 #include "lib/common.h"
+#include "json.hpp"
 
 #ifndef _MSC_VER
 typedef int optval_t;
@@ -38,18 +39,18 @@ public:
         OPEN,
         CLOSED
     };
-    enum class ProtocolType {
+    enum class ProtocolInstanceType {
         SERVER,
         CLIENT,
         SERVER_CLIENT,
         NONE
     };
-    Protocol() : host(Host::ALL_INTERFACES6), type(ProtocolType::NONE),
+    Protocol() : host(Host::ALL_INTERFACES6), type(ProtocolInstanceType::NONE),
         socket(-1), state(ProtocolState::CLOSED), totalWritten(0LL), totalRead(0LL) {;}
-    Protocol(Host otherHost, ProtocolType otherType, int otherSocket, ProtocolState otherState) :
+    Protocol(Host otherHost, ProtocolInstanceType otherType, int otherSocket, ProtocolState otherState) :
         host(otherHost), type(otherType), socket(otherSocket), state(otherState) {;}
     Protocol(int newSocket, socklen_t len, const struct sockaddr * addr, bool isIPV4) : host(len, addr, isIPV4),
-        type(ProtocolType::SERVER_CLIENT), socket(newSocket), state(ProtocolState::OPEN) {;}
+        type(ProtocolInstanceType::SERVER_CLIENT), socket(newSocket), state(ProtocolState::OPEN) {;}
     virtual ~Protocol() {;};
     virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) { UNUSED(data);
         UNUSED(allowPartialRead); UNUSED(hostState); return false; };
@@ -60,15 +61,18 @@ public:
     virtual bool listen(const Host & localHost, const int backlog) { UNUSED(localHost); UNUSED(backlog); return false; };
     virtual bool connect(const Host & localHost) { UNUSED(localHost); return false; };
     virtual void close();
-    virtual bool isServer() { return getType() == ProtocolType::SERVER; };
-    virtual bool isClient() { return getType() == ProtocolType::CLIENT || getType() == ProtocolType::SERVER_CLIENT; };
-    virtual ProtocolType getType();
+    virtual bool isServer() { return getType() == ProtocolInstanceType::SERVER; };
+    virtual bool isClient() { return getType() == ProtocolInstanceType::CLIENT || getType() == ProtocolInstanceType::SERVER_CLIENT; };
+    virtual ProtocolInstanceType getType();
     virtual std::unique_ptr<Protocol> waitForNewConnection() { return std::unique_ptr<Protocol>(new Protocol()); };
     virtual long long getBytesRead() const noexcept { return totalRead; };
     virtual long long getBytesWritten() const noexcept { return totalWritten; };
+    virtual const Host & getHost() const noexcept { return host; };
+    
+    virtual nlohmann::json toJson() const noexcept;
 protected:
     Host host;
-    ProtocolType type;
+    ProtocolInstanceType type;
     std::mutex lock;
     int socket;
     ProtocolState state;

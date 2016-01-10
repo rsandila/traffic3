@@ -30,3 +30,5 @@ enum class ContentManagerType {
 };
 
 ContentManagerType convertStringToContentManagerType(const std::string & name);
+
+const std::string convertContentManagerTypeToString(const ContentManagerType type);

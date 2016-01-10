@@ -20,6 +20,7 @@
 
 #include "contentmanagertype.h"
 #include "lib/common.h"
+#include "json.hpp"
 
 // place holder class, don't derive from this one, derive from ContentManagerBase
 class ContentManager {
@@ -53,6 +54,9 @@ public:
     }
     virtual long long getBytesWritten() const noexcept {
         return 0LL;
+    }
+    virtual nlohmann::json toJson() const noexcept {
+        return nlohmann::json();
     }
 private:
     ContentManager(const ContentManager &) = delete;

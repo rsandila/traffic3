@@ -42,6 +42,7 @@ public:
     virtual ContentManagerType getType() const noexcept override = 0;
     virtual long long getBytesRead() const noexcept override;
     virtual long long getBytesWritten() const noexcept override;
+    virtual nlohmann::json toJson() const noexcept override;
 protected:
     void ServerWorker() noexcept;
     void ClientWorker() noexcept;

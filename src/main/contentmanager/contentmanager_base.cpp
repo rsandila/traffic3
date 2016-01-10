@@ -178,3 +178,18 @@ long long ContentManagerBase::getBytesWritten() const noexcept {
         return 0LL;
     }
 }
+            
+nlohmann::json ContentManagerBase::toJson() const noexcept {
+    nlohmann::json returnValue;
+    
+    returnValue["protocol"] = protocol->toJson();
+    returnValue["min"] = minimum;
+    returnValue["max"] = maximum;
+    // TODO - maybe a good idea to convert to atomic_flag
+    returnValue["started"] = (bool)started;
+    returnValue["running"] = (bool)running;
+    returnValue["exitBeforeState"] = (bool)doExitBeforeStart;
+    returnValue["commonHeaders"] = headerHandler.toJson();
+    
+    return std::move(returnValue);
+}

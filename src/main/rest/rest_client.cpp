@@ -20,6 +20,8 @@
 #include "lib/common.h"
 #include "lib/commonheaders.h"
 #include "rest_client.h"
+#include "html_return.h"
+#include "json.hpp"
 
 RestClient::RestClient(const std::string & uriPattern, RestState & _state) : uriBase(uriPattern), state(_state) {
 }
@@ -61,7 +63,6 @@ std::vector<char> RestClient::handleCreateClient(const RestRequest & request,
                                                  const std::vector<char> & body) const noexcept {
     UNUSED(headers);
     UNUSED(body);
-    std::vector<char> returnValue;
     
     unsigned id = std::stoul(request.getParamWithDefault("id", "0"));
     std::string protocol = request.getParamWithDefault("protocol", "tcp4");
@@ -83,12 +84,15 @@ std::vector<char> RestClient::handleCreateClient(const RestRequest & request,
     ContentManagerType contentManagerType = convertStringToContentManagerType(cm_type);
     ContentManagerFactory contentManagerFactory(contentManagerType, commonHeaders, contentManagerCustomizer);
     
+    nlohmann::json returnValue;
     if (state.startClient(id, count, protocolFactory, contentManagerFactory, host)) {
-        // TODO - return success
+        // return success
+        returnValue["result"] = std::string("Ok");
     } else {
-        // TODO - return failure
+        // return failure
+        returnValue["result"] = std::string("Failed");
     }
-    return returnValue;
+    return std::move(returnJsonPage(200, "OK", returnValue.dump()));
 }
 
 std::vector<char> RestClient::handleStopClient(const RestRequest & request,
@@ -96,13 +100,15 @@ std::vector<char> RestClient::handleStopClient(const RestRequest & request,
                                                const std::vector<char> & body) const noexcept {
     UNUSED(headers);
     UNUSED(body);
-    std::vector<char> returnValue;
+    nlohmann::json returnValue;
     // TODO
     unsigned id = std::stoul(request.getParam("id"));
     if (state.stopClient(id)) {
-        // TODO return success
+        // return success
+        returnValue["result"] = std::string("Ok");
     } else {
-        // TODO return error
+        // return error
+        returnValue["result"] = std::string("Failed");
     }
-    return returnValue;
+    return std::move(returnJsonPage(200, "OK", returnValue.dump()));;
 }

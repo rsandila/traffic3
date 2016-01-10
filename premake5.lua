@@ -29,16 +29,19 @@ workspace "traffic3"
 project "common"
 	kind "StaticLib"
 	language "C++"
+  includedirs { "%{cfg.basedir}/3rdparty/json/src" }
   files { "src/main/lib/**.h", "src/main/lib/**.cpp" }
 
 project "protocol"
   kind "StaticLib"
   language "C++"
+  includedirs { "%{cfg.basedir}/3rdparty/json/src" }
   files { "src/main/protocol/**.h", "src/main/protocol/**.cpp" }
 
 project "contentmanager"
   kind "StaticLib"
   language "C++"
+  includedirs { "%{cfg.basedir}/3rdparty/json/src" }
   files { "src/main/contentmanager/**.h", "src/main/contentmanager/**.cpp" }
 
 project "rest"
@@ -52,7 +55,8 @@ project "traffic3"
 	links { "common", "rest", "contentmanager", "protocol" }
 	language "C++"
   includedirs { "%{cfg.basedir}/src/main", "%{cfg.basedir}/3rdparty/easyloggingpp/src",
-    "%{cfg.basedir}/3rdparty/cmdline", "%{cfg.basedir}/src/main/rest" }
+    "%{cfg.basedir}/3rdparty/cmdline", "%{cfg.basedir}/src/main/rest",
+    "%{cfg.basedir}/3rdparty/json/src" }
 	files { "src/main/console/**.h", "src/main/console/**.cpp" }
 
 project "traffic3_test"
@@ -60,5 +64,6 @@ project "traffic3_test"
   links { "common", "protocol", "rest", "contentmanager" }
 	language "C++"
   includedirs { "%{cfg.basedir}/src/main", "%{cfg.basedir}/3rdparty/Catch/single_include",
-    "%{cfg.basedir}/3rdparty/hippomocks/HippoMocks", "%{cfg.basedir}/3rdparty/easyloggingpp/src" }
+    "%{cfg.basedir}/3rdparty/hippomocks/HippoMocks", "%{cfg.basedir}/3rdparty/easyloggingpp/src",
+    "%{cfg.basedir}/3rdparty/json/src" }
 	files { "src/test/lib/**.h", "src/test/lib/**.cpp", "src/test/rest/**.cpp", "src/test/rest/**.h" }

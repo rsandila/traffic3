@@ -84,3 +84,14 @@ long long Server::getNumBytesWritten() const noexcept {
     return total;
 }
 
+nlohmann::json Server::toJson() const noexcept {
+    nlohmann::json returnValue;
+    returnValue["numListeners"] = listeners.size();
+    
+    std::vector<nlohmann::json> listenersJson(listeners.size());
+    for (const auto & listener: listeners) {
+        listenersJson.push_back(listener->toJson());
+    }
+    returnValue["listeners"] = listenersJson;
+    return std::move(returnValue);
+}

@@ -92,12 +92,12 @@ void Protocol::close() {
 #endif
         socket = 0;
         host = Host::ALL_INTERFACES6;
-        type = ProtocolType::NONE;
+        type = ProtocolInstanceType::NONE;
         state = ProtocolState::CLOSED;
     }
 }
 
-Protocol::ProtocolType Protocol::getType() {
+Protocol::ProtocolInstanceType Protocol::getType() {
     std::unique_lock<std::mutex> lck(lock);
     return type;
 }
@@ -107,5 +107,43 @@ Protocol::ProtocolState Protocol::getState() {
     return state;
 }
 
-
+nlohmann::json Protocol::toJson() const noexcept {
+    nlohmann::json returnValue;
+    
+    returnValue["host"] = host.toJson();
+    switch (type) {
+        case ProtocolInstanceType::SERVER:
+            returnValue["type"] = "Server";
+            break;
+        case ProtocolInstanceType::CLIENT:
+            returnValue["type"] = "Client";
+            break;
+        case ProtocolInstanceType::SERVER_CLIENT:
+            returnValue["type"] = "ServerClient";
+            break;
+        case ProtocolInstanceType::NONE:
+            returnValue["type"] = "None";
+            break;
+    }
+    returnValue["socket"] = socket;
+    returnValue["numWritten"] = totalWritten;
+    returnValue["numRead"] = totalRead;
+    
+    switch (state) {
+        case ProtocolState::READ_READY:
+            returnValue["state"] = "ReadReady";
+            break;
+        case ProtocolState::WRITE_READY:
+            returnValue["state"] = "WriteReady";
+            break;
+        case ProtocolState::OPEN:
+            returnValue["state"] = "Open";
+            break;
+        case ProtocolState::CLOSED:
+            returnValue["state"] = "Closed";
+            break;
+    }
+    
+    return std::move(returnValue);
+}
 

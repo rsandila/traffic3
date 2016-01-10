@@ -28,6 +28,7 @@
 #include "contentmanager/contentmanagertype.h"
 #include "contentmanager/contentmanager_customizer.h"
 #include "rest/contentmanager_headers.h"
+#include "json.hpp"
 
 class ContentManagerFactory {
 public:
@@ -52,6 +53,17 @@ public:
                 return std::unique_ptr<ContentManager>(new ContentManager());
         }
     };
+    
+    virtual nlohmann::json toJson() const noexcept {
+        nlohmann::json returnValue;
+        
+        // TODO
+        returnValue["headerHandler"] = headerHandler.toJson();
+        returnValue["customizer"] = customizerHandler->toJson();
+        returnValue["type"] = convertContentManagerTypeToString(type);
+        
+        return std::move(returnValue);
+    }
 protected:
     virtual std::unique_ptr<ContentManager> withCustomizations(std::unique_ptr<ContentManager> contentManager) const {
         if (contentManager.get() != nullptr && customizerHandler.get() != nullptr) {

@@ -47,7 +47,7 @@ std::unique_ptr<Protocol> ProtocolTCP6::waitForNewConnection() {
     struct sockaddr_in6 addr;
     socklen_t addrlen=sizeof(addr);
     std::unique_lock<std::mutex> lck(lock);
-    if (state == ProtocolState::CLOSED || type != ProtocolType::SERVER) {
+    if (state == ProtocolState::CLOSED || type != ProtocolInstanceType::SERVER) {
         return std::unique_ptr<Protocol>(nullptr);
     }
     int newSocket=::accept(socket, (sockaddr *)&addr, &addrlen );

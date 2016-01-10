@@ -57,7 +57,7 @@ bool ProtocolUDP::read(std::vector<char> & data, bool allowPartialRead, Host & h
 		data.resize(numRead);
         totalRead += numRead;
 	}
-	if (type == ProtocolType::CLIENT) {
+	if (type == ProtocolInstanceType::CLIENT) {
 		hostState = host;
 	} else {
         hostState = Host(addr_len, (struct sockaddr *)&addr,
@@ -93,14 +93,14 @@ ProtocolUDP::ProtocolUDP(int socket, socklen_t len, const struct sockaddr * addr
 ProtocolUDP::ProtocolUDP(ProtocolUDP && other) : Protocol(other.host, other.type, other.socket, other.state) {
 	other.socket = -1;
 	other.host = Host::ALL_INTERFACES6;
-	other.type = ProtocolType::NONE;
+	other.type = ProtocolInstanceType::NONE;
 	other.state = ProtocolState::CLOSED;
 }
 
 bool ProtocolUDP::listen(const Host & localHost, const int backlog) {
     UNUSED(backlog);
     std::unique_lock<std::mutex> lck(lock);
-    if (state != ProtocolState::CLOSED || type != ProtocolType::NONE) {
+    if (state != ProtocolState::CLOSED || type != ProtocolInstanceType::NONE) {
         return false;
     }
     this->host = localHost;
@@ -112,7 +112,7 @@ bool ProtocolUDP::listen(const Host & localHost, const int backlog) {
     optval_t optval = 1;
     setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
     if (::bind(socket, localHost.getPreferredSockAddress(), localHost.getPreferedSockAddressLen()) == 0) {
-        type = ProtocolType::SERVER;
+        type = ProtocolInstanceType::SERVER;
         state = ProtocolState::OPEN;
         return true;
     }
@@ -121,7 +121,7 @@ bool ProtocolUDP::listen(const Host & localHost, const int backlog) {
 
 bool ProtocolUDP::connect(const Host & localHost) {
     std::unique_lock<std::mutex> lck(lock);
-    if (state != ProtocolState::CLOSED || type != ProtocolType::NONE) {
+    if (state != ProtocolState::CLOSED || type != ProtocolInstanceType::NONE) {
         return false;
     }
     this->host = localHost;
@@ -144,7 +144,7 @@ bool ProtocolUDP::connect(const Host & localHost) {
 #endif
 		return false;
 	}
-	type = ProtocolType::CLIENT;
+	type = ProtocolInstanceType::CLIENT;
     state = ProtocolState::OPEN;
     return true;
 }

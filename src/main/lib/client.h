@@ -23,6 +23,7 @@
 #include "protocol/protocolfactory.h"
 #include "contentmanager/contentmanagerfactory.h"
 #include "host.h"
+#include "json.hpp"
 
 class Client {
 public:
@@ -32,6 +33,7 @@ public:
     int getNumClients() noexcept;
     long long getNumBytesRead() const noexcept;
     long long getNumBytesWritten() const noexcept;
+    nlohmann::json toJson() const noexcept;
 protected:
 private:
     std::map<unsigned, std::vector<std::unique_ptr<ContentManager>>> workers;
