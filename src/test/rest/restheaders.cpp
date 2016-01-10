@@ -22,7 +22,7 @@
 #include "rest/restheaders.h"
 #include "lib/common.h"
 
-TEST_CASE("RestHeaders: write succeeds", "[headers]") {
+TEST_CASE("RestHeaders: write succeeds", "[headers][rest]") {
     class MockProtocol : public Protocol {
     public:
         MockProtocol() : count(0) {

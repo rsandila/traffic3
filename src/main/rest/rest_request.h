@@ -31,11 +31,12 @@ public:
     const std::string & getVersion() const noexcept;
     const std::string getParam(const std::string & name) const noexcept;
     const std::string getParamWithDefault(const std::string & name, const std::string & defaultValue) const noexcept;
+    bool hasParam(const std::string & name) const noexcept;
 protected:
     const std::string parseParamsFromUri(const std::string & uri) noexcept;
 private:
     const RestRequestType _type;
-    const std::string _uri;
     const std::string _version;
     std::map<std::string, std::string> params;
+    const std::string _uri;
 };

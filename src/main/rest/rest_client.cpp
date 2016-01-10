@@ -54,8 +54,14 @@ std::vector<char> RestClient::handleGetStatus(const RestRequest & request,
     UNUSED(headers);
     UNUSED(body);
     std::vector<char> returnValue;
-    // TODO - return the list of clients with their descriptions
-    return returnValue;
+    
+    if (request.hasParam("id")) {
+        // return just the stats for the specific client
+        return returnJsonPage(200, "OK", state.getClientJsonForId(std::stoul(request.getParam("id"))).dump());
+    } else {
+        // return stats for all the clients
+        return returnJsonPage(200, "OK", state.getClientJson().dump());
+    }
 }
 
 std::vector<char> RestClient::handleCreateClient(const RestRequest & request,

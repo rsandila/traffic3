@@ -85,6 +85,8 @@ long long Client::getNumBytesWritten() const noexcept {
 nlohmann::json Client::toJson() const noexcept {
     nlohmann::json returnValue;
     
+    returnValue["numClients"] = workers.size();
+    
     for (const auto & it: workers) {
         std::vector<nlohmann::json> returnArray;
         
@@ -94,4 +96,19 @@ nlohmann::json Client::toJson() const noexcept {
         returnValue[it.first] = returnArray;
     }
     return std::move(returnValue);
+}
+
+nlohmann::json Client::toJson(unsigned id) const noexcept {
+    nlohmann::json returnValue;
+    
+    const auto & it = workers.find(id);
+    if (it != workers.end()) {
+        returnValue["found"] = true;
+        for (const auto & it2: it->second) {
+            returnValue.push_back(it2->toJson());
+        }
+    } else {
+        returnValue["found"] = false;
+    }
+    return returnValue;
 }

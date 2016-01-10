@@ -21,7 +21,7 @@
 #include "rest_request.h"
 
 RestRequest::RestRequest(const RestRequestType & type, const std::string & uri, const std::string & version) :
-    _type(type), _uri(parseParamsFromUri(uri)), _version(version) {
+    _type(type),  _version(version), params(), _uri(parseParamsFromUri(uri)) {
 }
 
 RestRequestType RestRequest::getType() const noexcept {
@@ -40,12 +40,18 @@ const std::string RestRequest::getParam(const std::string & name) const noexcept
     return getParamWithDefault(name, "");
 }
 
-const std::string RestRequest::getParamWithDefault(const std::string & name, const std::string & defaultValue) const noexcept {
+const std::string RestRequest::getParamWithDefault(const std::string & name,
+                                                   const std::string & defaultValue) const noexcept {
     auto retval = params.find(name);
     if (retval == params.end()) {
         return defaultValue;
     }
-    return retval->first;
+    return retval->second;
+}
+
+bool RestRequest::hasParam(const std::string & name) const noexcept {
+    auto retval = params.find(name);
+    return retval != params.end();
 }
 
 const std::string RestRequest::parseParamsFromUri(const std::string & uri) noexcept {
@@ -62,7 +68,7 @@ const std::string RestRequest::parseParamsFromUri(const std::string & uri) noexc
     while (std::getline(istr, param, '&')) {
         std::string name, value;
         std::istringstream istr2(param);
-        if (std::getline(istr2, name, '=') && std::getline(istr, value, '=')) {
+        if (std::getline(istr2, name, '=') && std::getline(istr2, value)) {
             params[name] = value;
         } else {
             // TODO - do we throw an exception or ignore this?

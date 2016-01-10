@@ -39,6 +39,7 @@ public:
     long long getServerNumRead() const noexcept;
     nlohmann::json getServerJson() const noexcept;
     nlohmann::json getClientJson() const noexcept;
+    nlohmann::json getClientJsonForId(unsigned id) const noexcept;
 protected:
 private:
     Client client;
