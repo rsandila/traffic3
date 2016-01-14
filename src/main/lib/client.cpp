@@ -26,7 +26,8 @@ Client::~Client() {
     }
 }
 
-bool Client::startClients(unsigned clientId, unsigned num_clients, ProtocolFactory _protocolFactory, ContentManagerFactory  _contentManagerFactory, Host _server) {
+bool Client::startClients(unsigned clientId, unsigned num_clients, ProtocolFactory _protocolFactory,
+                          ContentManagerFactory & _contentManagerFactory, Host _server) {
     std::unique_lock<std::mutex> lck(lock);
     if (workers.find(clientId) != workers.end()) {
         return false;

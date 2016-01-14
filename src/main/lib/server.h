@@ -36,6 +36,7 @@ public:
     long long getNumBytesRead() const noexcept;
     long long getNumBytesWritten() const noexcept;
     nlohmann::json toJson() const noexcept;
+    nlohmann::json toJson(unsigned id) const noexcept;
 protected:
 private:
     std::vector<std::unique_ptr<Listener>> listeners;

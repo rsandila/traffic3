@@ -16,21 +16,25 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  USA.
  */
+#pragma once
 
 #include <string>
 #include <vector>
 #include <map>
-#include <regex>
 #include "rest/rest_request_handler.h"
 #include "lib/host.h"
 #include "rest/rest_request.h"
-
-#pragma once
+#include "rest/rest_state.h"
 
 class RestServer : public RestRequestHandler {
 public:
-    RestServer();
+    RestServer(const std::string & uriPattern, RestState & _state);
     virtual std::vector<char> handleRequest(const Host & host, const RestRequest & request, const std::map<std::string, std::string> & headers, const std::vector<char> & body);
 protected:
-    std::regex uriRegex;
+    virtual std::vector<char> handleGetStatus(const RestRequest & request, const std::map<std::string, std::string> & headers, const std::vector<char> & body) const noexcept;
+    virtual std::vector<char> handleCreateServer(const RestRequest & request, const std::map<std::string, std::string> & headers, const std::vector<char> & body) const noexcept;
+    virtual std::vector<char> handleStopServer(const RestRequest & request, const std::map<std::string, std::string> & headers, const std::vector<char> & body) const noexcept;
+private:
+    std::string uriBase;
+    RestState & state;
 };

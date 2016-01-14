@@ -32,23 +32,26 @@
 
 class ContentManagerFactory {
 public:
-    ContentManagerFactory(const ContentManagerType & _type, CommonHeaders & _headerHandler,
+    ContentManagerFactory(const ContentManagerType & _type, std::unique_ptr<CommonHeaders> & _headerHandler,
                           std::shared_ptr<ContentManagerCustomizer> & customizer)
-        : type(_type), headerHandler(_headerHandler), customizerHandler(std::move(customizer)) {
+            : type(_type), headerHandler(std::move(_headerHandler)), customizerHandler(std::move(customizer)) {
     };
     virtual ~ContentManagerFactory() {;};
     virtual std::unique_ptr<ContentManager> createContentManager(std::unique_ptr<Protocol> protocol, bool isServer) {
         switch (type) {
             case ContentManagerType::RandomText:
-                return withCustomizations(std::unique_ptr<ContentManager>(new ContentManager_Random_Text(std::move(protocol), headerHandler, isServer)));
+                return withCustomizations(std::unique_ptr<ContentManager>(new ContentManager_Random_Text(std::move(protocol), *headerHandler, isServer)));
             case ContentManagerType::RandomBinary:
-                return withCustomizations(std::unique_ptr<ContentManager>(new ContentManager_Random_Binary(std::move(protocol), headerHandler, isServer)));
+                return withCustomizations(std::unique_ptr<ContentManager>(new ContentManager_Random_Binary(std::move(protocol), *headerHandler, isServer)));
             case ContentManagerType::Fixed:
-                return withCustomizations(std::unique_ptr<ContentManager>(new ContentManager_Fixed(std::move(protocol), headerHandler, isServer)));
+                return withCustomizations(std::unique_ptr<ContentManager>(new ContentManager_Fixed(std::move(protocol),
+                       *headerHandler, isServer)));
             case ContentManagerType::Echo:
-                return withCustomizations(std::unique_ptr<ContentManager>(new ContentManager_Echo(std::move(protocol), headerHandler, isServer)));
+                return withCustomizations(std::unique_ptr<ContentManager>(new ContentManager_Echo(std::move(protocol),
+                        *headerHandler, isServer)));
             case ContentManagerType::RestHeaders:
-                return withCustomizations(std::unique_ptr<ContentManager>(new ContentManager_Headers(std::move(protocol), headerHandler, isServer)));
+                return withCustomizations(std::unique_ptr<ContentManager>(new ContentManager_Headers(std::move(protocol),
+                        *headerHandler, isServer)));
             default:
                 return std::unique_ptr<ContentManager>(new ContentManager());
         }
@@ -57,8 +60,7 @@ public:
     virtual nlohmann::json toJson() const noexcept {
         nlohmann::json returnValue;
         
-        // TODO
-        returnValue["headerHandler"] = headerHandler.toJson();
+        returnValue["headerHandler"] = headerHandler->toJson();
         returnValue["customizer"] = customizerHandler->toJson();
         returnValue["type"] = convertContentManagerTypeToString(type);
         
@@ -73,6 +75,6 @@ protected:
     }
 private:
     ContentManagerType type;
-    CommonHeaders & headerHandler;
+    std::unique_ptr<CommonHeaders> headerHandler;
     std::shared_ptr<ContentManagerCustomizer> customizerHandler;
 };

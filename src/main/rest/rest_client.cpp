@@ -84,7 +84,7 @@ std::vector<char> RestClient::handleCreateClient(const RestRequest & request,
     const Host::ProtocolPreference preference = convertFromProtocolTypeToPreference(protocolType);
     Host host(hostName, port, preference);
     ProtocolFactory protocolFactory(protocolType);// TODO map protocol string to ProtocolType
-    CommonHeaders commonHeaders;
+    std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
     std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(minimum, maximum));
     // convert cm_type string to contentManagerType
     ContentManagerType contentManagerType = convertStringToContentManagerType(cm_type);
@@ -107,7 +107,7 @@ std::vector<char> RestClient::handleStopClient(const RestRequest & request,
     UNUSED(headers);
     UNUSED(body);
     nlohmann::json returnValue;
-    // TODO
+
     unsigned id = std::stoul(request.getParam("id"));
     if (state.stopClient(id)) {
         // return success

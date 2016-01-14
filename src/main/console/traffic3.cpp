@@ -33,6 +33,7 @@
 #include "rest/rest_status.h"
 #include "rest/rest_state.h"
 #include "rest/rest_client.h"
+#include "rest/rest_server.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -47,17 +48,10 @@ static std::map<std::string, ModeType> modeMap {
     {"server", ModeType::ServerMode},
     {"client", ModeType::ClientMode},
     {"rest", ModeType::RestMode} };
-// TODO - convert the ProtocolType instead of std::string 
-/*static std::map<std::string, Host::ProtocolPreference> protocolPreferenceMap {
-    {"tcp4", Host::ProtocolPreference::IPV4},
-    {"tcp6", Host::ProtocolPreference::IPV6},
-    {"udp4", Host::ProtocolPreference::IPV4},
-    {"udp6", Host::ProtocolPreference::IPV6} };
-*/
 
 
 int beServer(const cmdline::parser & options) {
-    CommonHeaders headers;
+    std::unique_ptr<CommonHeaders> headers(new CommonHeaders());
     ProtocolFactory protocolFactory(convertStringToProtocolType(options.get<std::string>("protocol")));
     std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(
                                                     options.get<unsigned>("min"), options.get<unsigned>("max")));
@@ -76,7 +70,7 @@ int beServer(const cmdline::parser & options) {
 
 int beClient(const cmdline::parser & options) {
     ProtocolFactory protocolFactory(convertStringToProtocolType(options.get<std::string>("protocol")));
-    CommonHeaders headers;
+    std::unique_ptr<CommonHeaders> headers(new CommonHeaders());
     std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(
                                                         options.get<unsigned>("min"), options.get<unsigned>("max")));
     ContentManagerFactory contentManagerFactory(convertStringToContentManagerType(options.get<std::string>("type")), headers, contentManagerCustomizer);
@@ -94,13 +88,14 @@ int beClient(const cmdline::parser & options) {
 
 int beRest(const cmdline::parser & options) {
     ProtocolFactory protocolFactory(convertStringToProtocolType(options.get<std::string>("protocol")));
-    RestHeaders headers;
+    std::unique_ptr<CommonHeaders> headers(new RestHeaders());
     RestState state;
     
     std::vector<std::shared_ptr<RestRequestHandler>> restRequestHandlers;
     std::vector<std::shared_ptr<ErrorPageHandler>> errorPageHandlers;
     errorPageHandlers.push_back(std::shared_ptr<ErrorPageHandler>(new ErrorPageHandler()));
     // TODO - set up handlers
+    restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new RestServer("/server", state)));
     restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new RestClient("/client", state)));
     restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new RestStatus("/status", state)));
     restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new StaticRestRequestHandler(options.get<std::string>("rest_content"), "/(.*)")));

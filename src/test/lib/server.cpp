@@ -69,6 +69,7 @@ TEST_CASE("Server", "[protocol][server]") {
                 return ContentManagerType::None;
             }
         };
+        static std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
             MockContentManagerFactory(std::shared_ptr<ContentManagerCustomizer> & contentManagerCustomizer) : ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer) {;};
@@ -77,7 +78,6 @@ TEST_CASE("Server", "[protocol][server]") {
                 UNUSED(isServer);
                 return std::unique_ptr<ContentManager>(new MockContentManager());
             };
-            CommonHeaders commonHeaders;
         };
         MockProtocolFactory mockProtocolFactory;
         std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));

@@ -95,3 +95,17 @@ nlohmann::json Server::toJson() const noexcept {
     returnValue["listeners"] = listenersJson;
     return std::move(returnValue);
 }
+
+nlohmann::json Server::toJson(unsigned id) const noexcept {
+    nlohmann::json returnValue;
+    
+    for (const auto & listener: listeners) {
+        if (listener->getPortId() == id) {
+            returnValue["found"] = true;
+            returnValue["server"] = listener->toJson();
+            return returnValue;
+        }
+    }
+    returnValue["found"] = false;
+    return returnValue;
+}

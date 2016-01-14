@@ -64,6 +64,10 @@ nlohmann::json RestState::getServerJson() const noexcept {
     return std::move(server.toJson());
 }
 
+nlohmann::json RestState::getServerJsonForId(unsigned id) const noexcept {
+    return std::move(server.toJson(id));
+}
+
 nlohmann::json RestState::getClientJson() const noexcept {
     return std::move(client.toJson());
 }
