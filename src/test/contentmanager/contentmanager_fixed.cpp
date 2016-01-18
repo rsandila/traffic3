@@ -108,3 +108,11 @@ TEST_CASE("Client: Test generating fixed buffer", "[content][client]") {
         REQUIRE(fixedReadOrder > fixedWriteOrder);
     }
 }
+
+/*
+ TODO add test for
+ virtual nlohmann::json toJson() const noexcept override;
+ virtual long long getBytesRead() const noexcept override;
+ virtual long long getBytesWritten() const noexcept override;
+ */
+

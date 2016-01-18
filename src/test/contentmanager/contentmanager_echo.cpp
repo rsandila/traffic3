@@ -111,3 +111,10 @@ TEST_CASE("Client: Test generating echo buffer", "[content][client]") {
         REQUIRE(echoReadOrder > echoWriteOrder);
     }
 }
+
+/*
+ TODO add test for    
+    virtual nlohmann::json toJson() const noexcept override;
+    virtual long long getBytesRead() const noexcept override;
+    virtual long long getBytesWritten() const noexcept override;
+*/

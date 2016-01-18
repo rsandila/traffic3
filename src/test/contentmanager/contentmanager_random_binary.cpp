@@ -109,3 +109,10 @@ TEST_CASE("Client: Test random generating random binary", "[content][client]") {
         REQUIRE(randomBinaryReadOrder > randomBinaryWriteOrder);
     }
 }
+
+/*
+ TODO add test for
+ virtual nlohmann::json toJson() const noexcept override;
+ virtual long long getBytesRead() const noexcept override;
+ virtual long long getBytesWritten() const noexcept override;
+ */
