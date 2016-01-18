@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
  USA.
  */
-// Tests for protocol_udp6.cpp class
+// Tests for protocol_udp4.cpp class
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif
@@ -24,116 +24,113 @@
 #include <thread>
 #include "catch.hpp"
 #include "hippomocks.h"
-#include "protocol/protocol_udp6.h"
+#include "protocol/protocol_udp4.h"
 #include "lib/common.h"
 
-TEST_CASE("IPV6: UDP read test", "[ipv6][protocol]") {
+TEST_CASE("IPV4: UDP read test", "[ipv4][protocol]") {
     SECTION("Test read with closed socket") {
         MockRepository mocks;
-        ProtocolUDP6 protocol;
+        ProtocolUDP4 protocol;
         mocks.NeverCallFunc(::recvfrom);
         std::vector<char> data;
         data.resize(1024);
-        Host hostState = Host::ALL_INTERFACES6;
+        Host hostState = Host::ALL_INTERFACES4;
         REQUIRE_FALSE(protocol.read(data, false, hostState));
         REQUIRE(data.size() == 1024);
     }
     SECTION("Test read with connected socket") {
         MockRepository mocks;
-        ProtocolUDP6 protocol;
+        ProtocolUDP4 protocol;
         mocks.ExpectCallFunc(::bind).Return(0);
-        REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
+        REQUIRE(protocol.connect(Host::ALL_INTERFACES4));
+        // mocks.ExpectCallFunc(::recv).Return(10);
         mocks.ExpectCallFunc(::recvfrom).Return(10);
-        mocks.NeverCallFunc(::recv);
         std::vector<char> data;
         data.resize(1024);
-        Host hostState = Host::ALL_INTERFACES6;
+        Host hostState = Host::ALL_INTERFACES4;
         REQUIRE(protocol.read(data, true, hostState));
         REQUIRE(data.size() == 10);
     }
     SECTION("Test read failure mode 1 with connected socket") {
         MockRepository mocks;
-        ProtocolUDP6 protocol;
+        ProtocolUDP4 protocol;
         mocks.ExpectCallFunc(::bind).Return(0);
-		REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
+        REQUIRE(protocol.connect(Host::ALL_INTERFACES4));
         mocks.ExpectCallFunc(::recvfrom).Return(0);
-        mocks.NeverCallFunc(::recv);
+        // mocks.NeverCallFunc(::recvfrom);
         std::vector<char> data;
         data.resize(1024);
-        Host hostState = Host::ALL_INTERFACES6;
+        Host hostState = Host::ALL_INTERFACES4;
         REQUIRE_FALSE(protocol.read(data, true, hostState));
         REQUIRE(data.size() == 1024);
     }
     SECTION("Test read failure mode 2 with connected socket") {
         MockRepository mocks;
-        ProtocolUDP6 protocol;
+        ProtocolUDP4 protocol;
         mocks.ExpectCallFunc(::bind).Return(0);
-		REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
+        REQUIRE(protocol.connect(Host::ALL_INTERFACES4));
         mocks.ExpectCallFunc(::recvfrom).Return(-1);
-        mocks.NeverCallFunc(::recv);
+        // mocks.NeverCallFunc(::recvfrom);
         std::vector<char> data;
         data.resize(1024);
-        Host hostState = Host::ALL_INTERFACES6;
+        Host hostState = Host::ALL_INTERFACES4;
         REQUIRE_FALSE(protocol.read(data, true, hostState));
         REQUIRE(data.size() == 1024);
     }
     
 }
 
-TEST_CASE("IPV6: UDP write test", "[ipv6][protocol]") {
+TEST_CASE("IPV4: UDP write test", "[ipv4][protocol]") {
     SECTION("Test write with closed socket") {
         MockRepository mocks;
-        ProtocolUDP6 protocol;
+        ProtocolUDP4 protocol;
         mocks.NeverCallFunc(::sendto);
         mocks.NeverCallFunc(::send);
         std::vector<char> data;
         data.resize(1024);
-        Host hostState = Host::ALL_INTERFACES6;
+        Host hostState = Host::ALL_INTERFACES4;
         REQUIRE_FALSE(protocol.write(data, hostState));
         REQUIRE(data.size() == 1024);
     }
     SECTION("Test write with connected socket") {
         MockRepository mocks;
-        ProtocolUDP6 protocol;
+        ProtocolUDP4 protocol;
         mocks.ExpectCallFunc(::bind).Return(0);
-		REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
+        REQUIRE(protocol.connect(Host::ALL_INTERFACES4));
 		mocks.ExpectCallFunc(::sendto).Return(10);
-        mocks.NeverCallFunc(::send);
-		std::vector<char> data;
+        std::vector<char> data;
         data.resize(10);
-        Host hostState = Host::ALL_INTERFACES6;
+        Host hostState = Host::ALL_INTERFACES4;
         REQUIRE(protocol.write(data, hostState));
         REQUIRE(data.size() == 10);
     }
     SECTION("Test write failure mode 1 with connected socket") {
         MockRepository mocks;
-        ProtocolUDP6 protocol;
+        ProtocolUDP4 protocol;
         mocks.ExpectCallFunc(::bind).Return(0);
-		REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
+        REQUIRE(protocol.connect(Host::ALL_INTERFACES4));
 		mocks.ExpectCallFunc(::sendto).Return(0);
-		mocks.NeverCallFunc(::send);
-		std::vector<char> data;
+        std::vector<char> data;
         data.resize(1024);
-        Host hostState = Host::ALL_INTERFACES6;
+        Host hostState = Host::ALL_INTERFACES4;
         REQUIRE_FALSE(protocol.write(data, hostState));
         REQUIRE(data.size() == 1024);
     }
     SECTION("Test write failure mode 2 with connected socket") {
         MockRepository mocks;
-        ProtocolUDP6 protocol;
+        ProtocolUDP4 protocol;
         mocks.ExpectCallFunc(::bind).Return(0);
-		REQUIRE(protocol.connect(Host::ALL_INTERFACES6));
+        REQUIRE(protocol.connect(Host::ALL_INTERFACES4));
 		mocks.ExpectCallFunc(::sendto).Return(-1);
-		mocks.NeverCallFunc(::send);
-		std::vector<char> data;
+        std::vector<char> data;
         data.resize(1024);
-        Host hostState = Host::ALL_INTERFACES6;
+        Host hostState = Host::ALL_INTERFACES4;
         REQUIRE_FALSE(protocol.write(data, hostState));
         REQUIRE(data.size() == 1024);
     }
 }
 
-TEST_CASE("IPV6: real sending, receiving of UDP data", "[ipv6][protocol]") {
+TEST_CASE("IPV4: real sending, receiving of UDP data", "[ipv4][protocol]") {
     SECTION("send/receive") {
         bool serverSuccess = false;
         bool testDone = false;
@@ -141,15 +138,15 @@ TEST_CASE("IPV6: real sending, receiving of UDP data", "[ipv6][protocol]") {
         std::vector<char> testBuffer, testBuffer2;
         testBuffer.resize(10);
         testBuffer2.resize(10);
-        ProtocolUDP6 serverProtocol;
-        Host listenHost("0:0:0:0:0:0:0:0", 10001, Host::ProtocolPreference::IPV6);
+        ProtocolUDP4 serverProtocol;
+        Host listenHost("0.0.0.0", 10001, Host::ProtocolPreference::IPV4);
         REQUIRE(serverProtocol.listen(listenHost, 10));
         memcpy(&testBuffer[0],  "0123456789", 10);
         memcpy(&testBuffer2[0], "1234567890", 10);
         std::thread serverThread([&serverProtocol, &testBuffer, &serverSuccess, &testBuffer2]() -> void {
             std::unique_ptr<Protocol> newProtocol = serverProtocol.waitForNewConnection();
             if (newProtocol.get() != nullptr && newProtocol->isClient() && newProtocol->getState() == Protocol::ProtocolState::OPEN) {
-                Host hostState = Host::ALL_INTERFACES6;
+                Host hostState = Host::ALL_INTERFACES4;
                 std::vector<char> readBuffer;
                 readBuffer.resize(1024);
                 if (newProtocol->read(readBuffer, false, hostState)) {
@@ -160,8 +157,8 @@ TEST_CASE("IPV6: real sending, receiving of UDP data", "[ipv6][protocol]") {
                 }
             }
         });
-        ProtocolUDP6 protocol;
-        Host local("::1", 10001, Host::ProtocolPreference::IPV6);
+        ProtocolUDP4 protocol;
+        Host local("127.0.0.1", 10001, Host::ProtocolPreference::IPV4);
         std::thread timeoutThread([&serverProtocol, &protocol, &testDone, &didTimeout]() -> void {
             int retry = 600;
             while (--retry > 0 && !testDone) {
@@ -175,8 +172,8 @@ TEST_CASE("IPV6: real sending, receiving of UDP data", "[ipv6][protocol]") {
         });
         REQUIRE(protocol.connect(local));
         std::vector<char> readBuffer;
-        readBuffer.resize(1024);
-        Host hostState = Host::ALL_INTERFACES6;
+        readBuffer.resize(100);
+        Host hostState = Host::ALL_INTERFACES4;
         REQUIRE(protocol.write(testBuffer2, hostState));
         REQUIRE(protocol.read(readBuffer, false, hostState));
         REQUIRE(readBuffer.size() == testBuffer.size());
@@ -189,4 +186,10 @@ TEST_CASE("IPV6: real sending, receiving of UDP data", "[ipv6][protocol]") {
         REQUIRE_FALSE(didTimeout);
     }
 }
-
+/*
+ TODO add tests for
+ virtual long long getBytesRead() const noexcept { return totalRead; };
+ virtual long long getBytesWritten() const noexcept { return totalWritten; };
+ virtual const Host & getHost() const noexcept { return host; };
+ virtual nlohmann::json toJson() const noexcept;
+ */

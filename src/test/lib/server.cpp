@@ -108,3 +108,12 @@ TEST_CASE("Server", "[protocol][server]") {
         REQUIRE(contentManagerCounterStop == 3);
     }
 }
+
+/*
+ TODO write tests for 
+ long long getNumBytesRead() const noexcept;
+ long long getNumBytesWritten() const noexcept;
+ nlohmann::json toJson() const noexcept;
+ nlohmann::json toJson(unsigned id) const noexcept;
+
+*/

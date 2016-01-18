@@ -66,4 +66,6 @@ project "traffic3_test"
   includedirs { "%{cfg.basedir}/src/main", "%{cfg.basedir}/3rdparty/Catch/single_include",
     "%{cfg.basedir}/3rdparty/hippomocks/HippoMocks", "%{cfg.basedir}/3rdparty/easyloggingpp/src",
     "%{cfg.basedir}/3rdparty/json/src" }
-	files { "src/test/lib/**.h", "src/test/lib/**.cpp", "src/test/rest/**.cpp", "src/test/rest/**.h" }
+	files { "src/test/lib/**.h", "src/test/lib/**.cpp", "src/test/rest/**.cpp", "src/test/rest/**.h",
+    "src/test/protocol/**.cpp", "src/test/protocol/**.h",
+    "src/test/contentmanager/**.cpp", "src/test/contentmanager/**.h" }

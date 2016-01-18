@@ -97,3 +97,7 @@ TEST_CASE("Validate IPV6 host constructors", "[host][ipv6]") {
         REQUIRE(memcmp(&addr->sin6_addr, expectedAddress, 16) == 0);
     }
 }
+
+// TODO - test getPrefered...
+// TODO - test toJson
+

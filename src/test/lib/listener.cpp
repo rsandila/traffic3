@@ -188,3 +188,7 @@ TEST_CASE("Listener test", "[server]") {
     }
 }
 
+// TODO - test toJSon
+// TODO - test unsigned getPortId() const noexcept;
+// TODO - test long long getBytesRead() const noexcept;
+// TODO - test long long getBytesWritten() const noexcept;
