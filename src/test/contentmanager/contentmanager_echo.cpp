@@ -52,10 +52,12 @@ public:
             memcpy(&data[0], "TRAF", 4);
             uint32_t size = htonl(8 + compareTo.size());
             memcpy(&data[4], &size, sizeof(uint32_t));
+            totalRead += data.size();
             firstRead = true;
         } else {
             REQUIRE(data.size() == compareTo.size());
             data = compareTo;
+            totalRead += data.size();
             echoDoExit = true;
         }
         return true;
@@ -67,6 +69,7 @@ public:
     virtual bool write(const std::vector<char> & data, const Host & hostState) override {
         UNUSED(hostState);
         echoLastWrite = data;
+        totalWritten += data.size();
         echoAssignOrder(echoWriteOrder);
         return true;
     }
@@ -89,6 +92,8 @@ TEST_CASE("Server: Test generating echo buffer", "[content][server]") {
         REQUIRE(echoLastWrite.size() == 20);
         REQUIRE(echoLastWrite == compareTo);
         REQUIRE(echoReadOrder < echoWriteOrder);
+        REQUIRE(28 == manager.getBytesRead());
+        REQUIRE(28 == manager.getBytesWritten());
     }
 }
 
@@ -109,12 +114,12 @@ TEST_CASE("Client: Test generating echo buffer", "[content][client]") {
         REQUIRE(echoLastWrite.size() == 20);
         REQUIRE(echoLastWrite == compareTo);
         REQUIRE(echoReadOrder > echoWriteOrder);
+        REQUIRE(28 == manager.getBytesRead());
+        REQUIRE(36 == manager.getBytesWritten());
     }
 }
 
 /*
  TODO add test for    
     virtual nlohmann::json toJson() const noexcept override;
-    virtual long long getBytesRead() const noexcept override;
-    virtual long long getBytesWritten() const noexcept override;
 */

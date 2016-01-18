@@ -17,4 +17,41 @@
  USA.
  */
 
-// TODO
+#include "catch.hpp"
+#include "contentmanager/contentmanager_customizer.h"
+#include "contentmanager/contentmanager.h"
+#include "lib/common.h"
+
+TEST_CASE("Content Manager Customizer", "[content][customizer]") {
+    
+    class MockContentManager: public ContentManager {
+    public:
+        MockContentManager() : maximum(0), minimum(0) {
+        }
+        virtual void setMinimumSize(unsigned long size) noexcept override {
+            minimum = size;
+        };
+        virtual void setMaximumSize(unsigned long size) noexcept override {
+            maximum = size;
+        };
+        unsigned long maximum;
+        unsigned long minimum;
+    };
+    SECTION("Good") {
+        ContentManagerCustomizer custom1(10, 100);
+        std::unique_ptr<ContentManager> mockContentManager(new MockContentManager());
+        std::unique_ptr<ContentManager> returnValue = custom1.customize(std::move(mockContentManager));
+        
+        REQUIRE(mockContentManager.get() == nullptr);
+        REQUIRE(returnValue.get() != nullptr);
+        MockContentManager * returnValueCast = dynamic_cast<MockContentManager *>(returnValue.get());
+        REQUIRE(returnValueCast != nullptr);
+        REQUIRE(returnValueCast->minimum == 10);
+        REQUIRE(returnValueCast->maximum == 100);
+        
+        nlohmann::json json = custom1.toJson();
+        REQUIRE(10 == json["min"].get<unsigned>());
+        REQUIRE(100 == json["max"].get<unsigned>());
+        REQUIRE("ContentManagerCustomizer" == json["type"].get<std::string>());
+    }
+}
