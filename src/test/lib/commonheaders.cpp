@@ -230,6 +230,12 @@ TEST_CASE("CommonHeaders", "[headers]") {
         data[2] = 'C';
         data[3] = 'D';
         REQUIRE(headers.write(mockProtocol, data, host));
+        
+        nlohmann::json json = headers.toJson();
+        REQUIRE(json.size() == 2);
+        
+        REQUIRE(json["version"].get<unsigned>() == 2);
+        REQUIRE(json["type"].get<std::string>() == "commonHeaders");
     }
     SECTION("Write success once") {
         class MockProtocol : public Protocol {
@@ -314,6 +320,4 @@ TEST_CASE("CommonHeaders", "[headers]") {
         REQUIRE_FALSE(headers.write(mockProtocol, data, host));
     }
 }
-
-// TODO test toJson
 
