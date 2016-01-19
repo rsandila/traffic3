@@ -130,7 +130,7 @@ nlohmann::json Listener::toJson() const noexcept {
     returnValue["contentManagerFactory"] = _contentManagerFactory->toJson();
     returnValue["numContentManagers"] = contentManagers.size();
     
-    std::vector<nlohmann::json> contentManagersJson(contentManagers.size());
+    std::vector<nlohmann::json> contentManagersJson;
     for (const auto & contentManager: contentManagers) {
         contentManagersJson.push_back(contentManager->toJson());
     }

@@ -88,7 +88,7 @@ nlohmann::json Server::toJson() const noexcept {
     nlohmann::json returnValue;
     returnValue["numListeners"] = listeners.size();
     
-    std::vector<nlohmann::json> listenersJson(listeners.size());
+    std::vector<nlohmann::json> listenersJson;
     for (const auto & listener: listeners) {
         listenersJson.push_back(listener->toJson());
     }
@@ -102,7 +102,7 @@ nlohmann::json Server::toJson(unsigned id) const noexcept {
     for (const auto & listener: listeners) {
         if (listener->getPortId() == id) {
             returnValue["found"] = true;
-            returnValue["server"] = listener->toJson();
+            returnValue["listener"] = listener->toJson();
             return returnValue;
         }
     }

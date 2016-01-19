@@ -103,17 +103,28 @@ TEST_CASE("Server", "[protocol][server]") {
             REQUIRE(testServer.stopPort(1));
             REQUIRE(testServer.getPorts().size() == 1);
             REQUIRE(testServer.getPorts()[0] == 2);
+            
+            REQUIRE(testServer.getNumBytesRead() == 0);
+            REQUIRE(testServer.getNumBytesWritten() == 0);
+            REQUIRE(testServer.getNumServers() == 1);
+            
+            nlohmann::json json = testServer.toJson();
+            REQUIRE(json.size() == 2);
+            
+            REQUIRE(json["numListeners"].get<unsigned>() == 1);
+            REQUIRE(json["listeners"].is_array());
+            REQUIRE(json["listeners"].size() == 1);
+            
+            nlohmann::json json2 = testServer.toJson(2);
+            REQUIRE(json2.size() == 2);
+            REQUIRE(json2["found"].get<bool>() == true);
+            REQUIRE(json2["listener"].is_object());
+            
+            nlohmann::json json3 = testServer.toJson(1);
+            REQUIRE(json3.size() == 1);
+            REQUIRE(json3["found"].get<bool>() == false);
         }
         REQUIRE(contentManagerCounterStart == 3);
         REQUIRE(contentManagerCounterStop == 3);
     }
 }
-
-/*
- TODO write tests for 
- long long getNumBytesRead() const noexcept;
- long long getNumBytesWritten() const noexcept;
- nlohmann::json toJson() const noexcept;
- nlohmann::json toJson(unsigned id) const noexcept;
-
-*/

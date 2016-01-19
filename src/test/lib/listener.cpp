@@ -182,13 +182,23 @@ TEST_CASE("Listener test", "[server]") {
             Listener listener(1, Host::ALL_INTERFACES4, mockProtocolFactory, contentManagerFactory);
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
             REQUIRE_FALSE(listener.inErrorState());
+            REQUIRE(listener.getPortId() == 1);
+            REQUIRE(listener.getBytesWritten() == 0);
+            REQUIRE(listener.getBytesRead() == 0);
+            
+            nlohmann::json json = listener.toJson();
+            REQUIRE(json.size() == 7);
+            REQUIRE(json["id"].get<unsigned>() == 1);
+            REQUIRE(json["host"].is_object());
+            REQUIRE(json["protocol"].is_object());
+            REQUIRE(json["contentManagerFactory"].is_object());
+            REQUIRE(json["numContentManagers"].get<unsigned>() == 1);
+            REQUIRE(json["contentManagers"].is_array());
+            REQUIRE(json["contentManagers"].size() == 1);
+            REQUIRE(json["errorState"].get<bool>() == false);
         }
         REQUIRE(startCalled == 1);
         REQUIRE(stopCalled == 1);
     }
 }
 
-// TODO - test toJSon
-// TODO - test unsigned getPortId() const noexcept;
-// TODO - test long long getBytesRead() const noexcept;
-// TODO - test long long getBytesWritten() const noexcept;

@@ -138,8 +138,3 @@ TEST_CASE("Client: Test generating echo buffer", "[content][client]") {
         REQUIRE(json["commonHeaders"].is_object() == true);
     }
 }
-
-/*
- TODO add test for    
-    virtual nlohmann::json toJson() const noexcept override;
-*/
