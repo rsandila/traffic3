@@ -50,6 +50,7 @@ TEST_CASE("Content Manager Customizer", "[content][customizer]") {
         REQUIRE(returnValueCast->maximum == 100);
         
         nlohmann::json json = custom1.toJson();
+        REQUIRE(json.size() == 3);
         REQUIRE(10 == json["min"].get<unsigned>());
         REQUIRE(100 == json["max"].get<unsigned>());
         REQUIRE("ContentManagerCustomizer" == json["type"].get<std::string>());

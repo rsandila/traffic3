@@ -94,6 +94,16 @@ TEST_CASE("Server: Test generating echo buffer", "[content][server]") {
         REQUIRE(echoReadOrder < echoWriteOrder);
         REQUIRE(28 == manager.getBytesRead());
         REQUIRE(28 == manager.getBytesWritten());
+        
+        nlohmann::json json = manager.toJson();
+        REQUIRE(json.size() == 7);
+        REQUIRE(json["min"].get<unsigned>() >= 0);
+        REQUIRE(json["max"].get<unsigned>() >= 0);
+        REQUIRE(json["started"].get<bool>() == true);
+        REQUIRE(json["running"].get<bool>() == true);
+        REQUIRE(json["exitBeforeState"].get<bool>() == false);
+        REQUIRE(json["protocol"].is_object() == true);
+        REQUIRE(json["commonHeaders"].is_object() == true);
     }
 }
 
@@ -116,6 +126,16 @@ TEST_CASE("Client: Test generating echo buffer", "[content][client]") {
         REQUIRE(echoReadOrder > echoWriteOrder);
         REQUIRE(28 == manager.getBytesRead());
         REQUIRE(36 == manager.getBytesWritten());
+
+        nlohmann::json json = manager.toJson();
+        REQUIRE(json.size() == 7);
+        REQUIRE(json["min"].get<unsigned>() >= 0);
+        REQUIRE(json["max"].get<unsigned>() >= 0);
+        REQUIRE(json["started"].get<bool>() == true);
+        REQUIRE(json["running"].get<bool>() == true);
+        REQUIRE(json["exitBeforeState"].get<bool>() == false);
+        REQUIRE(json["protocol"].is_object() == true);
+        REQUIRE(json["commonHeaders"].is_object() == true);
     }
 }
 

@@ -17,4 +17,38 @@
  USA.
  */
 
-// TODO
+#include "catch.hpp"
+#include "contentmanager/contentmanagertype.h"
+
+TEST_CASE("Testing ContentManagerType: convertStringToContentManagerType", "[content]") {
+    SECTION("randomtext") {
+        REQUIRE(convertStringToContentManagerType("randomtext") == ContentManagerType::RandomText);
+    }
+    SECTION("randombinary") {
+        REQUIRE(convertStringToContentManagerType("randombinary") == ContentManagerType::RandomBinary);
+    }
+    SECTION("fixed") {
+        REQUIRE(convertStringToContentManagerType("fixed") == ContentManagerType::Fixed);
+    }
+    SECTION("echo") {
+        REQUIRE(convertStringToContentManagerType("echo") == ContentManagerType::Echo);
+    }
+    SECTION("unknown") {
+        REQUIRE(convertStringToContentManagerType("unknown") == ContentManagerType::Echo);
+    }
+}
+
+TEST_CASE("Testing ContentManagerType: convertContentManagerTypeToString", "[content]") {
+    SECTION("randomtext") {
+        REQUIRE("randomtext" == convertContentManagerTypeToString(ContentManagerType::RandomText));
+    }
+    SECTION("randombinary") {
+        REQUIRE("randombinary" == convertContentManagerTypeToString(ContentManagerType::RandomBinary));
+    }
+    SECTION("fixed") {
+        REQUIRE("fixed" == convertContentManagerTypeToString(ContentManagerType::Fixed));
+    }
+    SECTION("echo") {
+        REQUIRE("echo" == convertContentManagerTypeToString(ContentManagerType::Echo));
+    }
+}

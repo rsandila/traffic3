@@ -53,6 +53,7 @@ public:
         uint32_t size = htonl(8);
         memcpy(&data[4], &size, sizeof(uint32_t));
         doExit = true;
+        totalRead += data.size();
         return true;
     };
     virtual void close() override {
@@ -62,6 +63,7 @@ public:
     virtual bool write(const std::vector<char> & data, const Host & hostState) override {
         UNUSED(hostState);
         lastWrite = data;
+        totalWritten += data.size();
         assignOrder(writeOrder);
         return true;
     }
@@ -85,6 +87,20 @@ TEST_CASE("Server: Test random generating random text", "[content][server]") {
         REQUIRE(lastWrite.size() >= 10);
         REQUIRE(lastWrite.size() <= 20);
         REQUIRE(readOrder < writeOrder);
+        
+        REQUIRE(8 == manager.getBytesRead());
+        REQUIRE(18 <= manager.getBytesWritten()); //  (10 + 8)
+        REQUIRE(28 >= manager.getBytesWritten()); //  (20 + 8)
+        
+        nlohmann::json json = manager.toJson();
+        REQUIRE(json.size() == 7);
+        REQUIRE(json["min"].get<unsigned>() == 10);
+        REQUIRE(json["max"].get<unsigned>() == 20);
+        REQUIRE(json["started"].get<bool>() == true);
+        REQUIRE(json["running"].get<bool>() == true);
+        REQUIRE(json["exitBeforeState"].get<bool>() == false);
+        REQUIRE(json["protocol"].is_object() == true);
+        REQUIRE(json["commonHeaders"].is_object() == true);
     }
 }
 
@@ -107,12 +123,20 @@ TEST_CASE("Client: Test random generating random text", "[content][client]") {
         REQUIRE(lastWrite.size() >= 10);
         REQUIRE(lastWrite.size() <= 20);
         REQUIRE(readOrder > writeOrder);
+        
+        REQUIRE(8 == manager.getBytesRead());
+        REQUIRE(36 <= manager.getBytesWritten()); // 2 * (10 + 8)
+        REQUIRE(56 >= manager.getBytesWritten()); // 2 * (20 + 8)
+        
+        nlohmann::json json = manager.toJson();
+        REQUIRE(json.size() == 7);
+        REQUIRE(json["min"].get<unsigned>() == 10);
+        REQUIRE(json["max"].get<unsigned>() == 20);
+        REQUIRE(json["started"].get<bool>() == true);
+        REQUIRE(json["running"].get<bool>() == true);
+        REQUIRE(json["exitBeforeState"].get<bool>() == false);
+        REQUIRE(json["protocol"].is_object() == true);
+        REQUIRE(json["commonHeaders"].is_object() == true);
     }
 }
 
-/*
- TODO add test for
- virtual nlohmann::json toJson() const noexcept override;
- virtual long long getBytesRead() const noexcept override;
- virtual long long getBytesWritten() const noexcept override;
- */
