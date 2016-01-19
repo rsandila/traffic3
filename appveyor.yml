@@ -15,7 +15,7 @@ test_script:
 - ps: >-
     # run tests
 
-    $err2 = .\bin\64bit\Debug\traffic3_test.exe -s ~[ipv6] -r junit -o traffic3_test.64.debug.xml
+    .\bin\64bit\Debug\traffic3_test.exe -s ~[ipv6] -r junit -o traffic3_test.64.debug.xml
 
     $err = $LASTEXITCODE
 
@@ -23,18 +23,12 @@ test_script:
 
     $wc = New-Object 'System.Net.WebClient'
 
-    $result = $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\traffic3_test.64.debug.xml))
+    $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\traffic3_test.64.debug.xml))
 
-    Write-Host "Result = $result"
-
-    Write-Host "Err = $err"
-
-    Write-Host "Err = $err2"
-
-    return $err
+    if ($err -ne 0) { exit $err }
 artifacts:
   - path: traffic3_test.64.debug.xml
     name: Log File
 
-  - path: 'bin\**\*.exe'
-    name: Traffic3 Windows executables
+  - path: 'bin\**\Debug\*.exe'
+    name: Traffic3 Windows Debug executables
