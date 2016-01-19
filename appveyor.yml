@@ -15,9 +15,9 @@ test_script:
 - ps: >-
     # run tests
 
-    .\bin\64bit\Debug\traffic3_test.exe -s ~[ipv6] -r junit -o traffic3_test.64.debug.xml
+    $err2 = .\bin\64bit\Debug\traffic3_test.exe -s ~[ipv6] -r junit -o traffic3_test.64.debug.xml
 
-    $err = $?
+    $err = $LASTEXITCODE
 
     # upload results to AppVeyor
 
@@ -29,4 +29,12 @@ test_script:
 
     $err
 
+    $err2
+
     return $err
+artifacts:
+  - path: traffic3_test.64.debug.xml
+    name: Log File
+
+  - path: bin\64bit\Debug\traffic3.exe
+    name: Traffic 32-bit Windows executable
