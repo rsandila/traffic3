@@ -156,7 +156,11 @@ TEST_CASE("Host toJson", "[host]") {
         REQUIRE(json["hostName"].get<std::string>() == "google-public-dns-a.google.com");
         REQUIRE(json["port"].get<unsigned>() == 80);
         REQUIRE(json["hasIPv4"].get<bool>() == true);
-        REQUIRE(json["hasIPv6"].get<bool>() == true);
+        if (json.size() == 9) {
+            REQUIRE(json["hasIPv6"].get<bool>() == true);
+        } else {
+            REQUIRE(json["hasIPv6"].get<bool>() == false);
+        }
         REQUIRE(json["protocolPreference"].get<std::string>() == "IPv4");
         
         REQUIRE(json["ipv4Name"].get<std::string>() == "google-public-dns-a.google.com");

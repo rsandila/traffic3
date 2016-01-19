@@ -25,16 +25,16 @@ test_script:
 
     $result = $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\traffic3_test.64.debug.xml))
 
-    $result
+    Write-Host "Result = $result"
 
-    $err
+    Write-Host "Err = $err"
 
-    $err2
+    Write-Host "Err = $err2"
 
     return $err
 artifacts:
   - path: traffic3_test.64.debug.xml
     name: Log File
 
-  - path: bin\64bit\Debug\traffic3.exe
-    name: Traffic 32-bit Windows executable
+  - path: 'bin\**\*.exe'
+    name: Traffic3 Windows executables
