@@ -26,7 +26,7 @@ Client::~Client() {
     }
 }
 
-bool Client::startClients(unsigned clientId, unsigned num_clients, ProtocolFactory _protocolFactory,
+bool Client::startClients(unsigned clientId, unsigned num_clients, ProtocolFactory & _protocolFactory,
                           ContentManagerFactory & _contentManagerFactory, Host _server) {
     std::unique_lock<std::mutex> lck(lock);
     if (workers.find(clientId) != workers.end()) {
@@ -88,14 +88,16 @@ nlohmann::json Client::toJson() const noexcept {
     
     returnValue["numClients"] = workers.size();
     
+    nlohmann::json workerArray;
     for (const auto & it: workers) {
         std::vector<nlohmann::json> returnArray;
         
         for (const auto & it2: it.second) {
             returnArray.push_back(it2->toJson());
         }
-        returnValue[it.first] = returnArray;
+        workerArray[std::to_string(it.first)] = returnArray;
     }
+    returnValue["workers"] = workerArray;
     return std::move(returnValue);
 }
 
@@ -105,9 +107,11 @@ nlohmann::json Client::toJson(unsigned id) const noexcept {
     const auto & it = workers.find(id);
     if (it != workers.end()) {
         returnValue["found"] = true;
+        nlohmann::json returnArray;
         for (const auto & it2: it->second) {
-            returnValue.push_back(it2->toJson());
+            returnArray.push_back(it2->toJson());
         }
+        returnValue["worker"] = returnArray;
     } else {
         returnValue["found"] = false;
     }

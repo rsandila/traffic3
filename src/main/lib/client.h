@@ -28,7 +28,7 @@
 class Client {
 public:
     virtual ~Client();
-    bool startClients(unsigned clientId, unsigned num_clients, ProtocolFactory _protocolFactory,
+    bool startClients(unsigned clientId, unsigned num_clients, ProtocolFactory & _protocolFactory,
                       ContentManagerFactory & _contentManagerFactory, Host _server);
     bool stopClients(unsigned clientId);
     int getNumClients() noexcept;
