@@ -358,16 +358,24 @@ TEST_CASE("IPV6: real sending, receiving of data", "[ipv6][protocol]") {
         REQUIRE(readBuffer == testBuffer);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         REQUIRE(serverSuccess);
+        
+        REQUIRE(protocol.getHost() == local);
+        REQUIRE(protocol.getBytesRead() == 10);
+        REQUIRE(protocol.getBytesWritten() == 0);
+        
+        nlohmann::json json = protocol.toJson();
+        REQUIRE(json.size() == 6);
+        REQUIRE(json["host"].is_object());
+        REQUIRE(json["type"].get<std::string>() == "Client");
+        REQUIRE(json["socket"].is_number_integer());
+        REQUIRE(json["numWritten"].get<unsigned>() == 0);
+        REQUIRE(json["numRead"].get<unsigned>() == 10);
+        REQUIRE(json["state"].get<std::string>() == "Open");
+
         testDone = true;
         serverThread.join();
         timeoutThread.join();
         REQUIRE_FALSE(didTimeout);
     }
 }
-/*
- TODO add tests for
- virtual long long getBytesRead() const noexcept { return totalRead; };
- virtual long long getBytesWritten() const noexcept { return totalWritten; };
- virtual const Host & getHost() const noexcept { return host; };
- virtual nlohmann::json toJson() const noexcept;
- */
+
