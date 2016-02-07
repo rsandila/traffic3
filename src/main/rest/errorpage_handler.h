@@ -24,6 +24,7 @@
 
 class ErrorPageHandler {
 public:
+    virtual ~ErrorPageHandler() {;};
     /*
         If it returns an empty vector then the next one will be called
      */

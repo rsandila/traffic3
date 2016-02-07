@@ -77,13 +77,13 @@ ContentManagerBase::~ContentManagerBase() {
 }
 
 bool ContentManagerBase::Stop() noexcept {
+    if (!started) {
+        doExitBeforeStart = true;
+    }
+    while (!running && started) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
     if (protocol->getState() != Protocol::ProtocolState::CLOSED) {
-        if (!started) {
-            doExitBeforeStart = true;
-        }
-        while (!running && started) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
         protocol->close();
     }
     if (worker.joinable()) {

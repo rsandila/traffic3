@@ -184,7 +184,7 @@ bool Host::populateToAddr6(const std::string & name, unsigned _port) {
         return false;
     }
 	struct addrinfo hints;
-	struct addrinfo *result;
+    struct addrinfo *result = nullptr;
 	memset(&hints, 0, sizeof(struct addrinfo));
 	hints.ai_family = AF_INET6;
 	hints.ai_socktype = 0;

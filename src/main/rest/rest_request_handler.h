@@ -27,6 +27,7 @@
 
 class RestRequestHandler {
 public:
+    virtual ~RestRequestHandler() {;};
     virtual std::vector<char> handleRequest(const Host & host, const RestRequest & request, const std::map<std::string, std::string> & headers, const std::vector<char> & body);
 protected:
 private:

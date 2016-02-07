@@ -39,11 +39,12 @@ protected:
     virtual std::vector<char> ProcessContent(const std::vector<char> & incomingData, const Host & host) noexcept override;
     virtual bool PrepareContent() noexcept override;
     virtual void CleanupContent() noexcept override;
-    virtual std::vector<char> returnErrorPage(ErrorTypes type, const std::vector<char> & incomingData); // TODO make this smarter
+    virtual std::vector<char> returnErrorPage(ErrorTypes type, const std::vector<char> & incomingData);
+
+    std::vector<std::shared_ptr<ErrorPageHandler>> errorHandlers;
+    std::vector<std::shared_ptr<RestRequestHandler>> restHandlers;
 private:
     std::string getLineFromVector(const std::vector<char> & data, unsigned int & startOffset) noexcept;
     void trimString(std::string & line) const noexcept;
     
-    std::vector<std::shared_ptr<ErrorPageHandler>> errorHandlers;
-    std::vector<std::shared_ptr<RestRequestHandler>> restHandlers;
 };
