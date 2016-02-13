@@ -24,23 +24,25 @@
 
 class RestState {
 public:
-    int getNumClients() noexcept;
-    int getNumServers() noexcept;
+    virtual int getNumClients() noexcept;
+    virtual int getNumServers() noexcept;
     
-    bool startClient(unsigned clientId, unsigned num_clients, ProtocolFactory & _protocolFactory, ContentManagerFactory & _contentManagerFactory, Host & _server);
-    bool stopClient(unsigned clientId);
+    virtual bool startClient(unsigned clientId, unsigned num_clients, ProtocolFactory & _protocolFactory,
+                             ContentManagerFactory & _contentManagerFactory, Host & _server);
+    virtual bool stopClient(unsigned clientId);
     
-    bool startServer(unsigned portId, Host & host, ProtocolFactory & protocolFactory, std::shared_ptr<ContentManagerFactory> & contentManagerFactory);
-    bool stopServer(unsigned portId);
+    virtual bool startServer(unsigned portId, Host & host, ProtocolFactory & protocolFactory,
+                             std::shared_ptr<ContentManagerFactory> & contentManagerFactory);
+    virtual bool stopServer(unsigned portId);
     
-    long long getClientNumWritten() const noexcept;
-    long long getClientNumRead() const noexcept;
-    long long getServerNumWritten() const noexcept;
-    long long getServerNumRead() const noexcept;
-    nlohmann::json getServerJson() const noexcept;
-    nlohmann::json getServerJsonForId(unsigned id) const noexcept;
-    nlohmann::json getClientJson() const noexcept;
-    nlohmann::json getClientJsonForId(unsigned id) const noexcept;
+    virtual long long getClientNumWritten() const noexcept;
+    virtual long long getClientNumRead() const noexcept;
+    virtual long long getServerNumWritten() const noexcept;
+    virtual long long getServerNumRead() const noexcept;
+    virtual nlohmann::json getServerJson() const noexcept;
+    virtual nlohmann::json getServerJsonForId(unsigned id) const noexcept;
+    virtual nlohmann::json getClientJson() const noexcept;
+    virtual nlohmann::json getClientJsonForId(unsigned id) const noexcept;
 protected:
 private:
     Client client;

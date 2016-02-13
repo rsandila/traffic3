@@ -25,7 +25,7 @@ std::vector<char> returnHtmlPage(unsigned code, const std::string message,  cons
                                  const std::string & body) {
     std::stringstream ostr;
     
-    ostr << "HTTP/1.0 " << code << " " << message << "\r\nConnection: close\r\nContent-Length:";
+    ostr << "HTTP/1.0 " << code << " " << message << "\r\nConnection: close\r\nContent-Length: ";
     std::stringstream returnBody;
     returnBody << "<!DOCTYPE HTML PUBLIC ""-//IETF//DTD HTML 2.0//EN"">\r\n<html><head><title>";
     returnBody << title << "</title></head><body><h1>" << body << "</h1>";
@@ -39,7 +39,7 @@ std::vector<char> returnHtmlPage(unsigned code, const std::string message,  cons
 std::vector<char> returnJsonPage(unsigned code, const std::string message, const std::string & dump) {
     std::stringstream ostr;
     
-    ostr << "HTTP/1.1 " << code << " " << message << "\r\nConnection: open\r\nContent-Length:";
+    ostr << "HTTP/1.1 " << code << " " << message << "\r\nConnection: open\r\nContent-Length: ";
     ostr << dump.length() << "\r\n\r\n" << dump;
 
     std::vector<char> returnValue(ostr.str().length());

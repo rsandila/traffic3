@@ -18,3 +18,108 @@
  */
 
 // TODO
+/*
+ RRT_GET - v,
+ RRT_PUT - v,
+ RRT_DELETE - v,
+ */
+#include "catch.hpp"
+#include "hippomocks.h"
+#include "rest/rest_client.h"
+
+TEST_CASE("RestClient", "[rest][server]") {
+    SECTION("URI not matching: short") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_GET, "/testclien", "1.0");
+
+        REQUIRE(client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>()) == std::vector<char>());
+    }
+    SECTION("URI not matching: long") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_GET, "/testclient2", "1.0");
+        
+        REQUIRE(client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>()) == std::vector<char>());
+    }
+    SECTION("Invalid Type: POST") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_POST, "/testclient", "1.0");
+
+        REQUIRE(client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>()) == std::vector<char>());
+    }
+    SECTION("Invalid Type: HEAD") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_HEAD, "/testclient", "1.0");
+        
+        REQUIRE(client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>()) == std::vector<char>());
+    }
+    SECTION("Invalid Type: TRACE") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_TRACE, "/testclient", "1.0");
+        
+        REQUIRE(client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>()) == std::vector<char>());
+    }
+    SECTION("Invalid Type: OPTIONS") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_OPTIONS, "/testclient", "1.0");
+        
+        REQUIRE(client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>()) == std::vector<char>());
+    }
+    SECTION("Invalid Type: CONNECT") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_CONNECT, "/testclient", "1.0");
+        
+        REQUIRE(client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>()) == std::vector<char>());
+    }
+    SECTION("Valid Type: GET unknown parameters") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.ExpectCall(restState, RestState::getClientJson).Return(std::vector<char> {'a'});
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_GET, "/testclient?boo=123", "1.0");
+        
+        REQUIRE(client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>()) != std::vector<char>());
+    }
+    // TODO - test GET with no id
+    // TODO - test GET with id that is not a number
+    // TODO - test GET with id with no value
+    // TODO - test GET with a valud id
+    // TODO - test DELETE
+    // TODO - test POST
+}
