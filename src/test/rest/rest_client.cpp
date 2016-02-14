@@ -17,12 +17,6 @@
  USA.
  */
 
-// TODO
-/*
- RRT_GET - v,
- RRT_PUT - v,
- RRT_DELETE - v,
- */
 #include "catch.hpp"
 #include "hippomocks.h"
 #include "rest/rest_client.h"
@@ -109,17 +103,277 @@ TEST_CASE("RestClient", "[rest][server]") {
         MockRepository mocks;
         
         RestState * restState = mocks.Mock<RestState>();
-        mocks.ExpectCall(restState, RestState::getClientJson).Return(std::vector<char> {'a'});
+        nlohmann::json returnJson;
+        returnJson["result"] = "Ok";
+        
+        mocks.ExpectCall(restState, RestState::getClientJson).Return(returnJson);
         
         RestClient client("/testclient", *restState);
         RestRequest request(RestRequestType::RRT_GET, "/testclient?boo=123", "1.0");
         
         REQUIRE(client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>()) != std::vector<char>());
     }
-    // TODO - test GET with no id
-    // TODO - test GET with id that is not a number
-    // TODO - test GET with id with no value
-    // TODO - test GET with a valud id
-    // TODO - test DELETE
-    // TODO - test POST
+    SECTION("Valid Type: GET no id") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        nlohmann::json returnJson;
+        returnJson["result"] = "Ok";
+        mocks.ExpectCall(restState, RestState::getClientJson).Return(returnJson);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_GET, "/testclient", "1.0");
+        
+        REQUIRE(client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>()) != std::vector<char>());
+    }
+    SECTION("Valid Type: GET id is not a number") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_GET, "/testclient?id=abc", "1.0");
+        std::vector<char> returnVector = client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>());
+        REQUIRE(returnVector != std::vector<char>());
+        std::string returnString(&returnVector[0], returnVector.size());
+        REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
+    }
+    SECTION("Valid Type: GET id is missing") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        nlohmann::json returnJson;
+        returnJson["result"] = "Ok";
+        mocks.ExpectCall(restState, RestState::getClientJson).Return(returnJson);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_GET, "/testclient?id=", "1.0");
+        std::vector<char> returnVector = client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>());
+        REQUIRE(returnVector != std::vector<char>());
+        std::string returnString(&returnVector[0], returnVector.size());
+        REQUIRE(returnString.find("HTTP/1.1 200 OK\r\n") != std::string::npos);
+    }
+    SECTION("Valid Type: GET with a valid id") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        nlohmann::json returnJson;
+        returnJson["result"] = "Ok";
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.ExpectCall(restState, RestState::getClientJsonForId).With(1L).Return(returnJson);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_GET, "/testclient?id=1", "1.0");
+        std::vector<char> returnVector = client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>());
+        REQUIRE(returnVector != std::vector<char>());
+        std::string returnString(&returnVector[0], returnVector.size());
+        REQUIRE(returnString.find("HTTP/1.1 200 OK\r\n") != std::string::npos);
+
+    }
+    SECTION("Valid Type: DELETE with invalid id") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::stopClient);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_DELETE, "/testclient?id=abc", "1.0");
+        std::vector<char> returnVector = client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>());
+        REQUIRE(returnVector != std::vector<char>());
+        std::string returnString(&returnVector[0], returnVector.size());
+        REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
+    }
+    SECTION("Valid Type: DELETE with no id") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::stopClient);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_DELETE, "/testclient", "1.0");
+        std::vector<char> returnVector = client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>());
+        REQUIRE(returnVector != std::vector<char>());
+        std::string returnString(&returnVector[0], returnVector.size());
+        REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
+    }
+    SECTION("Valid Type: DELETE with valid id") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.ExpectCall(restState, RestState::stopClient).With(1).Return(true);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_DELETE, "/testclient?id=1", "1.0");
+        std::vector<char> returnVector = client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>());
+        REQUIRE(returnVector != std::vector<char>());
+        std::string returnString(&returnVector[0], returnVector.size());
+        REQUIRE(returnString.find("HTTP/1.1 200 OK\r\n") != std::string::npos);
+        REQUIRE(returnString.find("\"result\":\"Ok\"") != std::string::npos);
+    }
+    SECTION("Valid Type: DELETE with valid id but stopClient fails") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.ExpectCall(restState, RestState::stopClient).With(1).Return(false);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_DELETE, "/testclient?id=1", "1.0");
+        std::vector<char> returnVector = client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>());
+        REQUIRE(returnVector != std::vector<char>());
+        std::string returnString(&returnVector[0], returnVector.size());
+        REQUIRE(returnString.find("HTTP/1.1 200 OK\r\n") != std::string::npos);
+        REQUIRE(returnString.find("\"result\":\"Failed\"") != std::string::npos);
+    }
+    SECTION("Valid Type: POST with no parameters") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::startClient);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_PUT, "/testclient", "1.0");
+        std::vector<char> returnVector = client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>());
+        REQUIRE(returnVector != std::vector<char>());
+        std::string returnString(&returnVector[0], returnVector.size());
+        REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
+    }
+    SECTION("Valid Type: POST with only host") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::startClient);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_PUT, "/testclient?host=127.0.0.1", "1.0");
+        std::vector<char> returnVector = client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>());
+        REQUIRE(returnVector != std::vector<char>());
+        std::string returnString(&returnVector[0], returnVector.size());
+        REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
+    }
+    SECTION("Valid Type: POST with host but invalid port") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::startClient);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_PUT, "/testclient?host=127.0.0.1&port=a", "1.0");
+        std::vector<char> returnVector = client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>());
+        REQUIRE(returnVector != std::vector<char>());
+        std::string returnString(&returnVector[0], returnVector.size());
+        REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
+    }
+    SECTION("Valid Type: POST with host and valid port and succeeds") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.ExpectCall(restState, RestState::startClient).Return(true);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_PUT, "/testclient?host=127.0.0.1&port=80", "1.0");
+        std::vector<char> returnVector = client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>());
+        REQUIRE(returnVector != std::vector<char>());
+        std::string returnString(&returnVector[0], returnVector.size());
+        REQUIRE(returnString.find("HTTP/1.1 200 OK\r\n") != std::string::npos);
+        REQUIRE(returnString.find("\"result\":\"Ok\"") != std::string::npos);
+    }
+    SECTION("Valid Type: POST with host and valid port and fails") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.ExpectCall(restState, RestState::startClient).Return(false);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_PUT, "/testclient?host=127.0.0.1&port=80", "1.0");
+        std::vector<char> returnVector = client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>());
+        REQUIRE(returnVector != std::vector<char>());
+        std::string returnString(&returnVector[0], returnVector.size());
+        REQUIRE(returnString.find("HTTP/1.1 200 OK\r\n") != std::string::npos);
+        REQUIRE(returnString.find("\"result\":\"Failed\"") != std::string::npos);
+    }
+    SECTION("Valid Type: POST with all parameters") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.ExpectCall(restState, RestState::startClient).Return(true);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_PUT, "/testclient?host=127.0.0.1&port=80&id=1&count=1&min=1&max=10&contentmanager=fixed", "1.0");
+        std::vector<char> returnVector = client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>());
+        REQUIRE(returnVector != std::vector<char>());
+        std::string returnString(&returnVector[0], returnVector.size());
+        REQUIRE(returnString.find("HTTP/1.1 200 OK\r\n") != std::string::npos);
+        REQUIRE(returnString.find("\"result\":\"Ok\"") != std::string::npos);
+    }
+    SECTION("Valid Type: POST with all parameters, invalid id") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::startClient);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_PUT, "/testclient?host=127.0.0.1&port=80&id=a&count=1&min=1&max=10&contentmanager=fixed", "1.0");
+        std::vector<char> returnVector = client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>());
+        REQUIRE(returnVector != std::vector<char>());
+        std::string returnString(&returnVector[0], returnVector.size());
+        REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
+    }
+    SECTION("Valid Type: POST with all parameters, invalid count") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::startClient);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_PUT, "/testclient?host=127.0.0.1&port=80&id=1&count=a&min=1&max=10&contentmanager=fixed", "1.0");
+        std::vector<char> returnVector = client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>());
+        REQUIRE(returnVector != std::vector<char>());
+        std::string returnString(&returnVector[0], returnVector.size());
+        REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
+    }
+    SECTION("Valid Type: POST with all parameters, invalid min") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::startClient);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_PUT, "/testclient?host=127.0.0.1&port=80&id=1&count=1&min=a&max=10&contentmanager=fixed", "1.0");
+        std::vector<char> returnVector = client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>());
+        REQUIRE(returnVector != std::vector<char>());
+        std::string returnString(&returnVector[0], returnVector.size());
+        REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
+    }
+    SECTION("Valid Type: POST with all parameters, invalid max") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::startClient);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_PUT, "/testclient?host=127.0.0.1&port=80&id=1&count=1&min=1&max=a&contentmanager=fixed", "1.0");
+        std::vector<char> returnVector = client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>());
+        REQUIRE(returnVector != std::vector<char>());
+        std::string returnString(&returnVector[0], returnVector.size());
+        REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
+    }
+    SECTION("Valid Type: POST with all parameters, invalid content_manager") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::startClient);
+        
+        RestClient client("/testclient", *restState);
+        RestRequest request(RestRequestType::RRT_PUT, "/testclient?host=127.0.0.1&port=80&id=1&count=1&min=1&max=10&contentmanager=boo", "1.0");
+        std::vector<char> returnVector = client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>());
+        REQUIRE(returnVector != std::vector<char>());
+        std::string returnString(&returnVector[0], returnVector.size());
+        REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
+    }
 }

@@ -32,8 +32,7 @@ ContentManagerType convertStringToContentManagerType(const std::string & name) {
     std::string lname = name;
     std::for_each(name.begin(), name.end(), [](char a){ return std::tolower(a);});
     if (contentManagerMap.find(lname) == contentManagerMap.end()) {
-        // TODO - should be an error and throw some exception
-        return ContentManagerType::Echo;
+        throw std::invalid_argument("Invalid ContentManagerType");
     }
     return contentManagerMap[lname];
 }

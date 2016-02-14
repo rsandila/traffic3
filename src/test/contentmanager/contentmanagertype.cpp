@@ -34,7 +34,7 @@ TEST_CASE("Testing ContentManagerType: convertStringToContentManagerType", "[con
         REQUIRE(convertStringToContentManagerType("echo") == ContentManagerType::Echo);
     }
     SECTION("unknown") {
-        REQUIRE(convertStringToContentManagerType("unknown") == ContentManagerType::Echo);
+        REQUIRE_THROWS_AS(convertStringToContentManagerType("unknown"), std::invalid_argument);
     }
 }
 

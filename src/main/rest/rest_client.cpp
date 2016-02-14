@@ -57,7 +57,11 @@ std::vector<char> RestClient::handleGetStatus(const RestRequest & request,
     
     if (request.hasParam("id")) {
         // return just the stats for the specific client
-        return returnJsonPage(200, "OK", state.getClientJsonForId(std::stoul(request.getParam("id"))).dump());
+        try {
+            return returnJsonPage(200, "OK", state.getClientJsonForId(std::stoul(request.getParam("id"))).dump());
+        } catch (std::invalid_argument& e) {
+            return returnHtmlPage(400, "Bad Request", "Invalid ID specified", "Invalid Id specified");
+        }
     } else {
         // return stats for all the clients
         return returnJsonPage(200, "OK", state.getClientJson().dump());
@@ -70,35 +74,39 @@ std::vector<char> RestClient::handleCreateClient(const RestRequest & request,
     UNUSED(headers);
     UNUSED(body);
     
-    unsigned id = std::stoul(request.getParamWithDefault("id", "0"));
-    std::string protocol = request.getParamWithDefault("protocol", "tcp4");
-    std::string cm_type = request.getParamWithDefault("contentmanager", "fixed");
-    unsigned count = std::stoul(request.getParamWithDefault("count", "1"));
-    std::string hostName = request.getParam("host");
-    unsigned port = std::stoul(request.getParam("port"));
-    unsigned minimum = std::stoul(request.getParamWithDefault("min", "10"));
-    unsigned maximum = std::stoul(request.getParamWithDefault("max", "10000"));
-    
-    // preference should map from protocol string to ProtocolPreference
-    ProtocolType protocolType = convertStringToProtocolType(protocol);
-    const Host::ProtocolPreference preference = convertFromProtocolTypeToPreference(protocolType);
-    Host host(hostName, port, preference);
-    ProtocolFactory protocolFactory(protocolType);// TODO map protocol string to ProtocolType
-    std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
-    std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(minimum, maximum));
-    // convert cm_type string to contentManagerType
-    ContentManagerType contentManagerType = convertStringToContentManagerType(cm_type);
-    ContentManagerFactory contentManagerFactory(contentManagerType, commonHeaders, contentManagerCustomizer);
-    
-    nlohmann::json returnValue;
-    if (state.startClient(id, count, protocolFactory, contentManagerFactory, host)) {
-        // return success
-        returnValue["result"] = std::string("Ok");
-    } else {
-        // return failure
-        returnValue["result"] = std::string("Failed");
+    try {
+        unsigned id = std::stoul(request.getParamWithDefault("id", "0"));
+        std::string protocol = request.getParamWithDefault("protocol", "tcp4");
+        std::string cm_type = request.getParamWithDefault("contentmanager", "fixed");
+        unsigned count = std::stoul(request.getParamWithDefault("count", "1"));
+        std::string hostName = request.getParam("host");
+        unsigned port = std::stoul(request.getParam("port"));
+        unsigned minimum = std::stoul(request.getParamWithDefault("min", "10"));
+        unsigned maximum = std::stoul(request.getParamWithDefault("max", "10000"));
+        
+        // preference should map from protocol string to ProtocolPreference
+        ProtocolType protocolType = convertStringToProtocolType(protocol);
+        const Host::ProtocolPreference preference = convertFromProtocolTypeToPreference(protocolType);
+        Host host(hostName, port, preference);
+        ProtocolFactory protocolFactory(protocolType); // map protocol string to ProtocolType
+        std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
+        std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(minimum, maximum));
+        // convert cm_type string to contentManagerType
+        ContentManagerType contentManagerType = convertStringToContentManagerType(cm_type);
+        ContentManagerFactory contentManagerFactory(contentManagerType, commonHeaders, contentManagerCustomizer);
+        
+        nlohmann::json returnValue;
+        if (state.startClient(id, count, protocolFactory, contentManagerFactory, host)) {
+            // return success
+            returnValue["result"] = std::string("Ok");
+        } else {
+            // return failure
+            returnValue["result"] = std::string("Failed");
+        }
+        return std::move(returnJsonPage(200, "OK", returnValue.dump()));
+    } catch (std::invalid_argument& e) {
+        return std::move(returnHtmlPage(400, "Bad Request", "Invalid value provided", "Invalid value provided"));
     }
-    return std::move(returnJsonPage(200, "OK", returnValue.dump()));
 }
 
 std::vector<char> RestClient::handleStopClient(const RestRequest & request,
@@ -108,7 +116,12 @@ std::vector<char> RestClient::handleStopClient(const RestRequest & request,
     UNUSED(body);
     nlohmann::json returnValue;
 
-    unsigned id = std::stoul(request.getParam("id"));
+    unsigned id;
+    try {
+        id = std::stoul(request.getParam("id"));
+    } catch (std::invalid_argument& e) {
+        return std::move(returnHtmlPage(400, "Bad Request", "Invalid ID specified", "Invalid ID specified"));
+    }
     if (state.stopClient(id)) {
         // return success
         returnValue["result"] = std::string("Ok");
