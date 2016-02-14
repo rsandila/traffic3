@@ -17,4 +17,16 @@
  USA.
  */
 
-// TODO
+#include "catch.hpp"
+#include "rest/rest_request_handler.h"
+
+TEST_CASE("RestRequestHandler", "[rest]") {
+    SECTION("Returns empty vector") {
+        RestRequestHandler handler;
+        
+        RestRequest request(RestRequestType::RRT_GET, "/testclient?boo=123", "1.0");
+        
+        REQUIRE(handler.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(),
+                                        std::vector<char>()) == std::vector<char>());
+    }
+}

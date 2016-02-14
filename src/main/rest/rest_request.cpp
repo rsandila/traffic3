@@ -20,7 +20,7 @@
 #include <sstream>
 #include "rest_request.h"
 
-RestRequest::RestRequest(const RestRequestType & type, const std::string & uri, const std::string & version) :
+RestRequest::RestRequest(const RestRequestType & type, const std::string & uri, const std::string & version) throw(std::invalid_argument) :
     _type(type),  _version(version), params(), _uri(parseParamsFromUri(uri)) {
 }
 
@@ -54,7 +54,7 @@ bool RestRequest::hasParam(const std::string & name) const noexcept {
     return retval != params.end();
 }
 
-const std::string RestRequest::parseParamsFromUri(const std::string & uri) noexcept {
+const std::string RestRequest::parseParamsFromUri(const std::string & uri) throw(std::invalid_argument) {
     std::string retval = uri;
     unsigned long pos = retval.find("?");
     if (pos == std::string::npos) {
@@ -71,7 +71,7 @@ const std::string RestRequest::parseParamsFromUri(const std::string & uri) noexc
         if (std::getline(istr2, name, '=') && std::getline(istr2, value)) {
             params[name] = value;
         } else {
-            // TODO - do we throw an exception or ignore this?
+            throw std::invalid_argument("Found request with no value");
         }
     }
     return retval;

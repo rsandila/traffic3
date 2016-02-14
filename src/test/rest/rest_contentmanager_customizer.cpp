@@ -17,4 +17,33 @@
  USA.
  */
 
+#include "catch.hpp"
+#include "hippomocks.h"
+#include "rest/rest_contentmanager_customizer.h"
+#include "rest/contentmanager_headers.h"
+
+/*
+ This will never work: https://github.com/dascandy/hippomocks/issues/10
+ 
+TEST_CASE("RestContentManagerCustomizer", "[rest][content]") {
+    SECTION("nullptr") {
+        MockRepository mocks;
+        
+        std::vector<std::shared_ptr<RestRequestHandler>> restRequestHandlers { std::shared_ptr<RestRequestHandler>(nullptr) };
+        std::vector<std::shared_ptr<ErrorPageHandler>> errorPageHandlers { std::shared_ptr<ErrorPageHandler>(nullptr) };
+        RestContentManagerCustomizer customizer(restRequestHandlers, errorPageHandlers);
+        
+        ContentManager_Headers * contentManagerTmp = mocks.Mock<ContentManager_Headers>();
+        mocks.NeverCall(contentManagerTmp, ContentManager_Headers::addErrorPageHandlers);
+        mocks.NeverCall(contentManagerTmp, ContentManager_Headers::addRestRequestHandlers);
+        
+        std::unique_ptr<ContentManager> contentManager(contentManagerTmp);
+        
+        contentManager = std::move(customizer.customize(std::move(contentManager)));
+        
+        mocks.ExpectCallDestructor(contentManager.get());
+        contentManager.reset();
+    }
+}
+ */
 // TODO

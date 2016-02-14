@@ -24,6 +24,17 @@
  bool hasParam(const std::string & name) const noexcept;
  */
 
+TEST_CASE("RestRequest: constructor", "[request][rest]") {
+    SECTION("Missing value") {
+        try {
+            RestRequest request(RestRequestType::RRT_CONNECT, "/dummy?id=10&bla=", "1.0");
+            FAIL("Expect invalid_argument, should never get here");
+        } catch (std::invalid_argument &e) {
+            // success
+        }
+    }
+}
+
 TEST_CASE("RestRequest: getType", "[request][rest]") {
     SECTION("GET") {
         RestRequest request(RestRequestType::RRT_GET, "/", "1.0");

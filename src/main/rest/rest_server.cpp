@@ -29,7 +29,7 @@ std::vector<char> RestServer::handleRequest(const Host & host, const RestRequest
                                             const std::vector<char> & body) {
     UNUSED(host);
     std::vector<char> returnValue;
-    if (request.getUri().find(uriBase) == 0) {
+    if (request.getUri() == uriBase) {
         switch (request.getType()) {
             case RestRequestType::RRT_GET:
                 // get status

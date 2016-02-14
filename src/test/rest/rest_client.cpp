@@ -139,21 +139,6 @@ TEST_CASE("RestClient", "[rest][server]") {
         std::string returnString(&returnVector[0], returnVector.size());
         REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
     }
-    SECTION("Valid Type: GET id is missing") {
-        MockRepository mocks;
-        
-        RestState * restState = mocks.Mock<RestState>();
-        nlohmann::json returnJson;
-        returnJson["result"] = "Ok";
-        mocks.ExpectCall(restState, RestState::getClientJson).Return(returnJson);
-        
-        RestClient client("/testclient", *restState);
-        RestRequest request(RestRequestType::RRT_GET, "/testclient?id=", "1.0");
-        std::vector<char> returnVector = client.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>());
-        REQUIRE(returnVector != std::vector<char>());
-        std::string returnString(&returnVector[0], returnVector.size());
-        REQUIRE(returnString.find("HTTP/1.1 200 OK\r\n") != std::string::npos);
-    }
     SECTION("Valid Type: GET with a valid id") {
         MockRepository mocks;
         

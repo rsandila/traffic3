@@ -25,7 +25,7 @@
 
 class RestRequest {
 public:
-    RestRequest(const RestRequestType & type, const std::string & uri, const std::string & version);
+    RestRequest(const RestRequestType & type, const std::string & uri, const std::string & version) throw(std::invalid_argument);
     RestRequestType getType() const noexcept;
     const std::string & getUri() const noexcept;
     const std::string & getVersion() const noexcept;
@@ -33,7 +33,7 @@ public:
     const std::string getParamWithDefault(const std::string & name, const std::string & defaultValue) const noexcept;
     bool hasParam(const std::string & name) const noexcept;
 protected:
-    const std::string parseParamsFromUri(const std::string & uri) noexcept;
+    const std::string parseParamsFromUri(const std::string & uri) throw(std::invalid_argument);
 private:
     const RestRequestType _type;
     const std::string _version;

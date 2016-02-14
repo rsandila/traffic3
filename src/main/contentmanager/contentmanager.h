@@ -33,7 +33,7 @@ public:
         UNUSED(other);
         return *this;
     }
-    virtual ~ContentManager() {;};
+    virtual ~ContentManager() {};
     virtual bool Stop() {
         return false;
     };

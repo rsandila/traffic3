@@ -32,8 +32,7 @@ ProtocolType convertStringToProtocolType(const std::string & name) {
     std::string lname = name;
     std::for_each(name.begin(), name.end(), [](char a){ return std::tolower(a);});
     if (protocolMap.find(lname) == protocolMap.end()) {
-        // TODO - should be an error and throw some exception
-        return ProtocolType::None;
+        throw std::invalid_argument("Invalid protocol specified");
     }
     return protocolMap[lname];
 }

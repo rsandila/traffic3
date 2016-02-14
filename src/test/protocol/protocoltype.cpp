@@ -34,7 +34,7 @@ TEST_CASE("Protocol Type: convertStringToProtocolType", "[protocol]") {
         REQUIRE(convertStringToProtocolType("udp6") == ProtocolType::UDP6);
     }
     SECTION("None") {
-        REQUIRE(convertStringToProtocolType("bla") == ProtocolType::None);
+        REQUIRE_THROWS_AS(convertStringToProtocolType("bla"), std::invalid_argument);
     }
 }
 
