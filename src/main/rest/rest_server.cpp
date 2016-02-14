@@ -54,7 +54,11 @@ std::vector<char> RestServer::handleGetStatus(const RestRequest & request, const
     
     if (request.hasParam("id")) {
         // return just the stats for the specific client
-        return returnJsonPage(200, "OK", state.getServerJsonForId(std::stoul(request.getParam("id"))).dump());
+        try {
+            return returnJsonPage(200, "OK", state.getServerJsonForId(std::stoul(request.getParam("id"))).dump());
+        } catch (std::invalid_argument & e) {
+            return returnHtmlPage(400, "Bad Request", "Invalid Id specified", "Invalid Id specified");
+        }
     } else {
         // return stats for all the clients
         return returnJsonPage(200, "OK", state.getServerJson().dump());
@@ -68,31 +72,35 @@ std::vector<char> RestServer::handleCreateServer(const RestRequest & request,
     UNUSED(headers);
     UNUSED(body);
     
-    unsigned id = std::stoul(request.getParamWithDefault("id", "0"));
-    std::string protocol = request.getParamWithDefault("protocol", "tcp4");
-    std::string cm_type = request.getParamWithDefault("contentmanager", "fixed");
-    std::string hostName = request.getParamWithDefault("host", "::");
-    unsigned port = std::stoul(request.getParam("port"));
-    unsigned minimum = std::stoul(request.getParamWithDefault("min", "10"));
-    unsigned maximum = std::stoul(request.getParamWithDefault("max", "10000"));
-    
-    std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders);
-    ProtocolFactory protocolFactory(convertStringToProtocolType(protocol));
-    std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(
-                                        new ContentManagerCustomizer(minimum, maximum));
-    std::shared_ptr<ContentManagerFactory> contentManagerFactory = std::shared_ptr<ContentManagerFactory>(new ContentManagerFactory(convertStringToContentManagerType(cm_type), commonHeaders, contentManagerCustomizer));
-    // Server server;
-    Host port10000(hostName, port, convertFromProtocolTypeToPreference(convertStringToProtocolType(protocol)));
-    
-    nlohmann::json returnValue;
-    if (state.startServer(id, port10000, protocolFactory, contentManagerFactory)) {
-        // return success
-        returnValue["result"] = std::string("Ok");
-    } else {
-        // return failure
-        returnValue["result"] = std::string("Failed");
+    try {
+        unsigned id = std::stoul(request.getParamWithDefault("id", "0"));
+        std::string protocol = request.getParamWithDefault("protocol", "tcp4");
+        std::string cm_type = request.getParamWithDefault("contentmanager", "fixed");
+        std::string hostName = request.getParamWithDefault("host", "::");
+        unsigned port = std::stoul(request.getParam("port"));
+        unsigned minimum = std::stoul(request.getParamWithDefault("min", "10"));
+        unsigned maximum = std::stoul(request.getParamWithDefault("max", "10000"));
+        
+        std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders);
+        ProtocolFactory protocolFactory(convertStringToProtocolType(protocol));
+        std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(
+                                            new ContentManagerCustomizer(minimum, maximum));
+        std::shared_ptr<ContentManagerFactory> contentManagerFactory = std::shared_ptr<ContentManagerFactory>(new ContentManagerFactory(convertStringToContentManagerType(cm_type), commonHeaders, contentManagerCustomizer));
+        // Server server;
+        Host port10000(hostName, port, convertFromProtocolTypeToPreference(convertStringToProtocolType(protocol)));
+        
+        nlohmann::json returnValue;
+        if (state.startServer(id, port10000, protocolFactory, contentManagerFactory)) {
+            // return success
+            returnValue["result"] = std::string("Ok");
+        } else {
+            // return failure
+            returnValue["result"] = std::string("Failed");
+        }
+        return std::move(returnJsonPage(200, "OK", returnValue.dump()));
+    } catch (std::invalid_argument& e) {
+        return std::move(returnHtmlPage(400, "Bad Request", "Invalid parameters", "Invalid Parameters"));
     }
-    return std::move(returnJsonPage(200, "OK", returnValue.dump()));
 }
 
 std::vector<char> RestServer::handleStopServer(const RestRequest & request,
@@ -102,7 +110,12 @@ std::vector<char> RestServer::handleStopServer(const RestRequest & request,
     UNUSED(body);
     nlohmann::json returnValue;
     
-    unsigned id = std::stoul(request.getParam("id"));
+    unsigned id;
+    try {
+        id = std::stoul(request.getParam("id"));
+    } catch(std::invalid_argument& e) {
+        return returnHtmlPage(400, "Bad Request", "Invalid Id specified", "Invalid Id specified");
+    }
     if (state.stopServer(id)) {
         // return success
         returnValue["result"] = std::string("Ok");

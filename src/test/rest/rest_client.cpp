@@ -21,7 +21,7 @@
 #include "hippomocks.h"
 #include "rest/rest_client.h"
 
-TEST_CASE("RestClient", "[rest][server]") {
+TEST_CASE("RestClient", "[rest][client][server]") {
     SECTION("URI not matching: short") {
         MockRepository mocks;
         
@@ -212,7 +212,7 @@ TEST_CASE("RestClient", "[rest][server]") {
         REQUIRE(returnString.find("HTTP/1.1 200 OK\r\n") != std::string::npos);
         REQUIRE(returnString.find("\"result\":\"Failed\"") != std::string::npos);
     }
-    SECTION("Valid Type: POST with no parameters") {
+    SECTION("Valid Type: PUT with no parameters") {
         MockRepository mocks;
         
         RestState * restState = mocks.Mock<RestState>();
@@ -225,7 +225,7 @@ TEST_CASE("RestClient", "[rest][server]") {
         std::string returnString(&returnVector[0], returnVector.size());
         REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
     }
-    SECTION("Valid Type: POST with only host") {
+    SECTION("Valid Type: PUT with only host") {
         MockRepository mocks;
         
         RestState * restState = mocks.Mock<RestState>();
@@ -238,7 +238,7 @@ TEST_CASE("RestClient", "[rest][server]") {
         std::string returnString(&returnVector[0], returnVector.size());
         REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
     }
-    SECTION("Valid Type: POST with host but invalid port") {
+    SECTION("Valid Type: PUT with host but invalid port") {
         MockRepository mocks;
         
         RestState * restState = mocks.Mock<RestState>();
@@ -251,7 +251,7 @@ TEST_CASE("RestClient", "[rest][server]") {
         std::string returnString(&returnVector[0], returnVector.size());
         REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
     }
-    SECTION("Valid Type: POST with host and valid port and succeeds") {
+    SECTION("Valid Type: PUT with host and valid port and succeeds") {
         MockRepository mocks;
         
         RestState * restState = mocks.Mock<RestState>();
@@ -266,7 +266,7 @@ TEST_CASE("RestClient", "[rest][server]") {
         REQUIRE(returnString.find("HTTP/1.1 200 OK\r\n") != std::string::npos);
         REQUIRE(returnString.find("\"result\":\"Ok\"") != std::string::npos);
     }
-    SECTION("Valid Type: POST with host and valid port and fails") {
+    SECTION("Valid Type: PUT with host and valid port and fails") {
         MockRepository mocks;
         
         RestState * restState = mocks.Mock<RestState>();
@@ -281,7 +281,7 @@ TEST_CASE("RestClient", "[rest][server]") {
         REQUIRE(returnString.find("HTTP/1.1 200 OK\r\n") != std::string::npos);
         REQUIRE(returnString.find("\"result\":\"Failed\"") != std::string::npos);
     }
-    SECTION("Valid Type: POST with all parameters") {
+    SECTION("Valid Type: PUT with all parameters") {
         MockRepository mocks;
         
         RestState * restState = mocks.Mock<RestState>();
@@ -296,7 +296,7 @@ TEST_CASE("RestClient", "[rest][server]") {
         REQUIRE(returnString.find("HTTP/1.1 200 OK\r\n") != std::string::npos);
         REQUIRE(returnString.find("\"result\":\"Ok\"") != std::string::npos);
     }
-    SECTION("Valid Type: POST with all parameters, invalid id") {
+    SECTION("Valid Type: PUT with all parameters, invalid id") {
         MockRepository mocks;
         
         RestState * restState = mocks.Mock<RestState>();
@@ -309,7 +309,7 @@ TEST_CASE("RestClient", "[rest][server]") {
         std::string returnString(&returnVector[0], returnVector.size());
         REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
     }
-    SECTION("Valid Type: POST with all parameters, invalid count") {
+    SECTION("Valid Type: PUT with all parameters, invalid count") {
         MockRepository mocks;
         
         RestState * restState = mocks.Mock<RestState>();
@@ -322,7 +322,7 @@ TEST_CASE("RestClient", "[rest][server]") {
         std::string returnString(&returnVector[0], returnVector.size());
         REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
     }
-    SECTION("Valid Type: POST with all parameters, invalid min") {
+    SECTION("Valid Type: PUT with all parameters, invalid min") {
         MockRepository mocks;
         
         RestState * restState = mocks.Mock<RestState>();
@@ -335,7 +335,7 @@ TEST_CASE("RestClient", "[rest][server]") {
         std::string returnString(&returnVector[0], returnVector.size());
         REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
     }
-    SECTION("Valid Type: POST with all parameters, invalid max") {
+    SECTION("Valid Type: PUT with all parameters, invalid max") {
         MockRepository mocks;
         
         RestState * restState = mocks.Mock<RestState>();
@@ -348,7 +348,7 @@ TEST_CASE("RestClient", "[rest][server]") {
         std::string returnString(&returnVector[0], returnVector.size());
         REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
     }
-    SECTION("Valid Type: POST with all parameters, invalid content_manager") {
+    SECTION("Valid Type: PUT with all parameters, invalid content_manager") {
         MockRepository mocks;
         
         RestState * restState = mocks.Mock<RestState>();

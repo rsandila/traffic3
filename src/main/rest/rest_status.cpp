@@ -34,7 +34,7 @@ std::vector<char> RestStatus::handleRequest(const Host & host, const RestRequest
     UNUSED(headers);
     UNUSED(body);
     
-    if (request.getUri() != uriPattern) {
+    if (request.getUri() != uriPattern || request.getType() != RestRequestType::RRT_GET) {
         // not me, return empty
         return std::vector<char>();
     }

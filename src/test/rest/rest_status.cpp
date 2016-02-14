@@ -17,4 +17,234 @@
  USA.
  */
 
-// TODO
+#include "catch.hpp"
+#include "hippomocks.h"
+#include "rest/rest_status.h"
+
+TEST_CASE("RestStatus", "[rest][status][server][client]") {
+    SECTION("PUT") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.NeverCall(restState, RestState::getNumClients);
+        mocks.NeverCall(restState, RestState::getNumServers);
+        mocks.NeverCall(restState, RestState::startClient);
+        mocks.NeverCall(restState, RestState::stopClient);
+        mocks.NeverCall(restState, RestState::startServer);
+        mocks.NeverCall(restState, RestState::stopServer);
+        mocks.NeverCall(restState, RestState::getClientNumRead);
+        mocks.NeverCall(restState, RestState::getClientNumWritten);
+        mocks.NeverCall(restState, RestState::getServerNumRead);
+        mocks.NeverCall(restState, RestState::getServerNumWritten);
+        mocks.NeverCall(restState, RestState::getServerJson);
+        mocks.NeverCall(restState, RestState::getServerJsonForId);
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.NeverCall(restState, RestState::getClientJsonForId);
+        
+        RestStatus status("/test", *restState);
+        RestRequest request(RestRequestType::RRT_PUT, "/test", "1.0");
+        
+        REQUIRE(status.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>()) == std::vector<char>());
+    }
+    SECTION("POST") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.NeverCall(restState, RestState::getNumClients);
+        mocks.NeverCall(restState, RestState::getNumServers);
+        mocks.NeverCall(restState, RestState::startClient);
+        mocks.NeverCall(restState, RestState::stopClient);
+        mocks.NeverCall(restState, RestState::startServer);
+        mocks.NeverCall(restState, RestState::stopServer);
+        mocks.NeverCall(restState, RestState::getClientNumRead);
+        mocks.NeverCall(restState, RestState::getClientNumWritten);
+        mocks.NeverCall(restState, RestState::getServerNumRead);
+        mocks.NeverCall(restState, RestState::getServerNumWritten);
+        mocks.NeverCall(restState, RestState::getServerJson);
+        mocks.NeverCall(restState, RestState::getServerJsonForId);
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.NeverCall(restState, RestState::getClientJsonForId);
+        
+        RestStatus status("/test", *restState);
+        RestRequest request(RestRequestType::RRT_POST, "/test", "1.0");
+        
+        REQUIRE(status.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>()) == std::vector<char>());
+    }
+    SECTION("HEAD") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.NeverCall(restState, RestState::getNumClients);
+        mocks.NeverCall(restState, RestState::getNumServers);
+        mocks.NeverCall(restState, RestState::startClient);
+        mocks.NeverCall(restState, RestState::stopClient);
+        mocks.NeverCall(restState, RestState::startServer);
+        mocks.NeverCall(restState, RestState::stopServer);
+        mocks.NeverCall(restState, RestState::getClientNumRead);
+        mocks.NeverCall(restState, RestState::getClientNumWritten);
+        mocks.NeverCall(restState, RestState::getServerNumRead);
+        mocks.NeverCall(restState, RestState::getServerNumWritten);
+        mocks.NeverCall(restState, RestState::getServerJson);
+        mocks.NeverCall(restState, RestState::getServerJsonForId);
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.NeverCall(restState, RestState::getClientJsonForId);
+        
+        RestStatus status("/test", *restState);
+        RestRequest request(RestRequestType::RRT_HEAD, "/test", "1.0");
+        
+        REQUIRE(status.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>()) == std::vector<char>());
+    }
+    SECTION("DELETE") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.NeverCall(restState, RestState::getNumClients);
+        mocks.NeverCall(restState, RestState::getNumServers);
+        mocks.NeverCall(restState, RestState::startClient);
+        mocks.NeverCall(restState, RestState::stopClient);
+        mocks.NeverCall(restState, RestState::startServer);
+        mocks.NeverCall(restState, RestState::stopServer);
+        mocks.NeverCall(restState, RestState::getClientNumRead);
+        mocks.NeverCall(restState, RestState::getClientNumWritten);
+        mocks.NeverCall(restState, RestState::getServerNumRead);
+        mocks.NeverCall(restState, RestState::getServerNumWritten);
+        mocks.NeverCall(restState, RestState::getServerJson);
+        mocks.NeverCall(restState, RestState::getServerJsonForId);
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.NeverCall(restState, RestState::getClientJsonForId);
+        
+        RestStatus status("/test", *restState);
+        RestRequest request(RestRequestType::RRT_DELETE, "/test", "1.0");
+        
+        REQUIRE(status.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>()) == std::vector<char>());
+    }
+    SECTION("TRACE") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.NeverCall(restState, RestState::getNumClients);
+        mocks.NeverCall(restState, RestState::getNumServers);
+        mocks.NeverCall(restState, RestState::startClient);
+        mocks.NeverCall(restState, RestState::stopClient);
+        mocks.NeverCall(restState, RestState::startServer);
+        mocks.NeverCall(restState, RestState::stopServer);
+        mocks.NeverCall(restState, RestState::getClientNumRead);
+        mocks.NeverCall(restState, RestState::getClientNumWritten);
+        mocks.NeverCall(restState, RestState::getServerNumRead);
+        mocks.NeverCall(restState, RestState::getServerNumWritten);
+        mocks.NeverCall(restState, RestState::getServerJson);
+        mocks.NeverCall(restState, RestState::getServerJsonForId);
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.NeverCall(restState, RestState::getClientJsonForId);
+        
+        RestStatus status("/test", *restState);
+        RestRequest request(RestRequestType::RRT_TRACE, "/test", "1.0");
+        
+        REQUIRE(status.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>()) == std::vector<char>());
+    }
+    SECTION("OPTIONS") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.NeverCall(restState, RestState::getNumClients);
+        mocks.NeverCall(restState, RestState::getNumServers);
+        mocks.NeverCall(restState, RestState::startClient);
+        mocks.NeverCall(restState, RestState::stopClient);
+        mocks.NeverCall(restState, RestState::startServer);
+        mocks.NeverCall(restState, RestState::stopServer);
+        mocks.NeverCall(restState, RestState::getClientNumRead);
+        mocks.NeverCall(restState, RestState::getClientNumWritten);
+        mocks.NeverCall(restState, RestState::getServerNumRead);
+        mocks.NeverCall(restState, RestState::getServerNumWritten);
+        mocks.NeverCall(restState, RestState::getServerJson);
+        mocks.NeverCall(restState, RestState::getServerJsonForId);
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.NeverCall(restState, RestState::getClientJsonForId);
+        
+        RestStatus status("/test", *restState);
+        RestRequest request(RestRequestType::RRT_OPTIONS, "/test", "1.0");
+        
+        REQUIRE(status.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>()) == std::vector<char>());
+    }
+    SECTION("GET, short path") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.NeverCall(restState, RestState::getNumClients);
+        mocks.NeverCall(restState, RestState::getNumServers);
+        mocks.NeverCall(restState, RestState::startClient);
+        mocks.NeverCall(restState, RestState::stopClient);
+        mocks.NeverCall(restState, RestState::startServer);
+        mocks.NeverCall(restState, RestState::stopServer);
+        mocks.NeverCall(restState, RestState::getClientNumRead);
+        mocks.NeverCall(restState, RestState::getClientNumWritten);
+        mocks.NeverCall(restState, RestState::getServerNumRead);
+        mocks.NeverCall(restState, RestState::getServerNumWritten);
+        mocks.NeverCall(restState, RestState::getServerJson);
+        mocks.NeverCall(restState, RestState::getServerJsonForId);
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.NeverCall(restState, RestState::getClientJsonForId);
+        
+        RestStatus status("/test", *restState);
+        RestRequest request(RestRequestType::RRT_GET, "/tes", "1.0");
+        
+        REQUIRE(status.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>()) == std::vector<char>());
+    }
+    SECTION("GET, long path") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.NeverCall(restState, RestState::getNumClients);
+        mocks.NeverCall(restState, RestState::getNumServers);
+        mocks.NeverCall(restState, RestState::startClient);
+        mocks.NeverCall(restState, RestState::stopClient);
+        mocks.NeverCall(restState, RestState::startServer);
+        mocks.NeverCall(restState, RestState::stopServer);
+        mocks.NeverCall(restState, RestState::getClientNumRead);
+        mocks.NeverCall(restState, RestState::getClientNumWritten);
+        mocks.NeverCall(restState, RestState::getServerNumRead);
+        mocks.NeverCall(restState, RestState::getServerNumWritten);
+        mocks.NeverCall(restState, RestState::getServerJson);
+        mocks.NeverCall(restState, RestState::getServerJsonForId);
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.NeverCall(restState, RestState::getClientJsonForId);
+        
+        RestStatus status("/test", *restState);
+        RestRequest request(RestRequestType::RRT_GET, "/test2", "1.0");
+        
+        REQUIRE(status.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>()) == std::vector<char>());
+   }
+    SECTION("GET, valid path") {
+        MockRepository mocks;
+        
+        RestState * restState = mocks.Mock<RestState>();
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.NeverCall(restState, RestState::startClient);
+        mocks.NeverCall(restState, RestState::stopClient);
+        mocks.NeverCall(restState, RestState::startServer);
+        mocks.NeverCall(restState, RestState::stopServer);
+        mocks.NeverCall(restState, RestState::getServerJson);
+        mocks.NeverCall(restState, RestState::getServerJsonForId);
+        mocks.NeverCall(restState, RestState::getClientJson);
+        mocks.NeverCall(restState, RestState::getClientJsonForId);
+        mocks.ExpectCall(restState, RestState::getNumClients).Return(0);
+        mocks.ExpectCall(restState, RestState::getNumServers).Return(0);
+        mocks.ExpectCall(restState, RestState::getServerNumRead).Return(0);
+        mocks.ExpectCall(restState, RestState::getServerNumWritten).Return(0);
+        mocks.ExpectCall(restState, RestState::getClientNumRead).Return(0);
+        mocks.ExpectCall(restState, RestState::getClientNumWritten).Return(0);
+        
+        RestStatus status("/test", *restState);
+        RestRequest request(RestRequestType::RRT_GET, "/test", "1.0");
+        
+        REQUIRE(status.handleRequest(Host::ALL_INTERFACES4, request, std::map<std::string, std::string>(), std::vector<char>()) != std::vector<char>());
+    }
+}

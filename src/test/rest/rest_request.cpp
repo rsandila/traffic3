@@ -20,10 +20,6 @@
 #include "catch.hpp"
 #include "rest/rest_request.h"
 
-/*
- bool hasParam(const std::string & name) const noexcept;
- */
-
 TEST_CASE("RestRequest: constructor", "[request][rest]") {
     SECTION("Missing value") {
         try {
