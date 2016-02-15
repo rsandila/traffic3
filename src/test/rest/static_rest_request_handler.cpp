@@ -17,6 +17,7 @@
  USA.
  */
 
+#include <cstdio>
 #include "catch.hpp"
 #include "rest/static_rest_request_handler.cpp"
 
