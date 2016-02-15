@@ -94,11 +94,12 @@ int beRest(const cmdline::parser & options) {
     std::vector<std::shared_ptr<RestRequestHandler>> restRequestHandlers;
     std::vector<std::shared_ptr<ErrorPageHandler>> errorPageHandlers;
     errorPageHandlers.push_back(std::shared_ptr<ErrorPageHandler>(new ErrorPageHandler()));
-    // TODO - set up handlers
+    
     restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new RestServer("/server", state)));
     restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new RestClient("/client", state)));
     restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new RestStatus("/status", state)));
-    restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new StaticRestRequestHandler(options.get<std::string>("rest_content"), "/(.*)")));
+    restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new StaticRestRequestHandler(options.get<std::string>("rest_content"),
+                                                                                                   "index.html", "/(.*)")));
     std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new RestContentManagerCustomizer(restRequestHandlers, errorPageHandlers));
     std::shared_ptr<ContentManagerFactory> contentManagerFactory = std::shared_ptr<ContentManagerFactory>(new ContentManagerFactory(ContentManagerType::RestHeaders, headers, contentManagerCustomizer));
     Server server;
@@ -119,7 +120,6 @@ void print_usage(const std::string argv0) {
 static const char * TRAFFIC_CONF = "traffic3.logging.conf";
 
 int main(int argc, char ** argv) {
-    // TODO
 	{
 		std::ifstream test(TRAFFIC_CONF);
 		if (test.is_open()) {

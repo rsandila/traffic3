@@ -25,8 +25,8 @@
 
 // uriPattern must contain a capture. The file name is derived from the capture
 // example: /static/([a-zA-Z0-9_\-\.]+
-StaticRestRequestHandler::StaticRestRequestHandler(const std::string & path, const std::string & uriPattern)
-        : basePath(path), uriRegex(uriPattern) {
+StaticRestRequestHandler::StaticRestRequestHandler(const std::string & path, const std::string & defaultFile, const std::string & uriPattern)
+        : basePath(path), defaultFilePath(defaultFile), uriRegex(uriPattern) {
 }
 
 std::vector<char> StaticRestRequestHandler::handleRequest(const Host & host, const RestRequest & request,
@@ -36,16 +36,20 @@ std::vector<char> StaticRestRequestHandler::handleRequest(const Host & host, con
     UNUSED(headers);
     UNUSED(body);
     std::smatch sm;
-    if (std::regex_match(request.getUri(), sm, uriRegex) || sm.size() != 2) {
+    if (request.getType() == RestRequestType::RRT_GET && (std::regex_match(request.getUri(), sm, uriRegex) || sm.size() != 2)) {
         std::ostringstream ostr;
-        ostr << basePath << "/" << sm[1];
+        std::string subPath = sm[1];
+        if (subPath.empty() || subPath == "/") {
+            subPath = defaultFilePath;
+        }
+        ostr << basePath << "/" << subPath;
         std::string path = ostr.str();
         if (path.find("..") == std::string::npos) {
             std::ifstream inp(path);
             if (inp) {
-                inp.seekg (0, inp.end);
+                inp.seekg(0, inp.end);
                 uint32_t length = inp.tellg();
-                inp.seekg (0, inp.beg);
+                inp.seekg(0, inp.beg);
                 std::stringstream ostr;
                 ostr << "HTTP/1.0 200 OK\r\nContent-Length: " << length << "\r\n\r\n";
                 std::vector<char> returnValue(length + ostr.str().length());

@@ -142,7 +142,7 @@ TEST_CASE("RestServer", "[rest][server]") {
         std::string returnString(&returnVector[0], returnVector.size());
         REQUIRE(returnString.find("HTTP/1.0 400 Bad Request") != std::string::npos);
     }
-    // TOOD - all the DELETE variants
+    // all the DELETE variants
     SECTION("Valid Type: DELETE with invalid id") {
         MockRepository mocks;
         

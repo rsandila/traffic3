@@ -29,10 +29,11 @@
 
 class StaticRestRequestHandler: public RestRequestHandler {
 public:
-    StaticRestRequestHandler(const std::string & path, const std::string & uriPattern);
+    StaticRestRequestHandler(const std::string & path, const std::string & defaultFile, const std::string & uriPattern);
     virtual std::vector<char> handleRequest(const Host & host, const RestRequest & request, const std::map<std::string, std::string> & headers, const std::vector<char> & body);
 protected:
 private:
     const std::string basePath;
+    const std::string defaultFilePath;
     std::regex uriRegex;
 };
