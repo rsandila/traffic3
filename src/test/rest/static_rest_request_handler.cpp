@@ -31,7 +31,7 @@ TEST_CASE("StaticRestRequestHandler", "[rest][server][content]") {
             }
         }
         virtual ~TemporaryTestFile() {
-            unlink(path.c_str());
+            remove(path.c_str());
         }
         private:
             const std::string path;
