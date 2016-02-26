@@ -150,7 +150,7 @@ int Host::getPreferredSocketDomain() const noexcept {
                 return AF_INET;
             }
     }
-    
+
 }
 
 Host::ProtocolPreference Host::getProtocolPreference() const noexcept {
@@ -184,7 +184,7 @@ bool Host::populateToAddr6(const std::string & name, unsigned _port) {
         return false;
     }
 	struct addrinfo hints;
-	struct addrinfo *result;
+    struct addrinfo *result = nullptr;
 	memset(&hints, 0, sizeof(struct addrinfo));
 	hints.ai_family = AF_INET6;
 	hints.ai_socktype = 0;
@@ -218,8 +218,64 @@ bool Host::operator==(const Host & other) const {
     return retval;
 }
 
+nlohmann::json Host::toJson() const noexcept {
+    nlohmann::json returnValue;
+
+    returnValue["hostName"] = hostName;
+    returnValue["port"] = port;
+    returnValue["hasIPv4"] = hasAddr;
+    returnValue["hasIPv6"] = hasAddr6;
+    switch (protocolPreference) {
+        case ProtocolPreference::IPV4:
+            returnValue["protocolPreference"] = std::string("IPv4");
+            break;
+        case ProtocolPreference::IPV6:
+            returnValue["protocolPreference"] = std::string("IPv6");
+            break;
+        case ProtocolPreference::ANY:
+            returnValue["protocolPreference"] = std::string("ANY");
+            break;
+    }
+
+    char hbuf[NI_MAXHOST], sbuf[NI_MAXSERV];
+    hbuf[0] = 0;
+    sbuf[0] = 0;
+    if (hasAddr && getnameinfo((const sockaddr *)&addr, sizeof(addr), hbuf, sizeof(hbuf), sbuf,
+                        sizeof(sbuf), 0) == 0) {
+        returnValue["ipv4Name"] = std::string(hbuf);
+        returnValue["ipv4Service"] = std::string(sbuf);
+    }
+    hbuf[0] = 0;
+    sbuf[0] = 0;
+    if (hasAddr6 && getnameinfo((const sockaddr *)&addr6, sizeof(addr6), hbuf, sizeof(hbuf), sbuf,
+                               sizeof(sbuf), 0) == 0) {
+        returnValue["ipv6Name"] = std::string(hbuf);
+        returnValue["ipv6Service"] = std::string(sbuf);
+    }
+
+    return std::move(returnValue);
+}
+
+
 std::ostream & operator<<(std::ostream & outp, const Host & host) {
     outp << host.hostName;
     outp << ":" << host.port;
     return outp;
+}
+
+Host::ProtocolPreference convertFromProtocolTypeToPreference(const ProtocolType type) {
+    switch (type) {
+        case ProtocolType::UDP4:
+            // fall through on purpose
+        case ProtocolType::TCP4:
+            return Host::ProtocolPreference::IPV4;
+        case ProtocolType::TCP6:
+            // fall through on purpose
+        case ProtocolType::UDP6:
+            return Host::ProtocolPreference::IPV6;
+        case ProtocolType::None:
+	   // fall through on purpose
+	default:
+            return Host::ProtocolPreference::ANY;
     }
+}

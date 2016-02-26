@@ -18,95 +18,49 @@
  */
 #include <fstream>
 #include <iostream>
-#include "host.h"
-#include "protocolfactory.h"
-#include "server.h"
-#include "contentmanagerfactory.h"
-#include "commonheaders.h"
-#include "client.h"
-#include "logging.h"
+#include "lib/host.h"
+#include "protocol/protocolfactory.h"
+#include "lib/server.h"
+#include "contentmanager/contentmanagerfactory.h"
+#include "lib/commonheaders.h"
+#include "lib/client.h"
+#include "lib/logging.h"
 #include "cmdline.h"
+#include "rest/restheaders.h"
+#include "contentmanager/contentmanager_customizer.h"
+#include "rest/rest_contentmanager_customizer.h"
+#include "rest/static_rest_request_handler.h"
+#include "rest/rest_status.h"
+#include "rest/rest_state.h"
+#include "rest/rest_client.h"
+#include "rest/rest_server.h"
 
 INITIALIZE_EASYLOGGINGPP
 
-ContentManagerType mapStringToContentManagerType(const std::string & value) {
-    switch (value[0]) {
-            case 'r':
-                if (value == "randomtext") {
-                    return ContentManagerType::RandomText;
-                }
-                if (value == "randombinary") {
-                    return ContentManagerType::RandomBinary;
-                }
-                break;
-            case 'f':
-                if (value == "fixed") {
-                    return ContentManagerType::Fixed;
-                }
-            case 'e':
-                if (value == "echo") {
-                    return ContentManagerType::Echo;
-                }
-                break;
-    }
-    return ContentManagerType::None;
-}
+enum class ModeType {
+    InvalidMode,
+    ServerMode,
+    ClientMode,
+    RestMode
+};
 
-ProtocolType mapStringToProtocolType(const std::string & value) {
-    switch (value[0]) {
-        case 't':
-            if (value == "tcp4") {
-                return ProtocolType::TCP4;
-            }
-            if (value == "tcp6") {
-                return ProtocolType::TCP6;
-            }
-            break;
-        case 'u':
-            if (value == "udp4") {
-                return ProtocolType::UDP4;
-            }
-            if (value == "udp6") {
-                return ProtocolType::UDP6;
-            }
-            break;
-        default:
-            break;
-    }
-    return ProtocolType::None;
-}
+static std::map<std::string, ModeType> modeMap {
+    {"server", ModeType::ServerMode},
+    {"client", ModeType::ClientMode},
+    {"rest", ModeType::RestMode} };
 
-Host::ProtocolPreference mapStringToProtocolPreference(const std::string & value) {
-    switch (value[0]) {
-        case 't':
-            if (value == "tcp4") {
-                return Host::ProtocolPreference::IPV4;
-            }
-            if (value == "tcp6") {
-                return Host::ProtocolPreference::IPV6;
-            }
-            break;
-        case 'u':
-            if (value == "udp4") {
-                return Host::ProtocolPreference::IPV4;
-            }
-            if (value == "udp6") {
-                return Host::ProtocolPreference::IPV6;
-            }
-            break;
-        default:
-            break;
-    }
-    return Host::ProtocolPreference::ANY;
-    
-}
 
 int beServer(const cmdline::parser & options) {
-    ProtocolFactory protocolFactory(mapStringToProtocolType(options.get<std::string>("protocol")));
-    ContentManagerFactory contentManagerFactory(mapStringToContentManagerType(options.get<std::string>("type")), options.get<unsigned>("min"), options.get<unsigned>("max"), CommonHeaders());
-    Server server(protocolFactory, contentManagerFactory);
-    Host port10000(options.get<std::string>("interface"), options.get<unsigned>("port"), mapStringToProtocolPreference(options.get<std::string>("protocol")));
-    if (!server.addPort(port10000)) {
+    std::unique_ptr<CommonHeaders> headers(new CommonHeaders());
+    ProtocolFactory protocolFactory(convertStringToProtocolType(options.get<std::string>("protocol")));
+    std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(
+                                                    options.get<unsigned>("min"), options.get<unsigned>("max")));
+    std::shared_ptr<ContentManagerFactory> contentManagerFactory = std::shared_ptr<ContentManagerFactory>(new ContentManagerFactory(convertStringToContentManagerType(options.get<std::string>("type")), headers,
+                                                contentManagerCustomizer));
+    Server server;
+    Host port10000(options.get<std::string>("interface"), options.get<unsigned>("port"),
+                   convertFromProtocolTypeToPreference(convertStringToProtocolType(options.get<std::string>("protocol"))));
+    if (!server.addPort(1, port10000, protocolFactory, contentManagerFactory)) {
         std::cerr << "Unable to listen on port " << options.get<unsigned>("port") << " " << options.get<std::string>("protocol") << " on interface " << options.get<std::string>("interface") << std::endl;
         return 1;
     }
@@ -115,9 +69,13 @@ int beServer(const cmdline::parser & options) {
 }
 
 int beClient(const cmdline::parser & options) {
-    ProtocolFactory protocolFactory(mapStringToProtocolType(options.get<std::string>("protocol")));
-    ContentManagerFactory contentManagerFactory(mapStringToContentManagerType(options.get<std::string>("type")), options.get<unsigned>("min"), options.get<unsigned>("max"), CommonHeaders());
-    Host port10000(options.get<std::string>("host"), options.get<unsigned>("port"), mapStringToProtocolPreference(options.get<std::string>("protocol")));
+    ProtocolFactory protocolFactory(convertStringToProtocolType(options.get<std::string>("protocol")));
+    std::unique_ptr<CommonHeaders> headers(new CommonHeaders());
+    std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(
+                                                        options.get<unsigned>("min"), options.get<unsigned>("max")));
+    ContentManagerFactory contentManagerFactory(convertStringToContentManagerType(options.get<std::string>("type")), headers, contentManagerCustomizer);
+    Host port10000(options.get<std::string>("host"), options.get<unsigned>("port"),
+                   convertFromProtocolTypeToPreference(convertStringToProtocolType(options.get<std::string>("protocol"))));
     Client client;
     if (client.startClients(1, options.get<unsigned>("count"), protocolFactory, contentManagerFactory, port10000)) {
         getchar();
@@ -128,6 +86,33 @@ int beClient(const cmdline::parser & options) {
     return 1;
 }
 
+int beRest(const cmdline::parser & options) {
+    ProtocolFactory protocolFactory(convertStringToProtocolType(options.get<std::string>("protocol")));
+    std::unique_ptr<CommonHeaders> headers(new RestHeaders());
+    RestState state;
+    
+    std::vector<std::shared_ptr<RestRequestHandler>> restRequestHandlers;
+    std::vector<std::shared_ptr<ErrorPageHandler>> errorPageHandlers;
+    errorPageHandlers.push_back(std::shared_ptr<ErrorPageHandler>(new ErrorPageHandler()));
+    
+    restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new RestServer("/server", state)));
+    restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new RestClient("/client", state)));
+    restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new RestStatus("/status", state)));
+    restRequestHandlers.push_back(std::shared_ptr<RestRequestHandler>(new StaticRestRequestHandler(options.get<std::string>("rest_content"),
+                                                                                                   "index.html", "/(.*)")));
+    std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new RestContentManagerCustomizer(restRequestHandlers, errorPageHandlers));
+    std::shared_ptr<ContentManagerFactory> contentManagerFactory = std::shared_ptr<ContentManagerFactory>(new ContentManagerFactory(ContentManagerType::RestHeaders, headers, contentManagerCustomizer));
+    Server server;
+    Host port10000(options.get<std::string>("interface"), options.get<unsigned>("port"),
+                   convertFromProtocolTypeToPreference(convertStringToProtocolType(options.get<std::string>("protocol"))));
+    if (!server.addPort(1, port10000, protocolFactory, contentManagerFactory)) {
+        std::cerr << "Unable to listen on port " << options.get<unsigned>("port") << " " << options.get<std::string>("protocol") << " on interface " << options.get<std::string>("interface") << std::endl;
+        return 1;
+    }
+    getchar();
+    return 0;
+}
+
 void print_usage(const std::string argv0) {
     std::cerr << std::endl << "\tUsage: " << argv0 << " server|client ...." << std::endl;
 }
@@ -135,12 +120,6 @@ void print_usage(const std::string argv0) {
 static const char * TRAFFIC_CONF = "traffic3.logging.conf";
 
 int main(int argc, char ** argv) {
-    // TODO
-    enum class ModeType {
-        InvalidMode,
-        ServerMode,
-        ClientMode
-    };
 	{
 		std::ifstream test(TRAFFIC_CONF);
 		if (test.is_open()) {
@@ -148,9 +127,8 @@ int main(int argc, char ** argv) {
 			el::Loggers::reconfigureAllLoggers(conf);
 		}
 	}
-	std::map<std::string, ModeType> modeMap { {"server", ModeType::ServerMode}, {"client", ModeType::ClientMode} };
     cmdline::parser options;
-    options.add<std::string>("mode", 'o', "Mode [server|client]", true);
+    options.add<std::string>("mode", 'o', "Mode [server|client|rest]", true);
     options.add<std::string>("protocol", 'r', "Protocol [tcp4|udp4|tcp6|udp6]", false, "tcp4");
     options.add<std::string>("type", 't', "ContentManager type [randomtext|randombinary|fixed|echo]", false, "randomtext");
     options.add<unsigned>("port", 'p', "Port to connect to or listen on", true);
@@ -159,6 +137,7 @@ int main(int argc, char ** argv) {
     options.add<std::string>("host", 'h', "Host to connect to", false, "127.0.0.1");
     options.add<unsigned>("count", 'c', "Number of clients to use", false, 1);
     options.add<std::string>("interface", 'i', "Interface IP to listen on", false, "0.0.0.0");
+    options.add<std::string>("rest_content", 'e', "Folder containing static files to server", false, "/tmp/static");
     options.parse_check(argc, argv);
 
     START_EASYLOGGINGPP(argc, argv);
@@ -168,6 +147,8 @@ int main(int argc, char ** argv) {
             return beServer(options);
         case ModeType::ClientMode:
             return beClient(options);
+        case ModeType::RestMode:
+            return beRest(options);
         default:
             std::cerr << "Unknown mode: " << options.get<std::string>("mode");
             print_usage(argv[0]);

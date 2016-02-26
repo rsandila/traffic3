@@ -15,11 +15,20 @@ test_script:
 - ps: >-
     # run tests
 
-    bin\64bit\Debug\traffic3_test.exe -s ~[ipv6] -r junit -o traffic3_test.64.debug.xml
+    .\bin\64bit\Debug\traffic3_test.exe -s ~[ipv6] -r junit -o traffic3_test.64.debug.xml
+
+    $err = $LASTEXITCODE
 
     # upload results to AppVeyor
 
     $wc = New-Object 'System.Net.WebClient'
 
-    $wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\traffic3_test.64.debug.xml))
-    
+    $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\traffic3_test.64.debug.xml))
+
+    if ($err -ne 0) { exit $err }
+artifacts:
+  - path: traffic3_test.64.debug.xml
+    name: Log File
+
+  - path: 'bin\**\Debug\*.exe'
+    name: Traffic3 Windows Debug executables

@@ -28,6 +28,8 @@
 #include <WS2tcpip.h>
 #endif
 #include <string>
+#include "protocol/protocoltype.h"
+#include "json.hpp"
 
 class Host {
 public:
@@ -52,6 +54,7 @@ public:
     static Host ALL_INTERFACES6;
     static const unsigned DEFAULT_PORT;
     bool operator==(const Host & other) const;
+    nlohmann::json toJson() const noexcept;
 protected:
     bool populateToAddr(const std::string & name, unsigned _port);
     bool populateToAddr6(const std::string & name, unsigned _port);
@@ -66,3 +69,4 @@ private:
     friend std::ostream & operator<<(std::ostream & outp, const Host & host);
 };
 
+Host::ProtocolPreference convertFromProtocolTypeToPreference(const ProtocolType type);

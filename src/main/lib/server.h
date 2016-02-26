@@ -22,21 +22,25 @@
 #include <thread>
 #include <mutex>
 #include "listener.h"
-#include "protocolfactory.h"
-#include "contentmanagerfactory.h"
+#include "protocol/protocolfactory.h"
+#include "contentmanager/contentmanagerfactory.h"
+#include "json.hpp"
 
 class Server {
 public:
-    Server(ProtocolFactory & protocolFactory, ContentManagerFactory & contentManagerFactory);
     virtual ~Server();
-    bool addPort(Host & host);
-    bool stopPort(Host & host);
-    const std::vector<Host> getPorts() const noexcept;
-    // TODO - collect statistics
+    bool addPort(unsigned portId, Host & host, ProtocolFactory & protocolFactory, std::shared_ptr<ContentManagerFactory> & contentManagerFactory);
+    bool stopPort(unsigned portId);
+    const std::vector<unsigned> getPorts() const noexcept;
+    int getNumServers() noexcept;
+    long long getNumBytesRead() const noexcept;
+    long long getNumBytesWritten() const noexcept;
+    nlohmann::json toJson() const noexcept;
+    nlohmann::json toJson(unsigned id) const noexcept;
 protected:
 private:
     std::vector<std::unique_ptr<Listener>> listeners;
-    ProtocolFactory & protocolFactory;
-    ContentManagerFactory & contentFactory;
+    // ProtocolFactory protocolFactory;
+    // std::shared_ptr<ContentManagerFactory> contentFactory;
     mutable std::mutex lock;
 };

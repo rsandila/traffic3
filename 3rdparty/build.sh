@@ -20,6 +20,6 @@ make -f Bootstrap.mak ${OS} || exit 5
 popd
 pushd ..
 ./3rdparty/premake-core/bin/release/premake5 gmake || exit 4
-make clean all || exit 2
-./test/Debug/traffic3_test || exit 3
+make clean all -j`getconf _NPROCESSORS_ONLN` || exit 2
+./bin/32bit/Debug/traffic3_test || exit 3
 popd

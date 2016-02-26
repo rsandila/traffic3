@@ -22,17 +22,19 @@
 #include <sstream>
 #include <thread>
 #include <vector>
-#include "contentmanagerfactory.h"
-#include "protocolfactory.h"
+#include "contentmanager/contentmanagerfactory.h"
+#include "protocol/protocolfactory.h"
 #include "listener.h"
 #include "logging.h"
 
-Listener::Listener(const Host & _host, ProtocolFactory & protocolFactory, ContentManagerFactory & contentManagerFactory) :
+Listener::Listener(unsigned portId, const Host & _host, ProtocolFactory & protocolFactory,
+                   std::shared_ptr<ContentManagerFactory> & contentManagerFactory) : _portId(portId),
         host(_host), protocol(protocolFactory.createProtocol()), _contentManagerFactory(contentManagerFactory),
     errorState(false), thread(std::thread(std::bind(&Listener::listen, this))) {
 }
 
-Listener::Listener(Listener && other) : host(other.host), protocol(std::move(other.protocol)), _contentManagerFactory(other._contentManagerFactory),
+Listener::Listener(Listener && other) : _portId(other._portId), host(other.host),
+        protocol(std::move(other.protocol)), _contentManagerFactory(other._contentManagerFactory),
         contentManagers(std::move(other.contentManagers)), errorState(other.errorState), thread(std::move(other.thread)) {
 }
 
@@ -46,8 +48,8 @@ Listener & Listener::operator=(Listener&& other) {
     return *this;
 }
 
-bool Listener::operator==(const Host & other) const {
-    return host == other;
+bool Listener::operator==(const unsigned portId) const {
+    return _portId == portId;
 }
 
 const Host & Listener::getHost() const {
@@ -82,7 +84,7 @@ void Listener::listen() {
         do {
             std::unique_ptr<Protocol> newProtocol = protocol->waitForNewConnection();
             if (newProtocol.get() != nullptr && newProtocol->getState() == Protocol::ProtocolState::OPEN) {
-                std::unique_ptr<ContentManager> tempContentManager =_contentManagerFactory.createContentManager(std::move(newProtocol), true);
+                std::unique_ptr<ContentManager> tempContentManager =_contentManagerFactory->createContentManager(std::move(newProtocol), true);
                 if (tempContentManager.get() != nullptr) {
                     tempContentManager->Start();
                     contentManagers.push_back(std::move(tempContentManager));
@@ -99,3 +101,41 @@ void Listener::listen() {
     
 }
 
+unsigned Listener::getPortId() const noexcept {
+    return _portId;
+}
+
+long long Listener::getBytesRead() const noexcept {
+    if (protocol.get()) {
+        return protocol->getBytesRead();
+    } else {
+        return 0LL;
+    }
+}
+
+long long Listener::getBytesWritten() const noexcept {
+    if (protocol.get()) {
+        return protocol->getBytesWritten();
+    } else {
+        return 0LL;
+    }
+}
+
+nlohmann::json Listener::toJson() const noexcept {
+    nlohmann::json returnValue;
+    
+    returnValue["id"] = _portId;
+    returnValue["host"] = host.toJson();
+    returnValue["protocol"] = protocol->toJson();
+    returnValue["contentManagerFactory"] = _contentManagerFactory->toJson();
+    returnValue["numContentManagers"] = contentManagers.size();
+    
+    std::vector<nlohmann::json> contentManagersJson;
+    for (const auto & contentManager: contentManagers) {
+        contentManagersJson.push_back(contentManager->toJson());
+    }
+    returnValue["contentManagers"] = contentManagersJson;
+    returnValue["errorState"] = errorState;
+    
+    return std::move(returnValue);
+}

@@ -20,7 +20,8 @@
 #pragma once
 
 #include <vector>
-#include "protocol.h"
+#include "protocol/protocol.h"
+#include "json.hpp"
 
 class CommonHeaders {
 public:
@@ -29,6 +30,7 @@ public:
     virtual bool read(std::unique_ptr<Protocol> & protocol, std::vector<char> & content, Host & hostState);
     virtual bool write(std::unique_ptr<Protocol> & protocol, const std::vector<char> & content, const Host & hostState);
     virtual unsigned getVersion() const;
+    virtual nlohmann::json toJson() const noexcept;
 protected:
 private:
 };

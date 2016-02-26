@@ -18,10 +18,6 @@
  */
 #include "client.h"
 
-Client::Client() {
-    
-}
-
 Client::~Client() {
     for (auto it = workers.begin(); it != workers.end(); it++) {
         for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++) {
@@ -30,8 +26,8 @@ Client::~Client() {
     }
 }
 
-bool Client::startClients(unsigned clientId, unsigned num_clients, ProtocolFactory & _protocolFactory, ContentManagerFactory & _contentManagerFactory,
-                          Host _server) {
+bool Client::startClients(unsigned clientId, unsigned num_clients, ProtocolFactory & _protocolFactory,
+                          ContentManagerFactory & _contentManagerFactory, Host _server) {
     std::unique_lock<std::mutex> lck(lock);
     if (workers.find(clientId) != workers.end()) {
         return false;
@@ -60,4 +56,64 @@ bool Client::stopClients(unsigned clientId) {
     }
     workers.erase(client);
     return true;
+}
+
+int Client::getNumClients() noexcept {
+    std::unique_lock<std::mutex> lck(lock);
+    return workers.size();
+}
+
+long long Client::getNumBytesRead() const noexcept {
+    long long total = 0;
+    for (const auto & client: workers) {
+        for (const auto & one: client.second) {
+            total += one->getBytesRead();
+        }
+    }
+    return total;
+}
+
+long long Client::getNumBytesWritten() const noexcept {
+    long long total = 0;
+    for (const auto & client: workers) {
+        for (const auto & one: client.second) {
+            total += one->getBytesWritten();
+        }
+    }
+    return total;
+}
+
+nlohmann::json Client::toJson() const noexcept {
+    nlohmann::json returnValue;
+    
+    returnValue["numClients"] = workers.size();
+    
+    nlohmann::json workerArray;
+    for (const auto & it: workers) {
+        std::vector<nlohmann::json> returnArray;
+        
+        for (const auto & it2: it.second) {
+            returnArray.push_back(it2->toJson());
+        }
+        workerArray[std::to_string(it.first)] = returnArray;
+    }
+    returnValue["workers"] = workerArray;
+    return std::move(returnValue);
+}
+
+nlohmann::json Client::toJson(unsigned id) const noexcept {
+    nlohmann::json returnValue;
+    
+    const auto & it = workers.find(id);
+    if (it != workers.end()) {
+        returnValue["found"] = true;
+        nlohmann::json returnArray;
+        for (const auto & it2: it->second) {
+            returnArray.push_back(it2->toJson());
+        }
+        returnValue["worker"] = returnArray;
+    } else {
+        returnValue["found"] = false;
+    }
+    return returnValue;
 }

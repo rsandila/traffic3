@@ -20,17 +20,22 @@
 
 #include <map>
 #include <vector>
-#include "protocolfactory.h"
-#include "contentmanagerfactory.h"
+#include "protocol/protocolfactory.h"
+#include "contentmanager/contentmanagerfactory.h"
 #include "host.h"
+#include "json.hpp"
 
 class Client {
 public:
-    Client();
     virtual ~Client();
-    bool startClients(unsigned clientId, unsigned num_clients, ProtocolFactory & _protocolFactory, ContentManagerFactory & _contentManagerFactory, Host _server);
+    bool startClients(unsigned clientId, unsigned num_clients, ProtocolFactory & _protocolFactory,
+                      ContentManagerFactory & _contentManagerFactory, Host _server);
     bool stopClients(unsigned clientId);
-    // TODO - collect statistics
+    int getNumClients() noexcept;
+    long long getNumBytesRead() const noexcept;
+    long long getNumBytesWritten() const noexcept;
+    nlohmann::json toJson() const noexcept;
+    nlohmann::json toJson(unsigned id) const noexcept;
 protected:
 private:
     std::map<unsigned, std::vector<std::unique_ptr<ContentManager>>> workers;

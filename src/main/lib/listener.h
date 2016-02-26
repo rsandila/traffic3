@@ -18,25 +18,31 @@
  */
 #pragma once
 
-#include "contentmanagerfactory.h"
-#include "protocolfactory.h"
+#include "contentmanager/contentmanagerfactory.h"
+#include "protocol/protocolfactory.h"
+#include "json.hpp"
 
 class Listener {
 public:
-    Listener(const Host & _host, ProtocolFactory & protocolFactory, ContentManagerFactory & contentManagerFactory);
+    Listener(unsigned portId, const Host & _host, ProtocolFactory & protocolFactory, std::shared_ptr<ContentManagerFactory> & contentManagerFactory);
     Listener(Listener && other);
     virtual ~Listener();
     Listener & operator=(Listener&& other);
-    bool operator==(const Host & other) const;
+    bool operator==(const unsigned portId) const;
     const Host & getHost() const;
     bool inErrorState() const noexcept;
     bool Stop();
+    unsigned getPortId() const noexcept;
+    long long getBytesRead() const noexcept;
+    long long getBytesWritten() const noexcept;
+    nlohmann::json toJson() const noexcept;
 protected:
     void listen();
 private:
+    unsigned _portId;
     Host host;
     std::unique_ptr<Protocol> protocol;
-    ContentManagerFactory & _contentManagerFactory;
+    std::shared_ptr<ContentManagerFactory> _contentManagerFactory;
     std::vector<std::unique_ptr<ContentManager>> contentManagers;
     bool errorState;
     std::thread thread;

@@ -28,7 +28,7 @@
 #endif
 #include <memory.h>
 #include "catch.hpp"
-#include "host.h"
+#include "lib/host.h"
 
 TEST_CASE("Validate IPV4 host constructors", "[host][ipv4]") {
     SECTION("IPV4: Test name based constructor") {
@@ -38,6 +38,11 @@ TEST_CASE("Validate IPV4 host constructors", "[host][ipv4]") {
         REQUIRE(googleDNS.getSockAddressLen4() == sizeof(*addr));
         char expectedAddress[] = { 8, 8, 8, 8 };
         REQUIRE(memcmp(&addr->sin_addr, expectedAddress, 4) == 0);
+        
+        REQUIRE(googleDNS.getProtocolPreference() == Host::ProtocolPreference::IPV4);
+        REQUIRE(googleDNS.getPreferredSocketDomain() == AF_INET);
+        REQUIRE(googleDNS.getPreferedSockAddressLen() == googleDNS.getSockAddressLen4());
+        REQUIRE(googleDNS.getPreferredSockAddress() == googleDNS.getSockAddress4());
     }
     SECTION("IPV4: Test copy constructor") {
         Host googleDNS("google-public-dns-a.google.com", 80, Host::ProtocolPreference::IPV4);
@@ -47,6 +52,11 @@ TEST_CASE("Validate IPV4 host constructors", "[host][ipv4]") {
         REQUIRE(copy.getSockAddressLen4() == sizeof(*addr));
         char expectedAddress[] = { 8, 8, 8, 8 };
         REQUIRE(memcmp(&addr->sin_addr, expectedAddress, 4) == 0);
+        
+        REQUIRE(googleDNS.getProtocolPreference() == Host::ProtocolPreference::IPV4);
+        REQUIRE(googleDNS.getPreferredSocketDomain() == AF_INET);
+        REQUIRE(googleDNS.getPreferedSockAddressLen() == googleDNS.getSockAddressLen4());
+        REQUIRE(googleDNS.getPreferredSockAddress() == googleDNS.getSockAddress4());
     }
     SECTION("IPV4: Test sock_addr constructor") {
         Host googleDNS("google-public-dns-a.google.com", 80, Host::ProtocolPreference::IPV4);
@@ -56,6 +66,11 @@ TEST_CASE("Validate IPV4 host constructors", "[host][ipv4]") {
         REQUIRE(copy.getSockAddressLen4() == sizeof(*addr));
         char expectedAddress[] = { 8, 8, 8, 8 };
         REQUIRE(memcmp(&addr->sin_addr, expectedAddress, 4) == 0);
+        
+        REQUIRE(googleDNS.getProtocolPreference() == Host::ProtocolPreference::IPV4);
+        REQUIRE(googleDNS.getPreferredSocketDomain() == AF_INET);
+        REQUIRE(googleDNS.getPreferedSockAddressLen() == googleDNS.getSockAddressLen4());
+        REQUIRE(googleDNS.getPreferredSockAddress() == googleDNS.getSockAddress4());
     }
     SECTION("IPV4: Test == operator") {
         Host googleDNS1("google-public-dns-a.google.com", 80, Host::ProtocolPreference::IPV4);
@@ -66,6 +81,11 @@ TEST_CASE("Validate IPV4 host constructors", "[host][ipv4]") {
         REQUIRE(googleDNS1 == googleDNS2);
         REQUIRE_FALSE(googleDNS1 == googleDNS3);
         REQUIRE_FALSE(googleDNS1 == localHost);
+        
+        REQUIRE(googleDNS1.getProtocolPreference() == Host::ProtocolPreference::IPV4);
+        REQUIRE(googleDNS1.getPreferredSocketDomain() == AF_INET);
+        REQUIRE(googleDNS1.getPreferedSockAddressLen() == googleDNS1.getSockAddressLen4());
+        REQUIRE(googleDNS1.getPreferredSockAddress() == googleDNS1.getSockAddress4());
     }
 }
 
@@ -77,6 +97,11 @@ TEST_CASE("Validate IPV6 host constructors", "[host][ipv6]") {
         REQUIRE(googleDNS.getSockAddressLen6() == sizeof(*addr));
         uint8_t expectedAddress[] = { 0x20, 0x01, 0x48, 0x60, 0x48, 0x60, 0, 0, 0, 0, 0, 0, 0, 0, 0x88, 0x88 };
         REQUIRE(memcmp(&addr->sin6_addr, expectedAddress, 16) == 0);
+        
+        REQUIRE(googleDNS.getProtocolPreference() == Host::ProtocolPreference::IPV6);
+        REQUIRE(googleDNS.getPreferredSocketDomain() == AF_INET6);
+        REQUIRE(googleDNS.getPreferedSockAddressLen() == googleDNS.getSockAddressLen6());
+        REQUIRE(googleDNS.getPreferredSockAddress() == googleDNS.getSockAddress6());
     }
     SECTION("IPV6: Test copy constructor") {
         Host googleDNS("google-public-dns-a.google.com", 80, Host::ProtocolPreference::IPV6);
@@ -86,6 +111,11 @@ TEST_CASE("Validate IPV6 host constructors", "[host][ipv6]") {
         REQUIRE(copy.getSockAddressLen6() == sizeof(*addr));
         uint8_t expectedAddress[] = { 0x20, 0x01, 0x48, 0x60, 0x48, 0x60, 0, 0, 0, 0, 0, 0, 0, 0, 0x88, 0x88 };
         REQUIRE(memcmp(&addr->sin6_addr, expectedAddress, 16) == 0);
+        
+        REQUIRE(googleDNS.getProtocolPreference() == Host::ProtocolPreference::IPV6);
+        REQUIRE(googleDNS.getPreferredSocketDomain() == AF_INET6);
+        REQUIRE(googleDNS.getPreferedSockAddressLen() == googleDNS.getSockAddressLen6());
+        REQUIRE(googleDNS.getPreferredSockAddress() == googleDNS.getSockAddress6());
     }
     SECTION("IPV6: Test sock_addr constructor") {
         Host googleDNS("google-public-dns-a.google.com", 80, Host::ProtocolPreference::IPV6);
@@ -95,5 +125,49 @@ TEST_CASE("Validate IPV6 host constructors", "[host][ipv6]") {
         REQUIRE(copy.getSockAddressLen6() == sizeof(*addr));
         uint8_t expectedAddress[] = { 0x20, 0x01, 0x48, 0x60, 0x48, 0x60, 0, 0, 0, 0, 0, 0, 0, 0, 0x88, 0x88 };
         REQUIRE(memcmp(&addr->sin6_addr, expectedAddress, 16) == 0);
+        
+        REQUIRE(googleDNS.getProtocolPreference() == Host::ProtocolPreference::IPV6);
+        REQUIRE(googleDNS.getPreferredSocketDomain() == AF_INET6);
+        REQUIRE(googleDNS.getPreferedSockAddressLen() == googleDNS.getSockAddressLen6());
+        REQUIRE(googleDNS.getPreferredSockAddress() == googleDNS.getSockAddress6());
+    }
+}
+
+TEST_CASE("Validate protocol type to preference conversion", "[host]") {
+    SECTION("IPV4") {
+        REQUIRE(Host::ProtocolPreference::IPV4 == convertFromProtocolTypeToPreference(ProtocolType::TCP4));
+        REQUIRE(Host::ProtocolPreference::IPV4 == convertFromProtocolTypeToPreference(ProtocolType::UDP4));
+    }
+    SECTION("IPV6") {
+        REQUIRE(Host::ProtocolPreference::IPV6 == convertFromProtocolTypeToPreference(ProtocolType::TCP6));
+        REQUIRE(Host::ProtocolPreference::IPV6 == convertFromProtocolTypeToPreference(ProtocolType::UDP6));
+    }
+}
+
+TEST_CASE("Host toJson", "[host]") {
+    SECTION("IPV4") {
+        Host googleDNS("google-public-dns-a.google.com", 80, Host::ProtocolPreference::IPV4);
+        
+        nlohmann::json json = googleDNS.toJson();
+        // appveyor returns 7 because IPV6 is disabled
+        REQUIRE(json.size() >= 7);
+        REQUIRE(json.size() <= 9);
+        
+        REQUIRE(json["hostName"].get<std::string>() == "google-public-dns-a.google.com");
+        REQUIRE(json["port"].get<unsigned>() == 80);
+        REQUIRE(json["hasIPv4"].get<bool>() == true);
+        if (json.size() == 9) {
+            REQUIRE(json["hasIPv6"].get<bool>() == true);
+        } else {
+            REQUIRE(json["hasIPv6"].get<bool>() == false);
+        }
+        REQUIRE(json["protocolPreference"].get<std::string>() == "IPv4");
+        
+        REQUIRE(json["ipv4Name"].get<std::string>() == "google-public-dns-a.google.com");
+        REQUIRE(json["ipv4Service"].get<std::string>() == "http");
+        if (json.size() == 9) {
+            REQUIRE(json["ipv6Name"].get<std::string>() == "google-public-dns-a.google.com");
+            REQUIRE(json["ipv6Service"].get<std::string>() == "http");
+        }
     }
 }
