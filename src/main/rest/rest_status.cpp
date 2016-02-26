@@ -34,11 +34,31 @@ std::vector<char> RestStatus::handleRequest(const Host & host, const RestRequest
     UNUSED(headers);
     UNUSED(body);
     
-    if (request.getUri() != uriPattern || request.getType() != RestRequestType::RRT_GET) {
+    if (request.getType() != RestRequestType::RRT_GET) {
+        // not me, return empty
+        return std::vector<char>();
+    }
+
+    if (request.getUri().substr(0, uriPattern.size()) != uriPattern) {
         // not me, return empty
         return std::vector<char>();
     }
     
+    if (request.getUri() == uriPattern) {
+        return std::move(basicStatus());
+    }
+    std::string rest = request.getUri().substr(uriPattern.size());
+    if (rest == "/supports/protocol") {
+        return std::move(supportedProtocols());
+    }
+    if (rest == "/supports/contentmanager") {
+        return std::move(supportedContentManagers());
+    }
+    
+    return std::vector<char>();
+}
+
+std::vector<char> RestStatus::basicStatus() const noexcept {
     nlohmann::json returnValue;
     
     returnValue["numClients"] = state.getNumClients();
@@ -50,3 +70,14 @@ std::vector<char> RestStatus::handleRequest(const Host & host, const RestRequest
     std::string returnBody = returnValue.dump(4);
     return std::move(returnJsonPage(200, "OK", returnValue.dump(0)));
 }
+
+std::vector<char> RestStatus::supportedProtocols() const noexcept {
+ 
+    return std::move(returnJsonPage(200, "OK", protocolTypesToJson().dump()));
+}
+
+std::vector<char> RestStatus::supportedContentManagers() const noexcept {
+
+    return std::move(returnJsonPage(200, "OK", contentManagerTypesToJson().dump()));
+}
+

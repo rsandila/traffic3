@@ -32,6 +32,9 @@ public:
     RestStatus(const std::string & _uriPattern, RestState & _state);
     virtual std::vector<char> handleRequest(const Host & host, const RestRequest & request, const std::map<std::string, std::string> & headers, const std::vector<char> & body);
 protected:
+    virtual std::vector<char> basicStatus() const noexcept;
+    virtual std::vector<char> supportedProtocols() const noexcept;
+    virtual std::vector<char> supportedContentManagers() const noexcept;
 private:
     std::string uriPattern;
     RestState & state;

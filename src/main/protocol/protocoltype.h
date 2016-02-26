@@ -19,6 +19,7 @@
 #pragma once
 
 #include <string>
+#include "json.hpp"
 
 enum class ProtocolType {
     TCP4,
@@ -31,3 +32,5 @@ enum class ProtocolType {
 ProtocolType convertStringToProtocolType(const std::string & name);
 
 const std::string protocolTypeToString(const ProtocolType type);
+
+nlohmann::json protocolTypesToJson();

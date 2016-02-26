@@ -45,3 +45,15 @@ const std::string convertContentManagerTypeToString(const ContentManagerType typ
     }
     return "none";
 }
+
+nlohmann::json contentManagerTypesToJson() {
+    nlohmann::json returnValue;
+    
+    // Not returning None and Rest as they are special cases
+    returnValue[convertContentManagerTypeToString(ContentManagerType::Echo)] = "Echo incoming data back";
+    returnValue[convertContentManagerTypeToString(ContentManagerType::Fixed)] = "Return a fixed buffer";
+    returnValue[convertContentManagerTypeToString(ContentManagerType::RandomBinary)] = "Return random binary data";
+    returnValue[convertContentManagerTypeToString(ContentManagerType::RandomText)] = "Return random text data";
+    
+    return returnValue;
+}

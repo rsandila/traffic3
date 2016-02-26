@@ -45,3 +45,15 @@ const std::string protocolTypeToString(const ProtocolType type) {
     }
     return "tcp4"; // should probably throw some exception
 }
+
+nlohmann::json protocolTypesToJson() {
+    nlohmann::json returnValue;
+    
+    // Not returning None as it is a special case
+    returnValue.push_back(protocolTypeToString(ProtocolType::TCP4));
+    returnValue.push_back(protocolTypeToString(ProtocolType::UDP4));
+    returnValue.push_back(protocolTypeToString(ProtocolType::TCP6));
+    returnValue.push_back(protocolTypeToString(ProtocolType::UDP6));
+    
+    return returnValue;
+}

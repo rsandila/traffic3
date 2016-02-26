@@ -19,6 +19,7 @@
 #pragma once
 
 #include <string>
+#include "json.hpp"
 
 enum class ContentManagerType {
     RandomText,
@@ -32,3 +33,5 @@ enum class ContentManagerType {
 ContentManagerType convertStringToContentManagerType(const std::string & name);
 
 const std::string convertContentManagerTypeToString(const ContentManagerType type);
+
+nlohmann::json contentManagerTypesToJson();
