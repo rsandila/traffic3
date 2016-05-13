@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html ng-app="traffic3App">
+<head>
+  <title>Traffic Generator v3</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-route.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous" />
+  <script>
+    angular.module("traffic3App", ["ngRoute"])
+      .config(function ($routeProvider) {
+        $routeProvider.when("/clientView",  {
+          templateUrl: "/views/client.html"
+        });
+        $routeProvider.when("/serverView",  {
+          templateUrl: "/views/server.html"
+        });
+        $routeProvider.otherwise({
+          templateUrl: "/views/status.html"
+        });
+    })
+    .controller("defaultCtrl", function($scope, $location) {
+      // TODO
+        // console.log("defaultCtrl started");
+
+        $scope.isActive = function (viewLocation) {
+          return viewLocation === $location.path();
+        };
+    });
+  </script>
+  <script src="controller/status.js"></script>
+</head>
+<body ng-controller="defaultCtrl">
+  <div class="panel">
+    <h1>Traffic Generator v3</h1>
+  </div>
+
+  <nav class="navbar navbar-default">
+        <ul class="nav navbar-nav">
+          <li ng-class="{ active: isActive('') }"><a href="#">Status <span class="sr-only">(current)</span></a></li>
+          <li ng-class="{ active: isActive('/clientView') }"><a href="#/clientView">Client</a></li>
+          <li ng-class="{ active: isActive('/serverView') }"><a href="#/serverView">Server</a></li>
+        </ul>
+  </nav>
+  <ng-view />
+</body>
+</html>

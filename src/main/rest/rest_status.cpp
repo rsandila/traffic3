@@ -66,7 +66,7 @@ std::vector<char> RestStatus::basicStatus() const noexcept {
     returnValue["serverNumRead"] = state.getServerNumRead();
     returnValue["serverNumWriten"] = state.getServerNumWritten();
     returnValue["clientNumRead"] = state.getClientNumRead();
-    returnValue["clentNumWritten"] = state.getClientNumWritten();
+    returnValue["clientNumWritten"] = state.getClientNumWritten();
     std::string returnBody = returnValue.dump(4);
     return std::move(returnJsonPage(200, "OK", returnValue.dump(0)));
 }
