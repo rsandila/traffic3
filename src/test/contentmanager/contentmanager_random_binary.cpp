@@ -53,7 +53,7 @@ public:
         uint32_t size = htonl(8);
         memcpy(&data[4], &size, sizeof(uint32_t));
         randomBinaryDoExit = true;
-        totalRead += data.size();
+        updateBytesRead(data.size());
         return true;
     };
     virtual void close() override {
@@ -64,7 +64,7 @@ public:
         UNUSED(hostState);
         randomBinaryLastWrite = data;
         assignOrder(randomBinaryWriteOrder);
-        totalWritten += data.size();
+        updateBytesWritten(data.size());
         return true;
     }
 };

@@ -30,7 +30,7 @@ public:
     virtual bool listen(const Host & localHost, const int backlog) override;
     virtual bool connect(const Host & localHost) override;
 protected:
-	ProtocolUDP(int socket, socklen_t len, const struct sockaddr * addr, bool isIPV4);
+ 	ProtocolUDP(int socket, socklen_t len, const struct sockaddr * addr, bool isIPV4);
 	ProtocolUDP(ProtocolUDP && other);
 private:
 	ProtocolUDP(const ProtocolUDP &) = delete;

@@ -64,14 +64,14 @@ public:
         returnValue["customizer"] = customizerHandler->toJson();
         returnValue["type"] = convertContentManagerTypeToString(type);
         
-        return std::move(returnValue);
+        return returnValue;
     }
 protected:
     virtual std::unique_ptr<ContentManager> withCustomizations(std::unique_ptr<ContentManager> contentManager) const {
         if (contentManager.get() != nullptr && customizerHandler.get() != nullptr) {
-            return std::move(customizerHandler->customize(std::move(contentManager)));
+            return customizerHandler->customize(std::move(contentManager));
         }
-        return std::move(contentManager);
+        return contentManager;
     }
 private:
     ContentManagerType type;

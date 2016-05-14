@@ -97,9 +97,9 @@ std::vector<char> RestServer::handleCreateServer(const RestRequest & request,
             // return failure
             returnValue["result"] = std::string("Failed");
         }
-        return std::move(returnJsonPage(200, "OK", returnValue.dump()));
+        return returnJsonPage(200, "OK", returnValue.dump());
     } catch (std::invalid_argument& e) {
-        return std::move(returnHtmlPage(400, "Bad Request", "Invalid parameters", "Invalid Parameters"));
+        return returnHtmlPage(400, "Bad Request", "Invalid parameters", "Invalid Parameters");
     }
 }
 
@@ -123,5 +123,5 @@ std::vector<char> RestServer::handleStopServer(const RestRequest & request,
         // return error
         returnValue["result"] = std::string("Failed");
     }
-    return std::move(returnJsonPage(200, "OK", returnValue.dump()));;
+    return returnJsonPage(200, "OK", returnValue.dump());
 }

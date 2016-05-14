@@ -33,5 +33,5 @@ std::unique_ptr<ContentManager> RestContentManagerCustomizer::customize(std::uni
         contentManagerHeaders->addErrorPageHandlers(errorPageHandlerList);
         contentManagerHeaders->addRestRequestHandlers(restRequestHandlerList);
     }
-    return std::move(contentManager);
+    return contentManager;
 }

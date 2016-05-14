@@ -55,7 +55,7 @@ bool ProtocolUDP::read(std::vector<char> & data, bool allowPartialRead, Host & h
 	}
 	if (numRead > 0) {
 		data.resize(numRead);
-        totalRead += numRead;
+        updateBytesRead(numRead);
 	}
 	if (type == ProtocolInstanceType::CLIENT) {
 		hostState = host;
@@ -81,7 +81,7 @@ bool ProtocolUDP::write(const std::vector<char> & data, const Host & hostState) 
 		targetHost.getPreferedSockAddressLen());
 	LOG(DEBUG) << std::this_thread::get_id() << " wrote " << numWritten << std::endl;
     if (numWritten > 0) {
-        totalWritten += numWritten;
+        updateBytesWritten(numWritten);
     }
 	return numWritten == data.size();
 }

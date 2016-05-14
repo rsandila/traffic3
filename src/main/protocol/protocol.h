@@ -50,7 +50,7 @@ public:
     Protocol(Host otherHost, ProtocolInstanceType otherType, int otherSocket, ProtocolState otherState) :
         host(otherHost), type(otherType), socket(otherSocket), state(otherState) {;}
     Protocol(int newSocket, socklen_t len, const struct sockaddr * addr, bool isIPV4) : host(len, addr, isIPV4),
-        type(ProtocolInstanceType::SERVER_CLIENT), socket(newSocket), state(ProtocolState::OPEN) {;}
+        type(ProtocolInstanceType::SERVER_CLIENT), socket(newSocket), state(ProtocolState::OPEN), totalWritten(0LL), totalRead(0LL) {;}
     virtual ~Protocol() {;};
     virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) { UNUSED(data);
         UNUSED(allowPartialRead); UNUSED(hostState); return false; };
@@ -76,9 +76,12 @@ protected:
     std::mutex lock;
     int socket;
     ProtocolState state;
+    
+    virtual void updateBytesRead(long long value);
+    virtual void updateBytesWritten(long long value);
+private:
     long long totalWritten;
     long long totalRead;
-private:
 	Protocol & operator=(const Protocol & other) = delete;
 	Protocol(const Protocol & other) = delete;
 };

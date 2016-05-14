@@ -45,14 +45,14 @@ std::vector<char> RestStatus::handleRequest(const Host & host, const RestRequest
     }
     
     if (request.getUri() == uriPattern) {
-        return std::move(basicStatus());
+        return basicStatus();
     }
     std::string rest = request.getUri().substr(uriPattern.size());
     if (rest == "/supports/protocol") {
-        return std::move(supportedProtocols());
+        return supportedProtocols();
     }
     if (rest == "/supports/contentmanager") {
-        return std::move(supportedContentManagers());
+        return supportedContentManagers();
     }
     
     return std::vector<char>();
@@ -68,16 +68,16 @@ std::vector<char> RestStatus::basicStatus() const noexcept {
     returnValue["clientNumRead"] = state.getClientNumRead();
     returnValue["clientNumWritten"] = state.getClientNumWritten();
     std::string returnBody = returnValue.dump(4);
-    return std::move(returnJsonPage(200, "OK", returnValue.dump(0)));
+    return returnJsonPage(200, "OK", returnValue.dump(0));
 }
 
 std::vector<char> RestStatus::supportedProtocols() const noexcept {
  
-    return std::move(returnJsonPage(200, "OK", protocolTypesToJson().dump()));
+    return returnJsonPage(200, "OK", protocolTypesToJson().dump());
 }
 
 std::vector<char> RestStatus::supportedContentManagers() const noexcept {
 
-    return std::move(returnJsonPage(200, "OK", contentManagerTypesToJson().dump()));
+    return returnJsonPage(200, "OK", contentManagerTypesToJson().dump());
 }
 

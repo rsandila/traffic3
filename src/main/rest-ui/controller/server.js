@@ -1,5 +1,5 @@
 angular.module("traffic3App")
-  .controller("serverCtrl", function ($scope, $http, $location) {
+  .controller("serverCtrl", function ($scope, $http, $location, $route, $interval) {
     $scope.data = {};
     $scope.addActive = 0;
     $scope.protocols = {};
@@ -17,11 +17,14 @@ angular.module("traffic3App")
       $scope.error = error;
     });
 
-    $http.get("/status/supports/contentmanager").success(function (data) {
-      $scope.contentmanagers = data;
-    }).error(function (error) {
-      $scope.error = error;
-    });
+    $scope.updateStatus = function() {
+      $http.get("/status/supports/contentmanager").success(function (data) {
+        $scope.contentmanagers = data;
+      }).error(function (error) {
+        $scope.error = error;
+      });
+    };
+    $scope.updateStatus();
 
     $http.get("/server").success(function (data) {
       $scope.data = data;
@@ -30,13 +33,20 @@ angular.module("traffic3App")
     });
 
     $scope.showAdd = function() {
-      $scope.add.success = null;
       $scope.add.error = null;
       $scope.addActive = 1;
     }
 
+    $scope.hideAdd = function() {
+      $scope.addActive = 0;
+    }
+
     $scope.isAddActive = function() {
       return $scope.addActive == 1;
+    }
+
+    $scope.wasAddSuccess = function() {
+      return angular.isUndefined($scope.add.error) || $scope.add.error == null;
     }
 
     $scope.addSubmit = function() {
@@ -48,10 +58,36 @@ angular.module("traffic3App")
                         "&min=" + $scope.add.min +
                         "&max=" + $scope.add.max
                       ).success(function (data) {
-                        $scope.add.success = data
+                        $scope.add.error = null;
+                        $scope.hideAdd();
+                        $route.reload();
                       }).error(function (error) {
+                        console.log("Add failed: " + error);
                         $scope.add.error = error;
                       });
-      $scope.addActive = 0;
     }
+
+    $scope.deleteServer = function(id) {
+      $http.delete("/server?id=" + id).success(function (data) {
+        $route.reload();
+      }).error(function (error) {
+        console.log(error);
+      });
+    }
+
+    $scope.getNumRead = function(contentManager) {
+      returnValue = 0;
+      angular.forEach(contentManager, function(item) {
+        returnValue += item.protocol.numRead;
+      });
+      return returnValue;
+    };
+
+    $scope.getNumWritten = function(contentManager) {
+      returnValue = 0;
+      angular.forEach(contentManager, function(item) {
+        returnValue += item.protocol.numWritten;
+      });
+      return returnValue;
+    };
   });

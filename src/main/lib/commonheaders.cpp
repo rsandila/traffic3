@@ -49,7 +49,8 @@ bool CommonHeaders::read(std::unique_ptr<Protocol> & protocol, std::vector<char>
             LOG(DEBUG) << std::this_thread::get_id() << " reading " << length << " " << content.size() << " bytes" << std::endl;
             return protocol->read(content, false, hostState);
         } else {
-            LOG(WARNING) << std::this_thread::get_id() << " Invalid signature received " << signature.size() << " " << &signature[0] << std::endl;
+            LOG(WARNING) << std::this_thread::get_id() << " Invalid signature received " << signature.size() << " "
+            << std::string(&signature[0], signature.size()) << std::endl;
         }
     }
     return false;
@@ -77,5 +78,5 @@ nlohmann::json CommonHeaders::toJson() const noexcept {
     returnValue["version"] = getVersion();
     returnValue["type"] = std::string("commonHeaders");
     
-    return std::move(returnValue);
+    return returnValue;
 }

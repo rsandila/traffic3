@@ -44,11 +44,11 @@ std::vector<char> ContentManager_Random_Binary::ProcessContent(const std::vector
         data[i] = (char)chars(generator);
     }
     LOG(DEBUG) << "exiting with " << data.size() << std::endl;
-    return std::move(data);
+    return data;
 }
 
 bool ContentManager_Random_Binary::PrepareContent() noexcept {
-    distribution = std::move(std::unique_ptr<std::uniform_int_distribution<int>>(new std::uniform_int_distribution<int>(getMin(), (int)getMax())));
+    distribution = std::unique_ptr<std::uniform_int_distribution<int>>(new std::uniform_int_distribution<int>(getMin(), (int)getMax()));
     return true;
 }
 

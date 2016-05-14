@@ -60,7 +60,7 @@ const std::vector<unsigned> Server::getPorts() const noexcept {
     for (auto it = listeners.cbegin(); it != listeners.cend(); ++it) {
         retVal.push_back((*it)->getPortId());
     }
-    return std::move(retVal);
+    return retVal;
 }
 
 int Server::getNumServers() noexcept {
@@ -93,7 +93,7 @@ nlohmann::json Server::toJson() const noexcept {
         listenersJson.push_back(listener->toJson());
     }
     returnValue["listeners"] = listenersJson;
-    return std::move(returnValue);
+    return returnValue;
 }
 
 nlohmann::json Server::toJson(unsigned id) const noexcept {

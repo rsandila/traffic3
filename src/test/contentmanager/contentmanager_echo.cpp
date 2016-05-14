@@ -52,12 +52,12 @@ public:
             memcpy(&data[0], "TRAF", 4);
             uint32_t size = htonl(8 + compareTo.size());
             memcpy(&data[4], &size, sizeof(uint32_t));
-            totalRead += data.size();
+            updateBytesRead(data.size());
             firstRead = true;
         } else {
             REQUIRE(data.size() == compareTo.size());
             data = compareTo;
-            totalRead += data.size();
+            updateBytesRead(data.size());
             echoDoExit = true;
         }
         return true;
@@ -69,7 +69,7 @@ public:
     virtual bool write(const std::vector<char> & data, const Host & hostState) override {
         UNUSED(hostState);
         echoLastWrite = data;
-        totalWritten += data.size();
+        updateBytesWritten(data.size());
         echoAssignOrder(echoWriteOrder);
         return true;
     }

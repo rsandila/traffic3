@@ -53,7 +53,7 @@ public:
         uint32_t size = htonl(8);
         memcpy(&data[4], &size, sizeof(uint32_t));
         doExit = true;
-        totalRead += data.size();
+        updateBytesRead(data.size());
         return true;
     };
     virtual void close() override {
@@ -63,7 +63,7 @@ public:
     virtual bool write(const std::vector<char> & data, const Host & hostState) override {
         UNUSED(hostState);
         lastWrite = data;
-        totalWritten += data.size();
+        updateBytesWritten(data.size());
         assignOrder(writeOrder);
         return true;
     }

@@ -27,7 +27,7 @@ ContentManagerCustomizer::ContentManagerCustomizer(unsigned minimum, unsigned ma
 std::unique_ptr<ContentManager> ContentManagerCustomizer::customize(std::unique_ptr<ContentManager> contentManager) {
     contentManager->setMinimumSize(_minimum);
     contentManager->setMaximumSize(_maximum);
-    return std::move(contentManager);
+    return contentManager;
 }
 
 nlohmann::json ContentManagerCustomizer::toJson() const noexcept {
@@ -37,5 +37,5 @@ nlohmann::json ContentManagerCustomizer::toJson() const noexcept {
     returnValue["max"] = _maximum;
     returnValue["type"] = "ContentManagerCustomizer";
     
-    return std::move(returnValue);
+    return returnValue;
 }

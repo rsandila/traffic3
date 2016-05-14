@@ -51,5 +51,5 @@ std::vector<char> ErrorPageHandler::handleError(ErrorTypes type, const std::vect
             break;
             
     }
-    return std::move(returnHtmlPage(code, message, message, message));
+    return returnHtmlPage(code, message, message, message);
 }

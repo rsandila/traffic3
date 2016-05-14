@@ -253,7 +253,7 @@ nlohmann::json Host::toJson() const noexcept {
         returnValue["ipv6Service"] = std::string(sbuf);
     }
 
-    return std::move(returnValue);
+    return returnValue;
 }
 
 

@@ -107,7 +107,11 @@ unsigned Listener::getPortId() const noexcept {
 
 long long Listener::getBytesRead() const noexcept {
     if (protocol.get()) {
-        return protocol->getBytesRead();
+        long long returnValue = protocol->getBytesRead();
+        for (const auto & contentManager: contentManagers) {
+            returnValue += contentManager.get()->getBytesRead();
+        }
+        return returnValue;
     } else {
         return 0LL;
     }
@@ -115,7 +119,11 @@ long long Listener::getBytesRead() const noexcept {
 
 long long Listener::getBytesWritten() const noexcept {
     if (protocol.get()) {
-        return protocol->getBytesWritten();
+        long long returnValue = protocol->getBytesWritten();
+        for (const auto & contentManager: contentManagers) {
+            returnValue += contentManager.get()->getBytesWritten();
+        }
+        return returnValue;
     } else {
         return 0LL;
     }
@@ -137,5 +145,5 @@ nlohmann::json Listener::toJson() const noexcept {
     returnValue["contentManagers"] = contentManagersJson;
     returnValue["errorState"] = errorState;
     
-    return std::move(returnValue);
+    return returnValue;
 }

@@ -61,17 +61,17 @@ long long RestState::getServerNumRead() const noexcept {
 }
 
 nlohmann::json RestState::getServerJson() const noexcept {
-    return std::move(server.toJson());
+    return server.toJson();
 }
 
 nlohmann::json RestState::getServerJsonForId(unsigned id) const noexcept {
-    return std::move(server.toJson(id));
+    return server.toJson(id);
 }
 
 nlohmann::json RestState::getClientJson() const noexcept {
-    return std::move(client.toJson());
+    return client.toJson();
 }
 
 nlohmann::json RestState::getClientJsonForId(unsigned id) const noexcept {
-    return std::move(client.toJson(id));
+    return client.toJson(id);
 }

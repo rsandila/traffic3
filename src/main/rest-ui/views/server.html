@@ -3,10 +3,39 @@
     Unable to read server status ({{error.status}}). Try again.
   </div>
   <div class="container" ng-hide="error">
-    {{data}}
+    <table class="table">
+      <thead>
+        <th>Id</th>
+        <th>Type</th>
+        <th>Protocol</th>
+        <th>Port</th>
+        <th>Min</th>
+        <th>Max</th>
+        <th>State</th>
+        <th>Error State</th>
+        <th>Read</th>
+        <th>Written</th>
+        <th></th>
+      </thead>
+      <tbody>
+        <tr ng-repeat="bla in data.listeners">
+          <td>{{bla.id}}</td>
+          <td>{{bla.contentManagerFactory.type}}</td>
+          <td>{{bla.protocol.host.protocolPreference}}</td>
+          <td>{{bla.protocol.host.port}}</td>
+          <td>{{bla.contentManagerFactory.customizer.min}}</td>
+          <td>{{bla.contentManagerFactory.customizer.max}}</td>
+          <td>{{bla.protocol.state}}</td>
+          <td>{{bla.errorState}}</td>
+          <td>{{getNumRead(bla.contentManagers)}}</td>
+          <td>{{getNumWritten(bla.contentManagers)}}</td>
+          <td><button class="btn-primary btn-sm" ng-click="deleteServer(bla.id)">Stop</button></td>
+        </tr>
+      </tbody>
+    </table>
   </div>
   <div class="container" ng-hide="error">
-    <button type="button" class="btn btn-primary btn-lg" ng-click="showAdd()">Add</button>
+    <button type="button" class="btn btn-primary btn-lg" ng-click="showAdd()" ng-hide="isAddActive()">Add</button>
   </div>
   <div class="container" ng-show="isAddActive()">
     <form novalidate class="simple-form" ng-submit="addSubmit()">
@@ -35,11 +64,10 @@
         </tbody>
       </table>
     </form>
-  </div>
-  <div class="container" ng-show="add.success">
-    {{add.success}}
-  </div>
-  <div class="container" ng-show="add.error">
-    {{add.error}}
+    <div class="container" ng-hide="wasAddSuccess()">
+      <div class="alert alert-danger" role="alert">
+        <strong>Error adding server</strong> Probably related to the settings, please modify them and try again.
+      </div>
+    </div>
   </div>
 </div>

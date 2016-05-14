@@ -144,6 +144,13 @@ nlohmann::json Protocol::toJson() const noexcept {
             break;
     }
     
-    return std::move(returnValue);
+    return returnValue;
+}
+
+void Protocol::updateBytesRead(long long value) {
+    totalRead += value;
+}
+void Protocol::updateBytesWritten(long long value) {
+    totalWritten += value;
 }
 

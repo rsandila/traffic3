@@ -191,5 +191,5 @@ nlohmann::json ContentManagerBase::toJson() const noexcept {
     returnValue["exitBeforeState"] = (bool)doExitBeforeStart;
     returnValue["commonHeaders"] = headerHandler.toJson();
     
-    return std::move(returnValue);
+    return returnValue;
 }
