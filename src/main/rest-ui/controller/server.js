@@ -6,7 +6,7 @@ angular.module("traffic3App")
     $scope.contentmanagers = {};
     $scope.add = {
       id: 0,
-      host: "::",
+      host: "localhost",
       port: 10000,
       min: 100,
       max: 1000
@@ -58,9 +58,13 @@ angular.module("traffic3App")
                         "&min=" + $scope.add.min +
                         "&max=" + $scope.add.max
                       ).success(function (data) {
-                        $scope.add.error = null;
-                        $scope.hideAdd();
-                        $route.reload();
+                        if (data.result == "Ok") {
+                          $scope.add.error = null;
+                          $scope.hideAdd();
+                          $route.reload();
+                        } else {
+                          $scope.add.error = "Add failed";
+                        }
                       }).error(function (error) {
                         console.log("Add failed: " + error);
                         $scope.add.error = error;

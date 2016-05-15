@@ -1,9 +1,9 @@
-<div class="well" ng-controller="serverCtrl">
+<div class="container-fluid" ng-controller="serverCtrl">
   <div class="alert alert-danger" ng-show="error">
     Unable to read server status ({{error.status}}). Try again.
   </div>
   <div class="container" ng-hide="error">
-    <table class="table">
+    <table class="table table-sm table-bordered">
       <thead>
         <th>Id</th>
         <th>Type</th>
@@ -12,13 +12,12 @@
         <th>Min</th>
         <th>Max</th>
         <th>State</th>
-        <th>Error State</th>
         <th>Read</th>
         <th>Written</th>
         <th></th>
       </thead>
       <tbody>
-        <tr ng-repeat="bla in data.listeners">
+        <tr ng-repeat="bla in data.listeners" ng-class="bla.errorState?'danger':''">
           <td>{{bla.id}}</td>
           <td>{{bla.contentManagerFactory.type}}</td>
           <td>{{bla.protocol.host.protocolPreference}}</td>
@@ -26,7 +25,6 @@
           <td>{{bla.contentManagerFactory.customizer.min}}</td>
           <td>{{bla.contentManagerFactory.customizer.max}}</td>
           <td>{{bla.protocol.state}}</td>
-          <td>{{bla.errorState}}</td>
           <td>{{getNumRead(bla.contentManagers)}}</td>
           <td>{{getNumWritten(bla.contentManagers)}}</td>
           <td><button class="btn-primary btn-sm" ng-click="deleteServer(bla.id)">Stop</button></td>

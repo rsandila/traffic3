@@ -1,15 +1,15 @@
-<div class="well" ng-controller="statusCtrl">
+<div class="container-fluid" ng-controller="statusCtrl">
   <div class="alert alert-danger" ng-show="error">
     Unable to read status ({{error.status}}). Try again.
   </div>
-  <div class="container" ng-hide="error">
-    <table style="table table-bordered">
+  <div class="container-fluid" ng-hide="error">
+    <table class="table table-bordered">
       <thead class="thead-inverse">
         <tr>
           <th class="col-md-1 text-left">Type</th>
-          <th class="col-md-1 text-center">Count</th>
-          <th class="col-md-1 text-center">Read</th>
-          <th class="col-md-1 text-center">Write</th>
+          <th class="col-md-2 text-center">Count</th>
+          <th class="col-md-2 text-center">Read</th>
+          <th class="col-md-2 text-center">Write</th>
         </tr>
       </thead>
       <tbody>
