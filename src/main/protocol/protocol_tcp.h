@@ -23,14 +23,14 @@ USA.
 
 class ProtocolTCP : public Protocol {
 public:
-	ProtocolTCP();
+	ProtocolTCP(const std::string & protocolName);
 	virtual ~ProtocolTCP();
 	virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) override;
 	virtual bool write(const std::vector<char> & data, const Host & hostState) override;
     virtual bool listen(const Host & localHost, const int backlog) override;
     virtual bool connect(const Host & localHost) override;
 protected:
-	ProtocolTCP(int socket, socklen_t len, const struct sockaddr * addr, bool isIPV4);
+	ProtocolTCP(int socket, socklen_t len, const struct sockaddr * addr, bool isIPV4, const std::string & protocolName);
 	ProtocolTCP(ProtocolTCP && other);
 private:
 	ProtocolTCP(const ProtocolTCP &) = delete;

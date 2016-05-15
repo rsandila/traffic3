@@ -364,14 +364,14 @@ TEST_CASE("IPV6: real sending, receiving of data", "[ipv6][protocol]") {
         REQUIRE(protocol.getBytesWritten() == 0);
         
         nlohmann::json json = protocol.toJson();
-        REQUIRE(json.size() == 6);
+        REQUIRE(json.size() == 7);
         REQUIRE(json["host"].is_object());
         REQUIRE(json["type"].get<std::string>() == "Client");
         REQUIRE(json["socket"].is_number_integer());
         REQUIRE(json["numWritten"].get<unsigned>() == 0);
         REQUIRE(json["numRead"].get<unsigned>() == 10);
         REQUIRE(json["state"].get<std::string>() == "Open");
-
+        REQUIRE(json["name"].get<std::string>() == "TCP6");
         testDone = true;
         serverThread.join();
         timeoutThread.join();

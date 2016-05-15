@@ -52,13 +52,14 @@ TEST_CASE("Listener test", "[server]") {
     SECTION("Listen success, waitForNewConnection fails") {
         class MockProtocol : public Protocol {
         public:
+            MockProtocol() : Protocol("Mock") {;};
             virtual bool listen(const Host & ignoredHost, const int backlog) override { UNUSED(ignoredHost); UNUSED(backlog); return true; };
         };
         class MockProtocolFactory: public ProtocolFactory {
         public:
             MockProtocolFactory() : ProtocolFactory(ProtocolType::None) {;}
             virtual std::unique_ptr<Protocol> createProtocol() {
-                return std::unique_ptr<Protocol>(new MockProtocol);
+                return std::unique_ptr<Protocol>(new MockProtocol());
             }
         };
         static std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
@@ -83,7 +84,7 @@ TEST_CASE("Listener test", "[server]") {
     SECTION("Listen success, waitForNewConnection success, createContentManager fails") {
         class MockProtocol : public Protocol {
         public:
-            MockProtocol() : shouldReturnConnection(true) {;};
+            MockProtocol() : Protocol("Mock"), shouldReturnConnection(true) {;};
             virtual bool listen(const Host & ignoredHost, const int backlog) override { UNUSED(ignoredHost); UNUSED(backlog); return true; };
             virtual std::unique_ptr<Protocol> waitForNewConnection() override {
                 if (shouldReturnConnection) {
@@ -131,7 +132,7 @@ TEST_CASE("Listener test", "[server]") {
 
         class MockProtocol : public Protocol {
         public:
-            MockProtocol() : returnedOne(false) {
+            MockProtocol() : Protocol("Mock"), returnedOne(false) {
             }
             virtual bool listen(const Host & ignoredHost, const int backlog) override { UNUSED(ignoredHost); UNUSED(backlog); return true; };
             virtual std::unique_ptr<Protocol> waitForNewConnection() override {
@@ -139,7 +140,7 @@ TEST_CASE("Listener test", "[server]") {
                     returnedOne = true;
                     return std::unique_ptr<Protocol>(new MockProtocol());
                 } else {
-                    return std::unique_ptr<Protocol>(new Protocol());
+                    return std::unique_ptr<Protocol>(new Protocol("Mock"));
                 }
             };
             virtual ProtocolState getState() override {

@@ -143,7 +143,7 @@ nlohmann::json Protocol::toJson() const noexcept {
             returnValue["state"] = "Closed";
             break;
     }
-    
+    returnValue["name"] = name;
     return returnValue;
 }
 

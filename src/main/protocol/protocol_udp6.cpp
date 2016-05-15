@@ -31,10 +31,10 @@
 #include "protocol_udp6.h"
 #include "lib/logging.h"
 
-ProtocolUDP6::ProtocolUDP6() : ProtocolUDP(), numConnections(0) {
+ProtocolUDP6::ProtocolUDP6() : ProtocolUDP("UDP6"), numConnections(0) {
 }
 
-ProtocolUDP6::ProtocolUDP6(int newSocket, socklen_t len, const struct sockaddr * addr) : ProtocolUDP(newSocket, len, addr, false) {
+ProtocolUDP6::ProtocolUDP6(int newSocket, socklen_t len, const struct sockaddr * addr) : ProtocolUDP(newSocket, len, addr, false, "UDP6") {
 }
 
 ProtocolUDP6::ProtocolUDP6(ProtocolUDP6 && other) : ProtocolUDP(std::move(other)),

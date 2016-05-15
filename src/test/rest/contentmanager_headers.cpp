@@ -25,7 +25,7 @@
 TEST_CASE("ContentManager_Headers", "[rest][content][server]") {
     SECTION("Different request types") {
         RestHeaders restHeaders;
-        std::unique_ptr<Protocol> protocol(new Protocol());
+        std::unique_ptr<Protocol> protocol(new Protocol("Mock"));
         
         class ContentManager_Headers_Test: public ContentManager_Headers {
         public:

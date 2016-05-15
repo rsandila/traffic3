@@ -31,10 +31,10 @@
 #include "protocol_tcp4.h"
 #include "lib/logging.h"
 
-ProtocolTCP4::ProtocolTCP4() : ProtocolTCP() {
+ProtocolTCP4::ProtocolTCP4() : ProtocolTCP("TCP4") {
 }
 
-ProtocolTCP4::ProtocolTCP4(int newSocket, socklen_t len, const struct sockaddr * addr) : ProtocolTCP(newSocket, len, addr, true) {
+ProtocolTCP4::ProtocolTCP4(int newSocket, socklen_t len, const struct sockaddr * addr) : ProtocolTCP(newSocket, len, addr, true, "TCP4") {
 }
 
 ProtocolTCP4::ProtocolTCP4(ProtocolTCP4 && other) : ProtocolTCP(std::move(other)) {

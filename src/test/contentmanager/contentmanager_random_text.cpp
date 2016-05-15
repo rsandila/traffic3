@@ -39,7 +39,7 @@ static void assignOrder(std::atomic<int> & variable) {
 
 class MockProtocol: public Protocol {
 public:
-    MockProtocol() {
+    MockProtocol() : Protocol("Mock") {
     }
     virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) override {
         UNUSED(allowPartialRead);

@@ -45,12 +45,12 @@ public:
         SERVER_CLIENT,
         NONE
     };
-    Protocol() : host(Host::ALL_INTERFACES6), type(ProtocolInstanceType::NONE),
-        socket(-1), state(ProtocolState::CLOSED), totalWritten(0LL), totalRead(0LL) {;}
-    Protocol(Host otherHost, ProtocolInstanceType otherType, int otherSocket, ProtocolState otherState) :
-        host(otherHost), type(otherType), socket(otherSocket), state(otherState) {;}
-    Protocol(int newSocket, socklen_t len, const struct sockaddr * addr, bool isIPV4) : host(len, addr, isIPV4),
-        type(ProtocolInstanceType::SERVER_CLIENT), socket(newSocket), state(ProtocolState::OPEN), totalWritten(0LL), totalRead(0LL) {;}
+    Protocol(const std::string & protocolName) : host(Host::ALL_INTERFACES6), type(ProtocolInstanceType::NONE),
+        socket(-1), state(ProtocolState::CLOSED), name(protocolName), totalWritten(0LL), totalRead(0LL) {;}
+    Protocol(Host otherHost, ProtocolInstanceType otherType, int otherSocket, ProtocolState otherState, const std::string & otherName) :
+        host(otherHost), type(otherType), socket(otherSocket), state(otherState), name(otherName) {;}
+    Protocol(int newSocket, socklen_t len, const struct sockaddr * addr, bool isIPV4, const std::string & otherName) : host(len, addr, isIPV4),
+        type(ProtocolInstanceType::SERVER_CLIENT), socket(newSocket), state(ProtocolState::OPEN), name(otherName), totalWritten(0LL), totalRead(0LL) {;}
     virtual ~Protocol() {;};
     virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) { UNUSED(data);
         UNUSED(allowPartialRead); UNUSED(hostState); return false; };
@@ -64,10 +64,11 @@ public:
     virtual bool isServer() { return getType() == ProtocolInstanceType::SERVER; };
     virtual bool isClient() { return getType() == ProtocolInstanceType::CLIENT || getType() == ProtocolInstanceType::SERVER_CLIENT; };
     virtual ProtocolInstanceType getType();
-    virtual std::unique_ptr<Protocol> waitForNewConnection() { return std::unique_ptr<Protocol>(new Protocol()); };
+    virtual std::unique_ptr<Protocol> waitForNewConnection() { return std::unique_ptr<Protocol>(new Protocol("Undefined")); };
     virtual long long getBytesRead() const noexcept { return totalRead; };
     virtual long long getBytesWritten() const noexcept { return totalWritten; };
     virtual const Host & getHost() const noexcept { return host; };
+    virtual const std::string getName() const noexcept { return name; };
     
     virtual nlohmann::json toJson() const noexcept;
 protected:
@@ -76,6 +77,7 @@ protected:
     std::mutex lock;
     int socket;
     ProtocolState state;
+    std::string name;
     
     virtual void updateBytesRead(long long value);
     virtual void updateBytesWritten(long long value);

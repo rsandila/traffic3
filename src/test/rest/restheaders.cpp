@@ -25,7 +25,7 @@
 TEST_CASE("RestHeaders: write succeeds", "[headers][rest]") {
     class MockProtocol : public Protocol {
     public:
-        MockProtocol() : count(0) {
+        MockProtocol() : Protocol("Mock"), count(0) {
         }
         virtual bool write(const std::vector<char> & data, const Host & hostState) {
             switch (++count) {
@@ -61,7 +61,7 @@ TEST_CASE("RestHeaders: write succeeds", "[headers][rest]") {
 TEST_CASE("RestHeaders: write fails", "[headers]") {
     class MockProtocol : public Protocol {
     public:
-        MockProtocol() : count(0) {
+        MockProtocol() : Protocol("Mock"), count(0) {
         }
         virtual bool write(const std::vector<char> & data, const Host & hostState) {
             switch (++count) {
@@ -97,6 +97,7 @@ TEST_CASE("RestHeaders: write fails", "[headers]") {
 TEST_CASE("RestHeaders: read returns 0", "[headers]") {
     class MockProtocol : public Protocol {
     public:
+        MockProtocol() : Protocol("Mock") {;};
         virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) {
             data.resize(0);
             UNUSED(allowPartialRead); UNUSED(hostState);
@@ -112,7 +113,7 @@ TEST_CASE("RestHeaders: read returns 0", "[headers]") {
 TEST_CASE("RestHeaders: read returns no EOH", "[headers]") {
     class MockProtocol : public Protocol {
     public:
-        MockProtocol() : counter(0) {
+        MockProtocol() : Protocol("Mock"), counter(0) {
         }
         virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) {
             const std::string testString = "This is a test\r\nSecond line\r\n";
@@ -138,6 +139,7 @@ TEST_CASE("RestHeaders: read returns no EOH", "[headers]") {
 TEST_CASE("RestHeaders: read returns EOH, but no Content-Length", "[headers]") {
     class MockProtocol : public Protocol {
     public:
+        MockProtocol() : Protocol("Mock") {;};
         virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) {
             const std::string testString = "This is a test\r\nSecond line\r\n\r\n";
             data.resize(testString.length());
@@ -156,6 +158,7 @@ TEST_CASE("RestHeaders: read returns EOH, but no Content-Length", "[headers]") {
 TEST_CASE("RestHeaders: read returns EOH, Content-Length == 0", "[headers]") {
     class MockProtocol : public Protocol {
     public:
+        MockProtocol() : Protocol("Mock") {;};
         virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) {
             const std::string testString = "This is a test\r\nSecond line\r\nContent-Length: 0\r\n\r\n";
             data.resize(testString.length());
@@ -174,6 +177,7 @@ TEST_CASE("RestHeaders: read returns EOH, Content-Length == 0", "[headers]") {
 TEST_CASE("RestHeaders: read returns EOH, Content-Length == -1", "[headers]") {
     class MockProtocol : public Protocol {
     public:
+        MockProtocol() : Protocol("Mock") {;};
         virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) {
             const std::string testString = "This is a test\r\nSecond line\r\nContent-Length: -1\r\n\r\n";
             data.resize(testString.length());
@@ -192,6 +196,7 @@ TEST_CASE("RestHeaders: read returns EOH, Content-Length == -1", "[headers]") {
 TEST_CASE("RestHeaders: Read returns EOH, Content-Length == invalid", "[headers]") {
     class MockProtocol : public Protocol {
     public:
+        MockProtocol() : Protocol("Mock") {;};
         virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) {
             const std::string testString = "This is a test\r\nSecond line\r\nContent-Length: invalid\r\n\r\n";
             data.resize(testString.length());
@@ -210,7 +215,7 @@ TEST_CASE("RestHeaders: Read returns EOH, Content-Length == invalid", "[headers]
 TEST_CASE("RestHeaders: Read returns EOH, valid Content-Length, but no content", "[headers]") {
     class MockProtocol : public Protocol {
     public:
-        MockProtocol() : counter(0) {
+        MockProtocol() : Protocol("Mock"), counter(0) {
         }
         virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) {
             // good return on first call, 0 return on second
@@ -248,7 +253,7 @@ TEST_CASE("RestHeaders: Read returns EOH, valid Content-Length and valid content
         
     class MockProtocol : public Protocol {
     public:
-        MockProtocol(const std::string & base, const std::string & testData) : counter(0),
+        MockProtocol(const std::string & base, const std::string & testData) : Protocol("Mock"), counter(0),
         testString(base + std::to_string(testData.length()) +
                         "\r\n\r\n" + testData) {
         }
@@ -286,7 +291,7 @@ TEST_CASE("RestHeaders: Read returns EOH, valid Content-Length and valid content
         "\r\n\r\n" + testData;
     class MockProtocol : public Protocol {
     public:
-        MockProtocol(const std::string & base, const std::string & testData) : counter(0),
+        MockProtocol(const std::string & base, const std::string & testData) : Protocol("Mock"), counter(0),
         testString(base + std::to_string(testData.length()) +
                     "\r\n\r\n"), returnData(testData) {
         }
@@ -329,7 +334,7 @@ TEST_CASE("RestHeaders: Read returns EOH, valid Content-Length and short content
     "\r\n\r\n" + testData;
     class MockProtocol : public Protocol {
     public:
-        MockProtocol(const std::string & base, const std::string & testData) : counter(0),
+        MockProtocol(const std::string & base, const std::string & testData) : Protocol("Mock"), counter(0),
         testString(base + std::to_string(testData.length()) +
                     "\r\n\r\n"), returnData(testData.substr(0, testData.length()/2)) {
         }
@@ -371,7 +376,7 @@ TEST_CASE("RestHeaders: Read returns EOH, valid Content-Length and too much cont
     "\r\n\r\n" + testData;
     class MockProtocol : public Protocol {
     public:
-        MockProtocol(const std::string & base, const std::string & testData) : counter(0),
+        MockProtocol(const std::string & base, const std::string & testData) : Protocol("Mock"), counter(0),
         testString(base + std::to_string(testData.length()) +
                     "\r\n\r\n"), returnData(testData) {
         }

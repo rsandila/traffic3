@@ -41,7 +41,7 @@ public:
             case ProtocolType::UDP6:
                 return std::unique_ptr<Protocol>(new ProtocolUDP6());
             default:
-                return std::unique_ptr<Protocol>(new Protocol());
+                return std::unique_ptr<Protocol>(new Protocol("Undefined"));
         }
     };
 private:

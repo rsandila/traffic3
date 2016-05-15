@@ -31,10 +31,10 @@
 #include "protocol_udp4.h"
 #include "lib/logging.h"
 
-ProtocolUDP4::ProtocolUDP4() : ProtocolUDP(), numConnections(0) {
+ProtocolUDP4::ProtocolUDP4() : ProtocolUDP("UDP4"), numConnections(0) {
 }
 
-ProtocolUDP4::ProtocolUDP4(int newSocket, socklen_t len, const struct sockaddr * addr) : ProtocolUDP(newSocket, len, addr, true) {
+ProtocolUDP4::ProtocolUDP4(int newSocket, socklen_t len, const struct sockaddr * addr) : ProtocolUDP(newSocket, len, addr, true, "UDP4") {
 }
 
 ProtocolUDP4::ProtocolUDP4(ProtocolUDP4 && other) : ProtocolUDP(std::move(other)), numConnections

@@ -20,14 +20,14 @@
         <tr ng-repeat="bla in data.listeners" ng-class="bla.errorState?'danger':''">
           <td>{{bla.id}}</td>
           <td>{{bla.contentManagerFactory.type}}</td>
-          <td>{{bla.protocol.host.protocolPreference}}</td>
+          <td>{{bla.protocol.name}}</td>
           <td>{{bla.protocol.host.port}}</td>
           <td>{{bla.contentManagerFactory.customizer.min}}</td>
           <td>{{bla.contentManagerFactory.customizer.max}}</td>
           <td>{{bla.protocol.state}}</td>
           <td>{{getNumRead(bla.contentManagers)}}</td>
           <td>{{getNumWritten(bla.contentManagers)}}</td>
-          <td><button class="btn-primary btn-sm" ng-click="deleteServer(bla.id)">Stop</button></td>
+          <td><button class="btn-primary btn-block" ng-click="deleteServer(bla.id)">Stop</button></td>
         </tr>
       </tbody>
     </table>

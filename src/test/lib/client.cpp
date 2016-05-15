@@ -24,7 +24,7 @@ TEST_CASE("Client", "[protocol][client]") {
     SECTION("Working") {
         class MockProtocol : public Protocol {
         public:
-            MockProtocol() {
+            MockProtocol() : Protocol("Mock") {
             }
             virtual bool connect(const Host & localHost) override { UNUSED(localHost); return true; };
             virtual ProtocolState getState() override {

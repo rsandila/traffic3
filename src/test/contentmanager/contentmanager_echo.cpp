@@ -38,7 +38,7 @@ static void echoAssignOrder(std::atomic<int> & variable) {
 
 class EchoMockProtocol: public Protocol {
 public:
-    EchoMockProtocol() : firstRead(false) {
+    EchoMockProtocol() : Protocol("Mock"), firstRead(false) {
     }
     virtual bool read(std::vector<char> & data,  bool allowPartialRead, Host & hostState) override {
         UNUSED(allowPartialRead);

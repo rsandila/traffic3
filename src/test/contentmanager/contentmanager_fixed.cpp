@@ -38,7 +38,7 @@ static void fixedAssignOrder(std::atomic<int> & variable) {
 
 class FixedMockProtocol: public Protocol {
 public:
-    FixedMockProtocol() {
+    FixedMockProtocol() : Protocol("Mock") {
     }
     virtual bool read(std::vector<char> & data,  bool allowPartialRead, Host & hostState) override {
         UNUSED(allowPartialRead);
