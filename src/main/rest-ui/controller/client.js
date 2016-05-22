@@ -1,5 +1,5 @@
 angular.module("traffic3App")
-  .controller("serverCtrl", function ($scope, $http, $location, $route, $interval) {
+  .controller("clientCtrl", function ($scope, $http, $location, $route, $interval) {
     $scope.data = {};
     $scope.addActive = 0;
     $scope.protocols = {};
@@ -7,10 +7,10 @@ angular.module("traffic3App")
 
     $scope.add = {
       id: 0,
-      host: "localhost",
       port: 10000,
       min: 100,
-      max: 1000
+      max: 1000,
+      count: 1
     };
     $http.get("/status/supports/protocol").success(function (data) {
       $scope.protocols = data;
@@ -27,7 +27,7 @@ angular.module("traffic3App")
 
 
     $scope.updateStatus = function() {
-      $http.get("/server").success(function (data) {
+      $http.get("/client").success(function (data) {
         $scope.data = data;
       }).error(function (error) {
         $scope.error = error;
@@ -38,7 +38,7 @@ angular.module("traffic3App")
 
     $scope.interval = $interval(function() {
       $scope.updateStatus();
-      console.log("UpdateServerStatus");
+      console.log("UpdateClientStatus");
     }, 5000);
 
     $scope.showAdd = function() {
@@ -59,13 +59,14 @@ angular.module("traffic3App")
     }
 
     $scope.addSubmit = function() {
-      $http.put("/server?id=" + $scope.add.id +
+      $http.put("/client?id=" + $scope.add.id +
                         "&protocol=" + $scope.add.protocol +
                         "&contentmanager=" + $scope.add.contentmanager +
                         "&host=" + $scope.add.host +
                         "&port=" + $scope.add.port +
                         "&min=" + $scope.add.min +
-                        "&max=" + $scope.add.max
+                        "&max=" + $scope.add.max +
+                        "&count=" + $scope.add.count
                       ).success(function (data) {
                         if (data.result == "Ok") {
                           $scope.add.error = null;
@@ -79,28 +80,4 @@ angular.module("traffic3App")
                         $scope.add.error = error;
                       });
     }
-
-    $scope.deleteServer = function(id) {
-      $http.delete("/server?id=" + id).success(function (data) {
-        $route.reload();
-      }).error(function (error) {
-        console.log(error);
-      });
-    }
-
-    $scope.getNumRead = function(contentManager) {
-      returnValue = 0;
-      angular.forEach(contentManager, function(item) {
-        returnValue += item.protocol.numRead;
-      });
-      return returnValue;
-    };
-
-    $scope.getNumWritten = function(contentManager) {
-      returnValue = 0;
-      angular.forEach(contentManager, function(item) {
-        returnValue += item.protocol.numWritten;
-      });
-      return returnValue;
-    };
   });
