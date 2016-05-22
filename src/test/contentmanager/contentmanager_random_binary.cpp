@@ -76,7 +76,7 @@ TEST_CASE("Server: Test random generating random binary", "[content][server]") {
         randomBinaryOrder = 0;
         randomBinaryReadOrder = 0;
         randomBinaryWriteOrder = 0;
-        CommonHeaders commonHeaders;
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         ContentManager_Random_Binary manager(std::move(proto), commonHeaders, true);
         manager.setMinimumSize(10);
         manager.setMaximumSize(20);
@@ -111,7 +111,7 @@ TEST_CASE("Client: Test random generating random binary", "[content][client]") {
         randomBinaryReadOrder = 0;
         randomBinaryWriteOrder = 0;
         std::unique_ptr<Protocol> proto(new RandomBinaryMockProtocol());
-        CommonHeaders commonHeaders;
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         ContentManager_Random_Binary manager(std::move(proto), commonHeaders, false);
         manager.setMinimumSize(10);
         manager.setMaximumSize(20);

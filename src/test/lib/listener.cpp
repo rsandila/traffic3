@@ -24,7 +24,7 @@
 TEST_CASE("Listener: Unable to listen", "[server]") {
     SECTION("Bad protocolFactory") {
         ProtocolFactory protocolFactory(ProtocolType::None);
-        std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         
         std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
         std::shared_ptr<ContentManagerFactory> contentManagerFactory(new ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer));
@@ -36,7 +36,7 @@ TEST_CASE("Listener: Unable to listen", "[server]") {
         Host googleDNS("google-public-dns-a.google.com", 80, Host::ProtocolPreference::IPV4);
         ProtocolFactory protocolFactory(ProtocolType::None);
 
-        std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
         std::shared_ptr<ContentManagerFactory> contentManagerFactory(new ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer));
         Listener listener(1, Host::ALL_INTERFACES4, protocolFactory, contentManagerFactory);
@@ -62,7 +62,7 @@ TEST_CASE("Listener test", "[server]") {
                 return std::unique_ptr<Protocol>(new MockProtocol());
             }
         };
-        static std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
+        static std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
             MockContentManagerFactory(std::shared_ptr<ContentManagerCustomizer> & contentManagerCustomizer) : ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer) {
@@ -109,7 +109,7 @@ TEST_CASE("Listener test", "[server]") {
                 return std::unique_ptr<Protocol>(new MockProtocol);
             }
         };
-        static std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
+        static std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
             MockContentManagerFactory(std::shared_ptr<ContentManagerCustomizer> & contentManagerCustomizer) : ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer) {
@@ -166,7 +166,7 @@ TEST_CASE("Listener test", "[server]") {
                 return true;
             }
         };
-        static std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
+        static std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
             MockContentManagerFactory(std::shared_ptr<ContentManagerCustomizer> & contentManagerCustomizer) : ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer) {

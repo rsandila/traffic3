@@ -89,7 +89,7 @@ std::vector<char> RestClient::handleCreateClient(const RestRequest & request,
         const Host::ProtocolPreference preference = convertFromProtocolTypeToPreference(protocolType);
         Host host(hostName, port, preference);
         ProtocolFactory protocolFactory(protocolType); // map protocol string to ProtocolType
-        std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(minimum, maximum));
         // convert cm_type string to contentManagerType
         ContentManagerType contentManagerType = convertStringToContentManagerType(cm_type);

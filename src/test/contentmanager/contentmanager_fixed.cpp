@@ -75,7 +75,7 @@ TEST_CASE("Server: Test generating fixed buffer", "[content][server]") {
         fixedOrder = 0;
         fixedReadOrder = 0;
         fixedWriteOrder = 0;
-        CommonHeaders commonHeaders;
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         ContentManager_Fixed manager(std::move(proto), commonHeaders, true);
         manager.setMinimumSize('A');
         manager.setMaximumSize(20);
@@ -109,7 +109,7 @@ TEST_CASE("Client: Test generating fixed buffer", "[content][client]") {
         fixedReadOrder = 0;
         fixedWriteOrder = 0;
         std::unique_ptr<Protocol> proto(new FixedMockProtocol());
-        CommonHeaders commonHeaders;
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         ContentManager_Fixed manager(std::move(proto), commonHeaders, false);
         manager.setMinimumSize('A');
         manager.setMaximumSize(20);

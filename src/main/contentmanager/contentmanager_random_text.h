@@ -26,7 +26,7 @@
 // place holder class
 class ContentManager_Random_Text : public ContentManagerBase {
 public:
-    ContentManager_Random_Text(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer);
+    ContentManager_Random_Text(std::unique_ptr<Protocol> _protocol, std::shared_ptr<CommonHeaders> &_headerHandler, bool isServer);
     virtual ~ContentManager_Random_Text();
     virtual ContentManagerType getType() const noexcept override;
 protected:

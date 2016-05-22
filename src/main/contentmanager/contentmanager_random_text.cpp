@@ -21,7 +21,7 @@
 #include "contentmanager_random_text.h"
 #include "lib/logging.h"
 
-ContentManager_Random_Text::ContentManager_Random_Text(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer) :
+ContentManager_Random_Text::ContentManager_Random_Text(std::unique_ptr<Protocol> _protocol, std::shared_ptr<CommonHeaders> &_headerHandler, bool isServer) :
         ContentManagerBase(std::move(_protocol), _headerHandler, isServer),
         generator(std::chrono::system_clock::now().time_since_epoch().count()),
         chars(32, 127), distribution(nullptr) {

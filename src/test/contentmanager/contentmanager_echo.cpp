@@ -83,7 +83,7 @@ TEST_CASE("Server: Test generating echo buffer", "[content][server]") {
         echoOrder = 0;
         echoReadOrder = 0;
         echoWriteOrder = 0;
-        CommonHeaders commonHeaders;
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         ContentManager_Echo manager(std::move(proto), commonHeaders, true);
         REQUIRE(manager.Start());
         while (echoLastWrite.size() == 0) {
@@ -114,7 +114,7 @@ TEST_CASE("Client: Test generating echo buffer", "[content][client]") {
         echoReadOrder = 0;
         echoWriteOrder = 0;
         std::unique_ptr<Protocol> proto(new EchoMockProtocol());
-        CommonHeaders commonHeaders;
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         ContentManager_Echo manager(std::move(proto), commonHeaders, false);
         REQUIRE(manager.Start());
         while (echoDoExit == false) {

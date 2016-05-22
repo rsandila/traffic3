@@ -51,7 +51,7 @@ static std::map<std::string, ModeType> modeMap {
 
 
 int beServer(const cmdline::parser & options) {
-    std::unique_ptr<CommonHeaders> headers(new CommonHeaders());
+    std::shared_ptr<CommonHeaders> headers(new CommonHeaders());
     ProtocolFactory protocolFactory(convertStringToProtocolType(options.get<std::string>("protocol")));
     std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(
                                                     options.get<unsigned>("min"), options.get<unsigned>("max")));
@@ -70,7 +70,7 @@ int beServer(const cmdline::parser & options) {
 
 int beClient(const cmdline::parser & options) {
     ProtocolFactory protocolFactory(convertStringToProtocolType(options.get<std::string>("protocol")));
-    std::unique_ptr<CommonHeaders> headers(new CommonHeaders());
+    std::shared_ptr<CommonHeaders> headers(new CommonHeaders());
     std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(
                                                         options.get<unsigned>("min"), options.get<unsigned>("max")));
     ContentManagerFactory contentManagerFactory(convertStringToContentManagerType(options.get<std::string>("type")), headers, contentManagerCustomizer);
@@ -88,7 +88,7 @@ int beClient(const cmdline::parser & options) {
 
 int beRest(const cmdline::parser & options) {
     ProtocolFactory protocolFactory(convertStringToProtocolType(options.get<std::string>("protocol")));
-    std::unique_ptr<CommonHeaders> headers(new RestHeaders());
+    std::shared_ptr<CommonHeaders> headers(new RestHeaders());
     RestState state;
     
     std::vector<std::shared_ptr<RestRequestHandler>> restRequestHandlers;

@@ -81,7 +81,7 @@ std::vector<char> RestServer::handleCreateServer(const RestRequest & request,
         unsigned minimum = std::stoul(request.getParamWithDefault("min", "10"));
         unsigned maximum = std::stoul(request.getParamWithDefault("max", "10000"));
         
-        std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders);
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders);
         ProtocolFactory protocolFactory(convertStringToProtocolType(protocol));
         std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(
                                             new ContentManagerCustomizer(minimum, maximum));

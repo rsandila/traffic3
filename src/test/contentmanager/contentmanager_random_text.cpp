@@ -76,7 +76,7 @@ TEST_CASE("Server: Test random generating random text", "[content][server]") {
         order = 0;
         readOrder = 0;
         writeOrder = 0;
-        CommonHeaders commonHeaders;
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         ContentManager_Random_Text manager(std::move(proto), commonHeaders, true);
         manager.setMinimumSize(10);
         manager.setMaximumSize(20);
@@ -111,7 +111,7 @@ TEST_CASE("Client: Test random generating random text", "[content][client]") {
         readOrder = 0;
         writeOrder = 0;
         std::unique_ptr<Protocol> proto(new MockProtocol());
-        CommonHeaders commonHeaders;
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         ContentManager_Random_Text manager(std::move(proto), commonHeaders, false);
         manager.setMinimumSize(10);
         manager.setMaximumSize(20);

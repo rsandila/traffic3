@@ -29,7 +29,7 @@
 
 class ContentManager_Headers : public ContentManagerBase {
 public:
-    ContentManager_Headers(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer);
+    ContentManager_Headers(std::unique_ptr<Protocol> _protocol, std::shared_ptr<CommonHeaders> &_headerHandler, bool isServer);
     virtual ~ContentManager_Headers();
     virtual ContentManagerType getType() const noexcept override;
     

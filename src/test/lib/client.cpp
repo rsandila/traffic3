@@ -64,7 +64,7 @@ TEST_CASE("Client", "[protocol][client]") {
                 return json;
             }
         };
-        static std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
+        static std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
             MockContentManagerFactory(std::shared_ptr<ContentManagerCustomizer> & contentManagerCustomizer) : ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer) {;};

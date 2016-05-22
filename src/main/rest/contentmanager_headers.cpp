@@ -36,7 +36,7 @@ static const std::map<std::string, RestRequestType> REST_REQUEST_TYPE_NAMES {
     {"CONNECT", RestRequestType::RRT_CONNECT}
 };
 
-ContentManager_Headers::ContentManager_Headers(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler,
+ContentManager_Headers::ContentManager_Headers(std::unique_ptr<Protocol> _protocol, std::shared_ptr<CommonHeaders> &_headerHandler,
                                                bool isServer) : ContentManagerBase(std::move(_protocol), _headerHandler, isServer) {
 }
 

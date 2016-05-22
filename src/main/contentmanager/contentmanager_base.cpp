@@ -24,7 +24,7 @@
 #include "lib/logging.h"
 #include "contentmanager_base.h"
 
-ContentManagerBase::ContentManagerBase(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer) :
+ContentManagerBase::ContentManagerBase(std::unique_ptr<Protocol> _protocol, std::shared_ptr<CommonHeaders> &_headerHandler, bool isServer) :
         protocol(std::move(_protocol)), minimum(0), maximum(1024000), started(false), running(false), doExitBeforeStart(false), headerHandler(_headerHandler),
         worker(std::thread(std::bind((isServer)?&ContentManagerBase::ServerWorker:&ContentManagerBase::ClientWorker, this)))  {
 }
@@ -128,11 +128,11 @@ void ContentManagerBase::ClientWorker() noexcept {
     running = true;
     do {
         std::vector<char> outData = ProcessContent(inData, hostState);
-        if (!headerHandler.write(protocol, outData, hostState)) {
+        if (!headerHandler->write(protocol, outData, hostState)) {
             LOG(WARNING) << std::this_thread::get_id() << " write failed " << errno << std::endl;
             break;
         }
-    } while (headerHandler.read(protocol, inData, hostState));
+    } while (headerHandler->read(protocol, inData, hostState));
     LOG(WARNING) << std::this_thread::get_id() << " read failed " << errno << std::endl;
     CleanupContent();
 }
@@ -152,9 +152,9 @@ void ContentManagerBase::ServerWorker() noexcept {
     
     Host hostState = Host::ALL_INTERFACES6;
     running = true;
-    while (headerHandler.read(protocol, inData, hostState)) {
+    while (headerHandler->read(protocol, inData, hostState)) {
         std::vector<char> outData = ProcessContent(inData, hostState);
-        if (!headerHandler.write(protocol, outData, hostState)) {
+        if (!headerHandler->write(protocol, outData, hostState)) {
             LOG(WARNING) << std::this_thread::get_id() << " write failed " << errno << std::endl;
             break;
         }
@@ -189,7 +189,7 @@ nlohmann::json ContentManagerBase::toJson() const noexcept {
     returnValue["started"] = (bool)started;
     returnValue["running"] = (bool)running;
     returnValue["exitBeforeState"] = (bool)doExitBeforeStart;
-    returnValue["commonHeaders"] = headerHandler.toJson();
+    returnValue["commonHeaders"] = headerHandler->toJson();
     
     return returnValue;
 }
