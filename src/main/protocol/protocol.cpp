@@ -143,7 +143,14 @@ nlohmann::json Protocol::toJson() const noexcept {
             returnValue["state"] = "Closed";
             break;
     }
-    
-    return std::move(returnValue);
+    returnValue["name"] = name;
+    return returnValue;
+}
+
+void Protocol::updateBytesRead(long long value) {
+    totalRead += value;
+}
+void Protocol::updateBytesWritten(long long value) {
+    totalWritten += value;
 }
 

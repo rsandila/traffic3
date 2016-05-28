@@ -21,7 +21,7 @@
 #include "contentmanager_random_text.h"
 #include "lib/logging.h"
 
-ContentManager_Random_Text::ContentManager_Random_Text(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer) :
+ContentManager_Random_Text::ContentManager_Random_Text(std::unique_ptr<Protocol> _protocol, std::shared_ptr<CommonHeaders> &_headerHandler, bool isServer) :
         ContentManagerBase(std::move(_protocol), _headerHandler, isServer),
         generator(std::chrono::system_clock::now().time_since_epoch().count()),
         chars(32, 127), distribution(nullptr) {
@@ -44,11 +44,11 @@ std::vector<char> ContentManager_Random_Text::ProcessContent(const std::vector<c
         data[i] = (char)chars(generator);
     }
     LOG(DEBUG) << "exiting with " << data.size() << std::endl;
-    return std::move(data);
+    return data;
 }
 
 bool ContentManager_Random_Text::PrepareContent() noexcept {
-    distribution = std::move(std::unique_ptr<std::uniform_int_distribution<int>>(new std::uniform_int_distribution<int>(getMin(), getMax())));
+    distribution = std::unique_ptr<std::uniform_int_distribution<int>>(new std::uniform_int_distribution<int>(getMin(), getMax()));
     return true;
 }
 

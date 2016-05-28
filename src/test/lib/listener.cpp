@@ -24,7 +24,7 @@
 TEST_CASE("Listener: Unable to listen", "[server]") {
     SECTION("Bad protocolFactory") {
         ProtocolFactory protocolFactory(ProtocolType::None);
-        std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         
         std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
         std::shared_ptr<ContentManagerFactory> contentManagerFactory(new ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer));
@@ -36,7 +36,7 @@ TEST_CASE("Listener: Unable to listen", "[server]") {
         Host googleDNS("google-public-dns-a.google.com", 80, Host::ProtocolPreference::IPV4);
         ProtocolFactory protocolFactory(ProtocolType::None);
 
-        std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
         std::shared_ptr<ContentManagerFactory> contentManagerFactory(new ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer));
         Listener listener(1, Host::ALL_INTERFACES4, protocolFactory, contentManagerFactory);
@@ -52,16 +52,17 @@ TEST_CASE("Listener test", "[server]") {
     SECTION("Listen success, waitForNewConnection fails") {
         class MockProtocol : public Protocol {
         public:
+            MockProtocol() : Protocol("Mock") {;};
             virtual bool listen(const Host & ignoredHost, const int backlog) override { UNUSED(ignoredHost); UNUSED(backlog); return true; };
         };
         class MockProtocolFactory: public ProtocolFactory {
         public:
             MockProtocolFactory() : ProtocolFactory(ProtocolType::None) {;}
             virtual std::unique_ptr<Protocol> createProtocol() {
-                return std::unique_ptr<Protocol>(new MockProtocol);
+                return std::unique_ptr<Protocol>(new MockProtocol());
             }
         };
-        static std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
+        static std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
             MockContentManagerFactory(std::shared_ptr<ContentManagerCustomizer> & contentManagerCustomizer) : ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer) {
@@ -83,7 +84,7 @@ TEST_CASE("Listener test", "[server]") {
     SECTION("Listen success, waitForNewConnection success, createContentManager fails") {
         class MockProtocol : public Protocol {
         public:
-            MockProtocol() : shouldReturnConnection(true) {;};
+            MockProtocol() : Protocol("Mock"), shouldReturnConnection(true) {;};
             virtual bool listen(const Host & ignoredHost, const int backlog) override { UNUSED(ignoredHost); UNUSED(backlog); return true; };
             virtual std::unique_ptr<Protocol> waitForNewConnection() override {
                 if (shouldReturnConnection) {
@@ -108,7 +109,7 @@ TEST_CASE("Listener test", "[server]") {
                 return std::unique_ptr<Protocol>(new MockProtocol);
             }
         };
-        static std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
+        static std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
             MockContentManagerFactory(std::shared_ptr<ContentManagerCustomizer> & contentManagerCustomizer) : ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer) {
@@ -131,7 +132,7 @@ TEST_CASE("Listener test", "[server]") {
 
         class MockProtocol : public Protocol {
         public:
-            MockProtocol() : returnedOne(false) {
+            MockProtocol() : Protocol("Mock"), returnedOne(false) {
             }
             virtual bool listen(const Host & ignoredHost, const int backlog) override { UNUSED(ignoredHost); UNUSED(backlog); return true; };
             virtual std::unique_ptr<Protocol> waitForNewConnection() override {
@@ -139,7 +140,7 @@ TEST_CASE("Listener test", "[server]") {
                     returnedOne = true;
                     return std::unique_ptr<Protocol>(new MockProtocol());
                 } else {
-                    return std::unique_ptr<Protocol>(new Protocol());
+                    return std::unique_ptr<Protocol>(new Protocol("Mock"));
                 }
             };
             virtual ProtocolState getState() override {
@@ -165,7 +166,7 @@ TEST_CASE("Listener test", "[server]") {
                 return true;
             }
         };
-        static std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
+        static std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
             MockContentManagerFactory(std::shared_ptr<ContentManagerCustomizer> & contentManagerCustomizer) : ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer) {

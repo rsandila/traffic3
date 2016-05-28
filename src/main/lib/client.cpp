@@ -34,9 +34,9 @@ bool Client::startClients(unsigned clientId, unsigned num_clients, ProtocolFacto
     }
     std::vector<std::unique_ptr<ContentManager>> clients;
     for (unsigned cnt = 0; cnt < num_clients; cnt++) {
-        std::unique_ptr<Protocol> protocol(std::move(_protocolFactory.createProtocol()));
+        std::unique_ptr<Protocol> protocol(_protocolFactory.createProtocol());
         if (protocol->connect(_server)) {
-            clients.push_back(std::move(_contentManagerFactory.createContentManager(std::move(protocol), false)));
+            clients.push_back(_contentManagerFactory.createContentManager(std::move(protocol), false));
         }
     }
     for (unsigned cnt = 0; cnt < clients.size(); cnt++) {
@@ -54,11 +54,14 @@ bool Client::stopClients(unsigned clientId) {
     if (client == workers.end()) {
         return false;
     }
+    for (auto & it: client->second) {
+        it->Stop();
+    }
     workers.erase(client);
     return true;
 }
 
-int Client::getNumClients() noexcept {
+int Client::getNumClients() const noexcept {
     std::unique_lock<std::mutex> lck(lock);
     return workers.size();
 }
@@ -98,7 +101,7 @@ nlohmann::json Client::toJson() const noexcept {
         workerArray[std::to_string(it.first)] = returnArray;
     }
     returnValue["workers"] = workerArray;
-    return std::move(returnValue);
+    return returnValue;
 }
 
 nlohmann::json Client::toJson(unsigned id) const noexcept {

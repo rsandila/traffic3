@@ -31,10 +31,10 @@
 #include "protocol_tcp6.h"
 #include "lib/logging.h"
 
-ProtocolTCP6::ProtocolTCP6() : ProtocolTCP() {
+ProtocolTCP6::ProtocolTCP6() : ProtocolTCP("TCP6") {
 }
 
-ProtocolTCP6::ProtocolTCP6(int newSocket, socklen_t len, const struct sockaddr * addr) : ProtocolTCP(newSocket, len, addr, false) {
+ProtocolTCP6::ProtocolTCP6(int newSocket, socklen_t len, const struct sockaddr * addr) : ProtocolTCP(newSocket, len, addr, false, "TCP6") {
 }
 
 ProtocolTCP6::ProtocolTCP6(ProtocolTCP6 && other) : ProtocolTCP(std::move(other)) {

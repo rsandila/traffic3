@@ -24,12 +24,12 @@
 
 TEST_CASE("ContentManager_Headers", "[rest][content][server]") {
     SECTION("Different request types") {
-        RestHeaders restHeaders;
-        std::unique_ptr<Protocol> protocol(new Protocol());
+        std::shared_ptr<CommonHeaders> restHeaders(new RestHeaders());
+        std::unique_ptr<Protocol> protocol(new Protocol("Mock"));
         
         class ContentManager_Headers_Test: public ContentManager_Headers {
         public:
-            ContentManager_Headers_Test(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler,
+            ContentManager_Headers_Test(std::unique_ptr<Protocol> _protocol, std::shared_ptr<CommonHeaders> &_headerHandler,
                                         bool isServer) : ContentManager_Headers(std::move(_protocol), _headerHandler, isServer) {
             }
             bool RunTest1() {

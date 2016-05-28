@@ -21,7 +21,7 @@
 #include "contentmanager_random_binary.h"
 #include "lib/logging.h"
 
-ContentManager_Random_Binary::ContentManager_Random_Binary(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer) :
+ContentManager_Random_Binary::ContentManager_Random_Binary(std::unique_ptr<Protocol> _protocol, std::shared_ptr<CommonHeaders> &_headerHandler, bool isServer) :
         ContentManagerBase(std::move(_protocol), _headerHandler, isServer),
         generator(std::chrono::system_clock::now().time_since_epoch().count()),
         chars(0, 255), distribution(nullptr) {
@@ -44,11 +44,11 @@ std::vector<char> ContentManager_Random_Binary::ProcessContent(const std::vector
         data[i] = (char)chars(generator);
     }
     LOG(DEBUG) << "exiting with " << data.size() << std::endl;
-    return std::move(data);
+    return data;
 }
 
 bool ContentManager_Random_Binary::PrepareContent() noexcept {
-    distribution = std::move(std::unique_ptr<std::uniform_int_distribution<int>>(new std::uniform_int_distribution<int>(getMin(), (int)getMax())));
+    distribution = std::unique_ptr<std::uniform_int_distribution<int>>(new std::uniform_int_distribution<int>(getMin(), (int)getMax()));
     return true;
 }
 

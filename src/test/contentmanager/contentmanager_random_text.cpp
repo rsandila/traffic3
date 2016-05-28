@@ -39,7 +39,7 @@ static void assignOrder(std::atomic<int> & variable) {
 
 class MockProtocol: public Protocol {
 public:
-    MockProtocol() {
+    MockProtocol() : Protocol("Mock") {
     }
     virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) override {
         UNUSED(allowPartialRead);
@@ -53,7 +53,7 @@ public:
         uint32_t size = htonl(8);
         memcpy(&data[4], &size, sizeof(uint32_t));
         doExit = true;
-        totalRead += data.size();
+        updateBytesRead(data.size());
         return true;
     };
     virtual void close() override {
@@ -63,7 +63,7 @@ public:
     virtual bool write(const std::vector<char> & data, const Host & hostState) override {
         UNUSED(hostState);
         lastWrite = data;
-        totalWritten += data.size();
+        updateBytesWritten(data.size());
         assignOrder(writeOrder);
         return true;
     }
@@ -76,7 +76,7 @@ TEST_CASE("Server: Test random generating random text", "[content][server]") {
         order = 0;
         readOrder = 0;
         writeOrder = 0;
-        CommonHeaders commonHeaders;
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         ContentManager_Random_Text manager(std::move(proto), commonHeaders, true);
         manager.setMinimumSize(10);
         manager.setMaximumSize(20);
@@ -93,7 +93,7 @@ TEST_CASE("Server: Test random generating random text", "[content][server]") {
         REQUIRE(28 >= manager.getBytesWritten()); //  (20 + 8)
         
         nlohmann::json json = manager.toJson();
-        REQUIRE(json.size() == 7);
+        REQUIRE(json.size() == 8);
         REQUIRE(json["min"].get<unsigned>() == 10);
         REQUIRE(json["max"].get<unsigned>() == 20);
         REQUIRE(json["started"].get<bool>() == true);
@@ -111,7 +111,7 @@ TEST_CASE("Client: Test random generating random text", "[content][client]") {
         readOrder = 0;
         writeOrder = 0;
         std::unique_ptr<Protocol> proto(new MockProtocol());
-        CommonHeaders commonHeaders;
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         ContentManager_Random_Text manager(std::move(proto), commonHeaders, false);
         manager.setMinimumSize(10);
         manager.setMaximumSize(20);
@@ -129,7 +129,7 @@ TEST_CASE("Client: Test random generating random text", "[content][client]") {
         REQUIRE(56 >= manager.getBytesWritten()); // 2 * (20 + 8)
         
         nlohmann::json json = manager.toJson();
-        REQUIRE(json.size() == 7);
+        REQUIRE(json.size() == 8);
         REQUIRE(json["min"].get<unsigned>() == 10);
         REQUIRE(json["max"].get<unsigned>() == 20);
         REQUIRE(json["started"].get<bool>() == true);

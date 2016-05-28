@@ -26,7 +26,7 @@
 // place holder class
 class ContentManager_Fixed : public ContentManagerBase {
 public:
-    ContentManager_Fixed(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer);
+    ContentManager_Fixed(std::unique_ptr<Protocol> _protocol, std::shared_ptr<CommonHeaders> &_headerHandler, bool isServer);
     virtual ~ContentManager_Fixed();
     virtual ContentManagerType getType() const noexcept override;
     void setMaximumSize(unsigned long size) noexcept override;

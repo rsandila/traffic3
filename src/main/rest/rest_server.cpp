@@ -81,7 +81,7 @@ std::vector<char> RestServer::handleCreateServer(const RestRequest & request,
         unsigned minimum = std::stoul(request.getParamWithDefault("min", "10"));
         unsigned maximum = std::stoul(request.getParamWithDefault("max", "10000"));
         
-        std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders);
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders);
         ProtocolFactory protocolFactory(convertStringToProtocolType(protocol));
         std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(
                                             new ContentManagerCustomizer(minimum, maximum));
@@ -97,9 +97,9 @@ std::vector<char> RestServer::handleCreateServer(const RestRequest & request,
             // return failure
             returnValue["result"] = std::string("Failed");
         }
-        return std::move(returnJsonPage(200, "OK", returnValue.dump()));
+        return returnJsonPage(200, "OK", returnValue.dump());
     } catch (std::invalid_argument& e) {
-        return std::move(returnHtmlPage(400, "Bad Request", "Invalid parameters", "Invalid Parameters"));
+        return returnHtmlPage(400, "Bad Request", "Invalid parameters", "Invalid Parameters");
     }
 }
 
@@ -123,5 +123,5 @@ std::vector<char> RestServer::handleStopServer(const RestRequest & request,
         // return error
         returnValue["result"] = std::string("Failed");
     }
-    return std::move(returnJsonPage(200, "OK", returnValue.dump()));;
+    return returnJsonPage(200, "OK", returnValue.dump());
 }

@@ -25,7 +25,7 @@ TEST_CASE("Server", "[protocol][server]") {
     SECTION("Working") {
         class MockProtocol : public Protocol {
         public:
-            MockProtocol() : returnedOne(false) {
+            MockProtocol() : Protocol("Mock"), returnedOne(false) {
             }
             virtual bool listen(const Host & ignoredHost, const int backlog) override { UNUSED(ignoredHost); UNUSED(backlog); return true; };
             virtual std::unique_ptr<Protocol> waitForNewConnection() override {
@@ -33,7 +33,7 @@ TEST_CASE("Server", "[protocol][server]") {
                     returnedOne = true;
                     return std::unique_ptr<Protocol>(new MockProtocol());
                 } else {
-                    return std::unique_ptr<Protocol>(new Protocol());
+                    return std::unique_ptr<Protocol>(new Protocol("Mock"));
                 }
             };
             virtual ProtocolState getState() override {
@@ -69,7 +69,7 @@ TEST_CASE("Server", "[protocol][server]") {
                 return ContentManagerType::None;
             }
         };
-        static std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
+        static std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
             MockContentManagerFactory(std::shared_ptr<ContentManagerCustomizer> & contentManagerCustomizer) : ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer) {;};

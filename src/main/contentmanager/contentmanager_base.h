@@ -31,7 +31,7 @@
 // place holder class, derive new ContentManagers from this class
 class ContentManagerBase : public ContentManager {
 public:
-    ContentManagerBase(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler, bool isServer);
+    ContentManagerBase(std::unique_ptr<Protocol> _protocol, std::shared_ptr<CommonHeaders> &_headerHandler, bool isServer);
     ContentManagerBase(ContentManagerBase && other);
     ContentManagerBase & operator=(ContentManagerBase&& other);
     virtual ~ContentManagerBase();
@@ -64,7 +64,7 @@ private:
     std::atomic<bool> started;
     std::atomic<bool> running;
     std::atomic<bool> doExitBeforeStart;
-    CommonHeaders & headerHandler;
+    std::shared_ptr<CommonHeaders> headerHandler;
     std::thread worker;
 
     ContentManagerBase(const ContentManagerBase &) = delete;

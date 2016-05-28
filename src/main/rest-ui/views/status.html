@@ -1,0 +1,31 @@
+<div class="container-fluid" ng-controller="statusCtrl">
+  <div class="alert alert-danger" ng-show="error">
+    Unable to read status ({{error.status}}). Try again.
+  </div>
+  <div class="container-fluid" ng-hide="error">
+    <table class="table table-bordered">
+      <thead class="thead-inverse">
+        <tr>
+          <th class="col-md-1 text-left">Type</th>
+          <th class="col-md-2 text-center">Count</th>
+          <th class="col-md-2 text-center">Read</th>
+          <th class="col-md-2 text-center">Write</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-left">Client</td>
+          <td class="text-center">{{data.numClients}}</td>
+          <td class="text-center">{{data.clientNumRead}}</td>
+          <td class="text-center">{{data.clientNumWritten}}</td>
+        </tr>
+        <tr>
+          <td class="text-left">Server</td>
+          <td class="text-center">{{data.numServers}}</td>
+          <td class="text-center">{{data.serverNumRead}}</td>
+          <td class="text-center">{{data.serverNumWriten}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

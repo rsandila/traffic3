@@ -25,11 +25,11 @@
 
 TEST_CASE("Testing contentmanagerfactory.h", "[content]") {
     SECTION("Test random text") {
-        std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
         std::shared_ptr<ContentManagerFactory> test(new ContentManagerFactory(ContentManagerType::RandomText,
                                                                               commonHeaders, contentManagerCustomizer));
-        std::unique_ptr<Protocol> dummy(new Protocol());
+        std::unique_ptr<Protocol> dummy(new Protocol("Mock"));
         
         std::unique_ptr<ContentManager> text(test->createContentManager(std::move(dummy), true));
         text->Start();
@@ -37,10 +37,10 @@ TEST_CASE("Testing contentmanagerfactory.h", "[content]") {
         text->Stop();
     }
     SECTION("Test fixed") {
-        std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
         ContentManagerFactory test(ContentManagerType::Fixed, commonHeaders, contentManagerCustomizer);
-        std::unique_ptr<Protocol> dummy(new Protocol());
+        std::unique_ptr<Protocol> dummy(new Protocol("Mock"));
         
         std::unique_ptr<ContentManager> text(test.createContentManager(std::move(dummy), true));
         text->Start();
@@ -48,10 +48,10 @@ TEST_CASE("Testing contentmanagerfactory.h", "[content]") {
         text->Stop();
     }
     SECTION("Test echo") {
-        std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(100, 100000));
         ContentManagerFactory test(ContentManagerType::Echo, commonHeaders, contentManagerCustomizer);
-        std::unique_ptr<Protocol> dummy(new Protocol());
+        std::unique_ptr<Protocol> dummy(new Protocol("Mock"));
         
         std::unique_ptr<ContentManager> text(test.createContentManager(std::move(dummy), true));
         text->Start();

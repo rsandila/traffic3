@@ -31,7 +31,7 @@ USA.
 #include "lib/logging.h"
 #include "protocol_tcp.h"
 
-ProtocolTCP::ProtocolTCP() : Protocol() {
+ProtocolTCP::ProtocolTCP(const std::string & protocolName) : Protocol(protocolName) {
 }
 
 ProtocolTCP::~ProtocolTCP() {
@@ -48,7 +48,7 @@ bool ProtocolTCP::read(std::vector<char> & data, bool allowPartialRead, Host & h
 		long int numRead = ::recv(socket, &data[0], data.size(), 0);
 		if (numRead > 0) {
 			data.resize(numRead);
-            totalRead += numRead;
+            updateBytesRead(numRead);
 		}
 		return numRead > 0;
 	}
@@ -59,7 +59,7 @@ bool ProtocolTCP::read(std::vector<char> & data, bool allowPartialRead, Host & h
 			numRead = ::recv(socket, &data[offset], data.size() - offset, MSG_WAITALL);
 			if (numRead > 0) {
 				offset += numRead;
-                totalRead += numRead;
+                updateBytesRead(numRead);
 			}
 			LOG(DEBUG) << std::this_thread::get_id() << " read " << numRead << std::endl;
 		} while (numRead > 0 && offset < data.size());
@@ -75,7 +75,7 @@ bool ProtocolTCP::write(const std::vector<char> & data, const Host & hostState) 
 	}
 	unsigned long numWritten = ::send(socket, &data[0], data.size(), 0);
     if (numWritten > 0) {
-        totalWritten += numWritten;
+        updateBytesWritten(numWritten);
     }
 	return numWritten == data.size();
 }
@@ -117,15 +117,14 @@ bool ProtocolTCP::connect(const Host & localHost) {
 	return false;
 }
 
-ProtocolTCP::ProtocolTCP(int socket, socklen_t len, const struct sockaddr * addr, bool isIPV4) :
-		Protocol(socket, len, addr, isIPV4) {
+ProtocolTCP::ProtocolTCP(int socket, socklen_t len, const struct sockaddr * addr, bool isIPV4, const std::string & protocolName) :
+		Protocol(socket, len, addr, isIPV4, protocolName) {
 }
 
-ProtocolTCP::ProtocolTCP(ProtocolTCP && other) : Protocol(other.host, other.type, other.socket, other.state) {
+ProtocolTCP::ProtocolTCP(ProtocolTCP && other) : Protocol(other.host, other.type, other.socket, other.state, other.name) {
 	other.socket = -1;
 	other.host = Host::ALL_INTERFACES6;
 	other.type = ProtocolInstanceType::NONE;
 	other.state = ProtocolState::CLOSED;
+    other.name = "";
 }
-
-

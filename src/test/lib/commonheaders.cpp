@@ -26,6 +26,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
     SECTION("Read returns invalid signature") {
         class MockProtocol : public Protocol {
         public:
+            MockProtocol() : Protocol("Mock") {;};
             virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) {
                 data.resize(8);
                 data[0] = 'A';
@@ -47,6 +48,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
     SECTION("Read returns short") {
         class MockProtocol : public Protocol {
         public:
+            MockProtocol() : Protocol("Mock") {;};
             virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) {
                 data.resize(5);
                 data[0] = 'T';
@@ -67,6 +69,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
     SECTION("Read returns invalid length") {
         class MockProtocol : public Protocol {
         public:
+            MockProtocol() : Protocol("Mock") {;};
             virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) {
                 data.resize(8);
                 data[0] = 'A';
@@ -88,6 +91,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
     SECTION("First read fails") {
         class MockProtocol : public Protocol {
         public:
+            MockProtocol() : Protocol("Mock") {;};
             virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) {
                 UNUSED(data); UNUSED(allowPartialRead); UNUSED(hostState);
                 return false; };
@@ -102,7 +106,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
     SECTION("Second read failes") {
         class MockProtocol : public Protocol {
         public:
-            MockProtocol() : firstTime(true) {
+            MockProtocol() : Protocol("Mock"), firstTime(true) {
             }
             virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) {
                 UNUSED(allowPartialRead); UNUSED(hostState);
@@ -132,6 +136,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
     SECTION("Read header only") {
         class MockProtocol : public Protocol {
         public:
+            MockProtocol() : Protocol("Mock") {;};
             virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) {
                 data.resize(8);
                 data[0] = 'T';
@@ -154,7 +159,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
     SECTION("Read header plus data") {
         class MockProtocol : public Protocol {
         public:
-            MockProtocol() : firstTime(true) {
+            MockProtocol() : Protocol("Mock"), firstTime(true) {
             }
             virtual bool read(std::vector<char> & data, bool allowPartialRead, Host & hostState) {
                 UNUSED(allowPartialRead); UNUSED(hostState);
@@ -190,7 +195,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
     SECTION("Write success") {
         class MockProtocol : public Protocol {
         public:
-            MockProtocol() : count(0) {
+            MockProtocol() : Protocol("Mock"), count(0) {
             }
             virtual bool write(const std::vector<char> & data, const Host & hostState) {
                 const uint32_t length = htonl(12);
@@ -240,7 +245,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
     SECTION("Write success once") {
         class MockProtocol : public Protocol {
         public:
-            MockProtocol() : count(0) {
+            MockProtocol() : Protocol("Mock"), count(0) {
             }
             virtual bool write(const std::vector<char> & data, const Host & hostState) {
                 const uint32_t length = htonl(12);
@@ -284,7 +289,7 @@ TEST_CASE("CommonHeaders", "[headers]") {
     SECTION("Write never succeeds") {
         class MockProtocol : public Protocol {
         public:
-            MockProtocol() : count(0) {
+            MockProtocol() : Protocol("Mock"), count(0) {
             }
             virtual bool write(const std::vector<char> & data, const Host & hostState) {
                 const uint32_t length = htonl(12);

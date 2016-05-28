@@ -1,0 +1,72 @@
+<div class="container-fluid" ng-controller="clientCtrl">
+  <div class="alert alert-danger" ng-show="error">
+    Unable to read client status ({{error.status}}). Try again.
+  </div>
+  <div class="container" ng-hide="error">
+    <table class="table table-sm table-bordered">
+      <thead>
+        <th>Id</th>
+        <th>Type</th>
+        <th>Protocol</th>
+        <th>Port</th>
+        <th>Min</th>
+        <th>Max</th>
+        <th>State</th>
+        <th>Read</th>
+        <th>Written</th>
+        <th></th>
+      </thead>
+      <tbody>
+        <tr ng-repeat="worker in data" ng-class="worker.errorState?'danger':''">
+            <td>{{worker.id}}</td>
+            <td>{{worker.type}}</td>
+            <td>{{worker.protocol.name}}</td>
+            <td>{{worker.protocol.host.port}}</td>
+            <td>{{worker.min}}</td>
+            <td>{{worker.max}}</td>
+            <td>{{worker.protocol.state}}</td>
+            <td>{{worker.protocol.numRead}}</td>
+            <td>{{worker.protocol.numWritten}}</td>
+            <td><button class="btn-primary btn-block" ng-click="deleteClient(worker.id)">Stop</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="container" ng-hide="error">
+    <button type="button" class="btn btn-primary btn-lg" ng-click="showAdd()" ng-hide="isAddActive()">Add</button>
+  </div>
+  <div class="container" ng-show="isAddActive()">
+    <form novalidate class="simple-form" ng-submit="addSubmit()">
+      <table class="table">
+        <tbody>
+          <tr><td>Id</td><td><input type="number" ng-model="add.id" /></td></tr>
+          <tr><td>Count</td><td><input type="number" ng-model="add.count" /></td></tr>
+          <tr><td>Protocol</td>
+            <td>
+              <select class="form-control" ng-model="add.protocol">
+                <option ng-repeat="prot in protocols" value="{{prot}}" ng-model="add.protocol">{{prot}}</option>
+              </select>
+            </td>
+          </tr>
+          <tr><td>Content Mananger</td>
+            <td>
+              <select class="form-control" ng-model="add.contentmanager">
+                <option ng-repeat="(key, value) in contentmanagers" value="{{key}}" ng-model="add.contentmanager">{{value}}</option>
+              Dropdown with content managers
+            </td>
+          </tr>
+          <tr><td>Host</td><td><input type="text" ng-model="add.host" /></td></tr>
+          <tr><td>Port</td><td><input type="number" ng-model="add.port" /></td></tr>
+          <tr><td>Min</td><td><input type="number" ng-model="add.min" /></td></tr>
+          <tr><td>Max</td><td><input type="number" ng-model="add.max" /></td></tr>
+          <tr><td><button type="submit" class="btn btn-lg">Add</button>
+        </tbody>
+      </table>
+    </form>
+    <div class="container" ng-hide="wasAddSuccess()">
+      <div class="alert alert-danger" role="alert">
+        <strong>Error adding server</strong> Probably related to the settings, please modify them and try again.
+      </div>
+    </div>
+  </div>
+</div>

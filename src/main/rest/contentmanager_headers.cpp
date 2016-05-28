@@ -36,7 +36,7 @@ static const std::map<std::string, RestRequestType> REST_REQUEST_TYPE_NAMES {
     {"CONNECT", RestRequestType::RRT_CONNECT}
 };
 
-ContentManager_Headers::ContentManager_Headers(std::unique_ptr<Protocol> _protocol, CommonHeaders &_headerHandler,
+ContentManager_Headers::ContentManager_Headers(std::unique_ptr<Protocol> _protocol, std::shared_ptr<CommonHeaders> &_headerHandler,
                                                bool isServer) : ContentManagerBase(std::move(_protocol), _headerHandler, isServer) {
 }
 
@@ -51,7 +51,7 @@ std::vector<char> ContentManager_Headers::ProcessContent(const std::vector<char>
     unsigned int offset = 0;
     std::string requestLine = getLineFromVector(incomingData, offset);
     if (requestLine.empty()) {
-        return std::move(returnErrorPage(ErrorTypes::EmptyRequest, incomingData));
+        return returnErrorPage(ErrorTypes::EmptyRequest, incomingData);
     }
     // split request line out
     trimString(requestLine);
@@ -62,11 +62,11 @@ std::vector<char> ContentManager_Headers::ProcessContent(const std::vector<char>
         fields.push_back(item);
     }
     if (fields.size() != 3) {
-        return std::move(returnErrorPage(ErrorTypes::BadlyFormedRequest, incomingData));
+        return returnErrorPage(ErrorTypes::BadlyFormedRequest, incomingData);
     }
     std::transform(fields[0].begin(), fields[0].end(), fields[0].begin(), toupper);
     if (REST_REQUEST_TYPE_NAMES.find(fields[0]) == REST_REQUEST_TYPE_NAMES.end()) {
-        return std::move(returnErrorPage(ErrorTypes::UnknownRequestType, incomingData));
+        return returnErrorPage(ErrorTypes::UnknownRequestType, incomingData);
     }
     RestRequest request(REST_REQUEST_TYPE_NAMES.find(fields[0])->second, fields[1], fields[2]);
     // split headers out into a map
@@ -79,7 +79,7 @@ std::vector<char> ContentManager_Headers::ProcessContent(const std::vector<char>
         size_t pos = line.find(":");
         if (pos == std::string::npos) {
             // TODO - what about headers with continuations
-            return std::move(returnErrorPage(ErrorTypes::BadlyFormatedHeader, incomingData));
+            return returnErrorPage(ErrorTypes::BadlyFormatedHeader, incomingData);
         }
         std::string name = line.substr(0, pos);
         std::string value = line.substr(pos + 1);
@@ -97,7 +97,7 @@ std::vector<char> ContentManager_Headers::ProcessContent(const std::vector<char>
             return resultValue;
         }
     }
-    return std::move(returnErrorPage(ErrorTypes::NotFound, incomingData));
+    return returnErrorPage(ErrorTypes::NotFound, incomingData);
 }
 
 bool ContentManager_Headers::PrepareContent() noexcept {

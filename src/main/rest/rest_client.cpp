@@ -89,7 +89,7 @@ std::vector<char> RestClient::handleCreateClient(const RestRequest & request,
         const Host::ProtocolPreference preference = convertFromProtocolTypeToPreference(protocolType);
         Host host(hostName, port, preference);
         ProtocolFactory protocolFactory(protocolType); // map protocol string to ProtocolType
-        std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         std::shared_ptr<ContentManagerCustomizer> contentManagerCustomizer(new ContentManagerCustomizer(minimum, maximum));
         // convert cm_type string to contentManagerType
         ContentManagerType contentManagerType = convertStringToContentManagerType(cm_type);
@@ -103,9 +103,9 @@ std::vector<char> RestClient::handleCreateClient(const RestRequest & request,
             // return failure
             returnValue["result"] = std::string("Failed");
         }
-        return std::move(returnJsonPage(200, "OK", returnValue.dump()));
+        return returnJsonPage(200, "OK", returnValue.dump());
     } catch (std::invalid_argument& e) {
-        return std::move(returnHtmlPage(400, "Bad Request", "Invalid value provided", "Invalid value provided"));
+        return returnHtmlPage(400, "Bad Request", "Invalid value provided", "Invalid value provided");
     }
 }
 
@@ -120,7 +120,7 @@ std::vector<char> RestClient::handleStopClient(const RestRequest & request,
     try {
         id = std::stoul(request.getParam("id"));
     } catch (std::invalid_argument& e) {
-        return std::move(returnHtmlPage(400, "Bad Request", "Invalid ID specified", "Invalid ID specified"));
+        return returnHtmlPage(400, "Bad Request", "Invalid ID specified", "Invalid ID specified");
     }
     if (state.stopClient(id)) {
         // return success
@@ -129,5 +129,5 @@ std::vector<char> RestClient::handleStopClient(const RestRequest & request,
         // return error
         returnValue["result"] = std::string("Failed");
     }
-    return std::move(returnJsonPage(200, "OK", returnValue.dump()));;
+    return returnJsonPage(200, "OK", returnValue.dump());
 }

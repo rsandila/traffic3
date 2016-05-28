@@ -18,60 +18,75 @@
  */
 #include "rest/rest_state.h"
 
-int RestState::getNumClients() noexcept {
+int RestState::getNumClients() const noexcept {
+    std::unique_lock<std::mutex> lck(clientMutex);
+    
     return client.getNumClients();
 }
 
-int RestState::getNumServers() noexcept {
+int RestState::getNumServers() const noexcept {
+    std::unique_lock<std::mutex> lck(serverMutex);
     return server.getNumServers();
 }
 
 bool RestState::startClient(unsigned clientId, unsigned num_clients, ProtocolFactory & _protocolFactory,
                            ContentManagerFactory & _contentManagerFactory, Host & _server) {
+    std::unique_lock<std::mutex> lck(clientMutex);
     return client.startClients(clientId, num_clients, _protocolFactory, _contentManagerFactory, _server);
 }
 
 bool RestState::stopClient(unsigned clientId) {
+    std::unique_lock<std::mutex> lck(clientMutex);
     return client.stopClients(clientId);
 }
 
 bool RestState::startServer(unsigned portId, Host & host, ProtocolFactory & protocolFactory,
                            std::shared_ptr<ContentManagerFactory> & contentManagerFactory) {
+    std::unique_lock<std::mutex> lck(serverMutex);
     return server.addPort(portId, host, protocolFactory, contentManagerFactory);
 }
 
 bool RestState::stopServer(unsigned portId) {
+    std::unique_lock<std::mutex> lck(serverMutex);
     return server.stopPort(portId);
 }
 
 long long RestState::getClientNumWritten() const noexcept {
+    std::unique_lock<std::mutex> lck(clientMutex);
     return client.getNumBytesWritten();
 }
 
 long long RestState::getClientNumRead() const noexcept {
+    std::unique_lock<std::mutex> lck(clientMutex);
     return client.getNumBytesRead();
 }
 
 long long RestState::getServerNumWritten() const noexcept {
+    std::unique_lock<std::mutex> lck(serverMutex);
     return server.getNumBytesWritten();
 }
 
 long long RestState::getServerNumRead() const noexcept {
+    std::unique_lock<std::mutex> lck(serverMutex);
     return server.getNumBytesRead();
 }
 
 nlohmann::json RestState::getServerJson() const noexcept {
-    return std::move(server.toJson());
+    std::unique_lock<std::mutex> lck(serverMutex);
+    return server.toJson();
 }
 
 nlohmann::json RestState::getServerJsonForId(unsigned id) const noexcept {
-    return std::move(server.toJson(id));
+    std::unique_lock<std::mutex> lck(serverMutex);
+    return server.toJson(id);
 }
 
 nlohmann::json RestState::getClientJson() const noexcept {
-    return std::move(client.toJson());
+    std::unique_lock<std::mutex> lck(clientMutex);
+    return client.toJson();
 }
 
 nlohmann::json RestState::getClientJsonForId(unsigned id) const noexcept {
-    return std::move(client.toJson(id));
+    std::unique_lock<std::mutex> lck(clientMutex);
+    return client.toJson(id);
 }

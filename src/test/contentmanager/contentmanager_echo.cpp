@@ -38,7 +38,7 @@ static void echoAssignOrder(std::atomic<int> & variable) {
 
 class EchoMockProtocol: public Protocol {
 public:
-    EchoMockProtocol() : firstRead(false) {
+    EchoMockProtocol() : Protocol("Mock"), firstRead(false) {
     }
     virtual bool read(std::vector<char> & data,  bool allowPartialRead, Host & hostState) override {
         UNUSED(allowPartialRead);
@@ -52,12 +52,12 @@ public:
             memcpy(&data[0], "TRAF", 4);
             uint32_t size = htonl(8 + compareTo.size());
             memcpy(&data[4], &size, sizeof(uint32_t));
-            totalRead += data.size();
+            updateBytesRead(data.size());
             firstRead = true;
         } else {
             REQUIRE(data.size() == compareTo.size());
             data = compareTo;
-            totalRead += data.size();
+            updateBytesRead(data.size());
             echoDoExit = true;
         }
         return true;
@@ -69,7 +69,7 @@ public:
     virtual bool write(const std::vector<char> & data, const Host & hostState) override {
         UNUSED(hostState);
         echoLastWrite = data;
-        totalWritten += data.size();
+        updateBytesWritten(data.size());
         echoAssignOrder(echoWriteOrder);
         return true;
     }
@@ -83,7 +83,7 @@ TEST_CASE("Server: Test generating echo buffer", "[content][server]") {
         echoOrder = 0;
         echoReadOrder = 0;
         echoWriteOrder = 0;
-        CommonHeaders commonHeaders;
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         ContentManager_Echo manager(std::move(proto), commonHeaders, true);
         REQUIRE(manager.Start());
         while (echoLastWrite.size() == 0) {
@@ -96,7 +96,7 @@ TEST_CASE("Server: Test generating echo buffer", "[content][server]") {
         REQUIRE(28 == manager.getBytesWritten());
         
         nlohmann::json json = manager.toJson();
-        REQUIRE(json.size() == 7);
+        REQUIRE(json.size() == 8);
         REQUIRE(json["min"].get<unsigned>() >= 0);
         REQUIRE(json["max"].get<unsigned>() >= 0);
         REQUIRE(json["started"].get<bool>() == true);
@@ -114,7 +114,7 @@ TEST_CASE("Client: Test generating echo buffer", "[content][client]") {
         echoReadOrder = 0;
         echoWriteOrder = 0;
         std::unique_ptr<Protocol> proto(new EchoMockProtocol());
-        CommonHeaders commonHeaders;
+        std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         ContentManager_Echo manager(std::move(proto), commonHeaders, false);
         REQUIRE(manager.Start());
         while (echoDoExit == false) {
@@ -128,7 +128,7 @@ TEST_CASE("Client: Test generating echo buffer", "[content][client]") {
         REQUIRE(36 == manager.getBytesWritten());
 
         nlohmann::json json = manager.toJson();
-        REQUIRE(json.size() == 7);
+        REQUIRE(json.size() == 8);
         REQUIRE(json["min"].get<unsigned>() >= 0);
         REQUIRE(json["max"].get<unsigned>() >= 0);
         REQUIRE(json["started"].get<bool>() == true);

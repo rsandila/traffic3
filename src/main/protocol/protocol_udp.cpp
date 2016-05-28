@@ -31,7 +31,7 @@ USA.
 #include "lib/logging.h"
 #include "protocol_udp.h"
 
-ProtocolUDP::ProtocolUDP() : Protocol() {
+ProtocolUDP::ProtocolUDP(const std::string & protocolName) : Protocol(protocolName) {
 }
 
 ProtocolUDP::~ProtocolUDP() {
@@ -55,7 +55,7 @@ bool ProtocolUDP::read(std::vector<char> & data, bool allowPartialRead, Host & h
 	}
 	if (numRead > 0) {
 		data.resize(numRead);
-        totalRead += numRead;
+        updateBytesRead(numRead);
 	}
 	if (type == ProtocolInstanceType::CLIENT) {
 		hostState = host;
@@ -81,20 +81,21 @@ bool ProtocolUDP::write(const std::vector<char> & data, const Host & hostState) 
 		targetHost.getPreferedSockAddressLen());
 	LOG(DEBUG) << std::this_thread::get_id() << " wrote " << numWritten << std::endl;
     if (numWritten > 0) {
-        totalWritten += numWritten;
+        updateBytesWritten(numWritten);
     }
 	return numWritten == data.size();
 }
 
-ProtocolUDP::ProtocolUDP(int socket, socklen_t len, const struct sockaddr * addr, bool isIPV4) :
-        Protocol(socket, len, addr, isIPV4) {
+ProtocolUDP::ProtocolUDP(int socket, socklen_t len, const struct sockaddr * addr, bool isIPV4, const std::string & protocolName) :
+        Protocol(socket, len, addr, isIPV4, protocolName) {
 }
 
-ProtocolUDP::ProtocolUDP(ProtocolUDP && other) : Protocol(other.host, other.type, other.socket, other.state) {
+ProtocolUDP::ProtocolUDP(ProtocolUDP && other) : Protocol(other.host, other.type, other.socket, other.state, other.name) {
 	other.socket = -1;
 	other.host = Host::ALL_INTERFACES6;
 	other.type = ProtocolInstanceType::NONE;
 	other.state = ProtocolState::CLOSED;
+    other.name = "";
 }
 
 bool ProtocolUDP::listen(const Host & localHost, const int backlog) {

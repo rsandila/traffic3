@@ -24,7 +24,7 @@ TEST_CASE("Client", "[protocol][client]") {
     SECTION("Working") {
         class MockProtocol : public Protocol {
         public:
-            MockProtocol() {
+            MockProtocol() : Protocol("Mock") {
             }
             virtual bool connect(const Host & localHost) override { UNUSED(localHost); return true; };
             virtual ProtocolState getState() override {
@@ -64,7 +64,7 @@ TEST_CASE("Client", "[protocol][client]") {
                 return json;
             }
         };
-        static std::unique_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
+        static std::shared_ptr<CommonHeaders> commonHeaders(new CommonHeaders());
         class MockContentManagerFactory: public ContentManagerFactory {
         public:
             MockContentManagerFactory(std::shared_ptr<ContentManagerCustomizer> & contentManagerCustomizer) : ContentManagerFactory(ContentManagerType::None, commonHeaders, contentManagerCustomizer) {;};

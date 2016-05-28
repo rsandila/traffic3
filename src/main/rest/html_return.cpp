@@ -33,7 +33,7 @@ std::vector<char> returnHtmlPage(unsigned code, const std::string message,  cons
     ostr << returnBody.str().length() << "\r\n\r\n" << returnBody.str();
     std::vector<char> returnValue(ostr.str().length());
     memcpy(&returnValue[0], ostr.str().c_str(), returnValue.size());
-    return std::move(returnValue);
+    return returnValue;
 }
 
 std::vector<char> returnJsonPage(unsigned code, const std::string message, const std::string & dump) {
@@ -44,5 +44,5 @@ std::vector<char> returnJsonPage(unsigned code, const std::string message, const
 
     std::vector<char> returnValue(ostr.str().length());
     memcpy(&returnValue[0], ostr.str().c_str(), returnValue.size());
-    return std::move(returnValue);
+    return returnValue;
 }
