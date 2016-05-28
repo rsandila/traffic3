@@ -63,7 +63,7 @@ const std::vector<unsigned> Server::getPorts() const noexcept {
     return retVal;
 }
 
-int Server::getNumServers() noexcept {
+int Server::getNumServers() const noexcept {
     std::unique_lock<std::mutex> lck(lock);
     return listeners.size();
 }

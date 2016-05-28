@@ -31,7 +31,7 @@ public:
     bool startClients(unsigned clientId, unsigned num_clients, ProtocolFactory & _protocolFactory,
                       ContentManagerFactory & _contentManagerFactory, Host _server);
     bool stopClients(unsigned clientId);
-    int getNumClients() noexcept;
+    int getNumClients() const noexcept;
     long long getNumBytesRead() const noexcept;
     long long getNumBytesWritten() const noexcept;
     nlohmann::json toJson() const noexcept;
@@ -39,5 +39,5 @@ public:
 protected:
 private:
     std::map<unsigned, std::vector<std::unique_ptr<ContentManager>>> workers;
-    std::mutex lock;
+    mutable std::mutex lock;
 };

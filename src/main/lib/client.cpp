@@ -54,11 +54,14 @@ bool Client::stopClients(unsigned clientId) {
     if (client == workers.end()) {
         return false;
     }
+    for (auto & it: client->second) {
+        it->Stop();
+    }
     workers.erase(client);
     return true;
 }
 
-int Client::getNumClients() noexcept {
+int Client::getNumClients() const noexcept {
     std::unique_lock<std::mutex> lck(lock);
     return workers.size();
 }

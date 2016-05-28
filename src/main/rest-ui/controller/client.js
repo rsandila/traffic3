@@ -28,7 +28,22 @@ angular.module("traffic3App")
 
     $scope.updateStatus = function() {
       $http.get("/client").success(function (data) {
-        $scope.data = data;
+        $scope.data = [];
+        angular.forEach(data.workers, function(value, key) {
+            console.log("value = " + value + " key = " + key)
+            if (angular.isUndefined(value) || value === null || value == "") {
+              console.log("value not defined for key " + key)
+              row = { id: key, errorState: true };
+              $scope.data.push(row);
+            } else {
+              angular.forEach(value, function (row) {
+                row.id = key;
+                row.errorState = false;
+                $scope.data.push(row);
+              }, this);
+            }
+        }, $scope.data)
+        // $scope.data = data;
       }).error(function (error) {
         $scope.error = error;
       });
@@ -79,5 +94,13 @@ angular.module("traffic3App")
                         console.log("Add failed: " + error);
                         $scope.add.error = error;
                       });
+    }
+
+    $scope.deleteClient = function(id) {
+      $http.delete("/client?id=" + id).success(function (data) {
+        $route.reload();
+      }).error(function (error) {
+        console.log(error);
+      });
     }
   });

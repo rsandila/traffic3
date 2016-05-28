@@ -190,6 +190,7 @@ nlohmann::json ContentManagerBase::toJson() const noexcept {
     returnValue["running"] = (bool)running;
     returnValue["exitBeforeState"] = (bool)doExitBeforeStart;
     returnValue["commonHeaders"] = headerHandler->toJson();
+    returnValue["type"] = convertContentManagerTypeToString(getType());
     
     return returnValue;
 }

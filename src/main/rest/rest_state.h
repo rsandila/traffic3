@@ -24,8 +24,8 @@
 
 class RestState {
 public:
-    virtual int getNumClients() noexcept;
-    virtual int getNumServers() noexcept;
+    virtual int getNumClients() const noexcept;
+    virtual int getNumServers() const noexcept;
     
     virtual bool startClient(unsigned clientId, unsigned num_clients, ProtocolFactory & _protocolFactory,
                              ContentManagerFactory & _contentManagerFactory, Host & _server);
@@ -45,6 +45,9 @@ public:
     virtual nlohmann::json getClientJsonForId(unsigned id) const noexcept;
 protected:
 private:
+    mutable std::mutex clientMutex;
+    mutable std::mutex serverMutex;
+    
     Client client;
     Server server;
 };

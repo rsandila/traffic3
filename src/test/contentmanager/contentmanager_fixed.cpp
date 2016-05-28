@@ -91,7 +91,7 @@ TEST_CASE("Server: Test generating fixed buffer", "[content][server]") {
         REQUIRE(28 == manager.getBytesWritten()); // 20 + 8
         
         nlohmann::json json = manager.toJson();
-        REQUIRE(json.size() == 7);
+        REQUIRE(json.size() == 8);
         REQUIRE(json["min"].get<unsigned>() == 'A');
         REQUIRE(json["max"].get<unsigned>() == 20);
         REQUIRE(json["started"].get<bool>() == true);
@@ -126,7 +126,7 @@ TEST_CASE("Client: Test generating fixed buffer", "[content][client]") {
         REQUIRE(56 == manager.getBytesWritten()); // 2 * (20 + 8)
         
         nlohmann::json json = manager.toJson();
-        REQUIRE(json.size() == 7);
+        REQUIRE(json.size() == 8);
         REQUIRE(json["min"].get<unsigned>() == 'A');
         REQUIRE(json["max"].get<unsigned>() == 20);
         REQUIRE(json["started"].get<bool>() == true);

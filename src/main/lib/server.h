@@ -32,7 +32,7 @@ public:
     bool addPort(unsigned portId, Host & host, ProtocolFactory & protocolFactory, std::shared_ptr<ContentManagerFactory> & contentManagerFactory);
     bool stopPort(unsigned portId);
     const std::vector<unsigned> getPorts() const noexcept;
-    int getNumServers() noexcept;
+    int getNumServers() const noexcept;
     long long getNumBytesRead() const noexcept;
     long long getNumBytesWritten() const noexcept;
     nlohmann::json toJson() const noexcept;

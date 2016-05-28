@@ -2,7 +2,36 @@
   <div class="alert alert-danger" ng-show="error">
     Unable to read client status ({{error.status}}). Try again.
   </div>
-  {{data}}
+  <div class="container" ng-hide="error">
+    <table class="table table-sm table-bordered">
+      <thead>
+        <th>Id</th>
+        <th>Type</th>
+        <th>Protocol</th>
+        <th>Port</th>
+        <th>Min</th>
+        <th>Max</th>
+        <th>State</th>
+        <th>Read</th>
+        <th>Written</th>
+        <th></th>
+      </thead>
+      <tbody>
+        <tr ng-repeat="worker in data" ng-class="worker.errorState?'danger':''">
+            <td>{{worker.id}}</td>
+            <td>{{worker.type}}</td>
+            <td>{{worker.protocol.name}}</td>
+            <td>{{worker.protocol.host.port}}</td>
+            <td>{{worker.min}}</td>
+            <td>{{worker.max}}</td>
+            <td>{{worker.protocol.state}}</td>
+            <td>{{worker.protocol.numRead}}</td>
+            <td>{{worker.protocol.numWritten}}</td>
+            <td><button class="btn-primary btn-block" ng-click="deleteClient(worker.id)">Stop</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
   <div class="container" ng-hide="error">
     <button type="button" class="btn btn-primary btn-lg" ng-click="showAdd()" ng-hide="isAddActive()">Add</button>
   </div>
